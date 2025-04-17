@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS hangout_invites (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sender_id INTEGER PRIMARY KEY AUTOINCREMENT,
     receiver_id INTEGER PRIMARY KEY AUTOIOINCREMENT,
-    description TEXT
+    status TEXT
 )
 ''')
 
@@ -30,6 +30,11 @@ cursor.execute('''
 INSERT INTO users (id, name, email, password, faculty, interests, bio) 
 VALUES (?, ?, ?, ?, ?, ?, ?)
 ''', ('Alice0940', 'Alice', 'alice@yahoo.com', '403242', 'FCI', 'Badminton', 'Game is game.'))
+
+cursor.execute('''
+INSERT INTO users (id, sender_id, receiver_id, status TEXT) 
+VALUES (?, ?, ?, ?)
+''', ('00001', '002', '001', 'ACTIVE'))
 
 connection.commit()
 connection.close()
