@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MMU JomGather - Find Partners & Peers</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    :root {
+      --mmu-red: #ff0000;
+      --mmu-blue: #0927af;
+      --mmu-light-blue: #0066ff;
+      --mmu-dark-blue: #001f3f;
+      --white: #ffffff;
+      --light-gray: #f5f5f5;
+      --gray: #e0e0e0;
+      --dark-gray: #555555;
+    }
+    
+    body {
+      background-color: var(--light-gray);
+      color: #333;
+    }
+    
+    .navbar {
+      background-color: var(--mmu-blue);
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    
+    .navbar__container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1300px;
+      padding: 0 50px;
+    }
+    
+    #navbar__logo {
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    
+    .logo-accent {
+      color: var(--mmu-red);
+    }
+    
+    .navbar__menu {
+      display: flex;
+      align-items: center;
+      list-style: none;
+    }
+    
+    .navbar__item {
+      height: 80px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar__links {
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      padding: 0 1rem;
+      font-size: 2rem;
+      height: 100%;
+      transition: all 1s ease;
+    }
+    
+    .navbar__links:hover {
+      color:#ff0000
+    }
+    
+    .active-link {
+      border-bottom: 3px solid var(--mmu-red);
+    }
+    
+    .button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      padding: 10px 20px;
+      height: 100%;
+      width: 100%;
+      border: none;
+      outline: none;
+      border-radius: 4px;
+      background: var(--mmu-red);
+      color: var(--white);
+      transition: all 1s ease;
+    }
+    
+    .button:hover {
+      background: #aa0000;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    .page-title {
+      color: var(--mmu-blue);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .tab-container {
+      margin-bottom: 30px;
+    }
+    
+    .tabs {
+      display: flex;
+      list-style: none;
+      border-bottom: 1px solid var(--gray);
+    }
+    
+    .tab-item {
+      padding: 12px 24px;
+      cursor: pointer;
+      background-color: var(--white);
+      border: 1px solid var(--gray);
+      border-bottom: none;
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+      transition: all 1s ease;
+    }
+    
+    .tab-item.active {
+      background-color: var(--mmu-red);
+      color: var(--white);
+      border-color: var(--mmu-red);
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 20px;
+      background-color: var(--white);
+      border: 1px solid var(--gray);
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .search-container {
+      background-color: var(--white);
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+    
+    .search-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .form-group {
+      flex: 1 1 200px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--mmu-dark-blue);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--gray);
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--mmu-light-blue);
+      box-shadow: 0 0 0 2px rgba(0, 87, 168, 0.2);
+    }
+    
+    .search-button {
+      background-color: var(--mmu-blue);
+      color: var(--white);
+      border: none;
+      padding: 12px 25px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      margin-top: 24px;
+    }
+    
+    .search-button:hover {
+      background-color: var(--mmu-light-blue);
+    }
+    
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .student-card {
+      background-color: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .student-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      position: relative;
+      height: 100px;
+      background-color: var(--mmu-blue);
+    }
+    
+    .profile-pic {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 4px solid var(--white);
+      bottom: -30px;
+      left: 20px;
+      background-color: var(--gray);
+    }
+    
+    .card-body {
+      padding: 40px 20px 20px;
+    }
+    
+    .student-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--mmu-dark-blue);
+      margin-bottom: 5px;
+    }
+    
+    .student-program {
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+    
+    .student-interests {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 15px;
+    }
+    
+    .interest-tag {
+      background-color: var(--light-gray);
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--mmu-dark-blue);
+    }
+    
+    .card-footer {
+      display: flex;
+      padding: 15px 20px;
+      border-top: 1px solid var(--gray);
+    }
+    
+    .connect-btn {
+      background-color: var(--mmu-red);
+      color: var(--white);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      margin-right: 10px;
+    }
+    
+    .connect-btn:hover {
+      background-color: #aa0000;
+    }
+    
+    .message-btn {
+      background-color: var(--mmu-blue);
+      color: var(--white);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    .message-btn:hover {
+      background-color: var(--mmu-light-blue);
+    }
+    
+    .event-card {
+      background-color: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .event-image {
+      height: 150px;
+      background-color: var(--gray);
+    }
+    
+    .event-details {
+      padding: 20px;
+    }
+    
+    .event-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--mmu-dark-blue);
+      margin-bottom: 10px;
+    }
+    
+    .event-meta {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    
+    .event-meta-item {
+      display: flex;
+      align-items: center;
+      margin-right: 15px;
+      font-size: 0.9rem;
+      color: var(--dark-gray);
+    }
+    
+    .event-description {
+      margin-bottom: 15px;
+      color: #333;
+      line-height: 1.5;
+    }
+    
+    .event-footer {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 15px;
+      border-top: 1px solid var(--gray);
+    }
+    
+    .event-organizer {
+      display: flex;
+      align-items: center;
+    }
+    
+    .organizer-pic {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: var(--gray);
+      margin-right: 10px;
+    }
+    
+    .organizer-name {
+      font-size: 0.9rem;
+      color: var(--mmu-dark-blue);
+    }
+    
+    .attend-btn {
+      background-color: var(--mmu-red);
+      color: var(--white);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    .attend-btn:hover {
+      background-color: #aa0000;
+    }
+    
+    .create-section {
+      background-color: var(--white);
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+      color: var(--mmu-blue);
+      margin-bottom: 20px;
+    }
+    
+    .create-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    .form-group-full {
+      grid-column: span 2;
+    }
+    
+    .textarea-control {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+    }
+    
+    .checkbox-item input {
+      margin-right: 5px;
+    }
+    
+    .submit-btn {
+      background-color: var(--mmu-red);
+      color: var(--white);
+      border: none;
+      padding: 12px 25px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      grid-column: span 2;
+      justify-self: end;
+    }
+    
+    .submit-btn:hover {
+      background-color: #aa0000;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      list-style: none;
+      margin-top: 30px;
+    }
+    
+    .pagination li {
+      margin: 0 5px;
+    }
+    
+    .pagination a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      background-color: var(--white);
+      color: var(--mmu-dark-blue);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .pagination a:hover {
+      background-color: var(--gray);
+    }
+    
+    .pagination .active a {
+      background-color: var(--mmu-blue);
+      color: var(--white);
+    }
+    
+    @media screen and (max-width: 768px) {
+      .navbar__container {
+        padding: 0 20px;
+      }
+      
+      .create-form {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-group-full {
+        grid-column: span 1;
+      }
+      
+      .submit-btn {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar__container">
+        <a href="/index2.html" id="navbar__logo">Jom<span class="logo-accent">Gather</span></a>
+        <div class="navbar__toggle" id="mobile-menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+        <ul class="navbar__menu">
+            <li class="navbar__item">
+                <a href="/index2.html" class="navbar__links">Home</a>
+            </li>            
+            <li class="navbar__item">
+                <a href="/customise.html" class="navbar__links">Customize Profile</a>
+            </li>
+            <li class="navbar__item">
+                <a href="/jomgather.html" class="navbar__links active-link">Jom Gather</a>
+            </li>
+            <li class="navbar__btn">
+              <a href="/register.html" class="button">Sign Up/Log In</a>
+            </li>
+        </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="page-title">Jom Gather - Connect with MMU Students</h1>
+    
+    <div class="tab-container">
+      <ul class="tabs">
+        <li class="tab-item active" data-tab="find-students">Find Students</li>
+        <li class="tab-item" data-tab="discover-events">Discover Events</li>
+        <li class="tab-item" data-tab="create-gathering">Create Gathering</li>
+      </ul>
+      
+      <!-- Find Students Tab -->
+      <div id="find-students" class="tab-content active">
+        <div class="search-container">
+          <form class="search-form">
+            <div class="form-group">
+              <label for="faculty">Faculty</label>
+              <select id="faculty" class="form-control">
+                <option value="">All Faculties</option>
+                <option value="fit">Faculty of Computing and Informatics</option>
+                <option value="foe">Faculty of Engineering</option>
+                <option value="fom">Faculty of Management</option>
+                <option value="fcm">Faculty of Applied Communication</option>
+                <option value="fci">Faculty of Creative Multimedia</option>
+                <option value="fci">Faculty of Cinematic Arts</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="program">Program</label>
+              <select id="program" class="form-control">
+                <option value="">All Programs</option>
+                <option value="cs">Software Engineering</option>
+                <option value="it">Cybersecurity</option>
+                <option value="se">Game Development</option>
+                <option value="ai">Data Science</option>
+                <option value="bm">Business Management</option>
+                <option value="bm">Artificial Intelligence</option>
+                <option value="bm">Animation</option>
+                <option value="bm">Immersive Media Design</option>
+                <option value="bm">Advertising Design</option>
+                <option value="bm">Visual Effects</option>
+                <option value="bm">Strategic Communication</option>
+                <option value="bm">Finance</option>
+                <option value="bm">Business Administration</option>
+                <option value="bm">Accounting</option>
+                <option value="bm">Marketing</option>
+                <option value="bm">Digital Analytics</option>
+                <option value="bm">Cinematography</option>
+                <option value="bm">Law</option>
+                
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="interest">Interest</label>
+              <select id="interest" class="form-control">
+                <option value="">Any Interest</option>
+                <option value="programming">Academic</option>
+                <option value="gaming">Study Preferences</option>
+                <option value="sports">Sports & Fitness</option>
+                <option value="music">Arts & Entertainment</option>
+                <option value="art">Social Activities</option>
+                <option value="reading">Other Hobbies</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="purpose">Purpose</label>
+              <select id="purpose" class="form-control">
+                <option value="">Any Purpose</option>
+                <option value="study">Study Partners</option>
+                <option value="project">Project Collaboration</option>
+                <option value="hobby">Hobby & Recreation</option>
+                <option value="sports">Sports & Fitness</option>
+                <option value="events">Events & Activities</option>
+              </select>
+            </div>
+            <button type="submit" class="search-button">Find Students</button>
+          </form>
+        </div>
+        
+        <div class="card-grid">
+          <!-- Student Card 1 -->
+          <div class="student-card">
+            <div class="card-header">
+              <div class="profile-pic"></div>
+            </div>
+            <div class="card-body">
+              <h3 class="student-name">Sarah Tan</h3>
+              <p class="student-program">Computer Science, Year 2</p>
+              <div class="student-interests">
+                <span class="interest-tag">Programming</span>
+                <span class="interest-tag">AI</span>
+                <span class="interest-tag">Music</span>
+              </div>
+              <p>"Looking for study partners for Database Systems and team members for hackathons."</p>
+            </div>
+            <div class="card-footer">
+              <button class="connect-btn">Connect</button>
+              <button class="message-btn">Message</button>
+            </div>
+          </div>
+          
+          <!-- Student Card 2 -->
+          <div class="student-card">
+            <div class="card-header">
+              <div class="profile-pic"></div>
+            </div>
+            <div class="card-body">
+              <h3 class="student-name">Ahmad Rizal</h3>
+              <p class="student-program">Software Engineering, Year 3</p>
+              <div class="student-interests">
+                <span class="interest-tag">Web Dev</span>
+                <span class="interest-tag">Basketball</span>
+                <span class="interest-tag">Gaming</span>
+              </div>
+              <p>"I enjoy working on web projects and playing basketball on weekends. Currently looking for project collaborators."</p>
+            </div>
+            <div class="card-footer">
+              <button class="connect-btn">Connect</button>
+              <button class="message-btn">Message</button>
+            </div>
+          </div>
+          
+          <!-- Student Card 3 -->
+          <div class="student-card">
+            <div class="card-header">
+              <div class="profile-pic"></div>
+            </div>
+            <div class="card-body">
+              <h3 class="student-name">Michelle Wong</h3>
+              <p class="student-program">Business Management, Year 2</p>
+              <div class="student-interests">
+                <span class="interest-tag">Marketing</span>
+                <span class="interest-tag">Photography</span>
+                <span class="interest-tag">Travel</span>
+              </div>
+              <p>"Passionate about digital marketing and photography. Looking for study groups and creative projects."</p>
+            </div>
+            <div class="card-footer">
+              <button class="connect-btn">Connect</button>
+              <button class="message-btn">Message</button>
+            </div>
+          </div>
+          
+          <!-- Student Card 4 -->
+          <div class="student-card">
+            <div class="card-header">
+              <div class="profile-pic"></div>
+            </div>
+            <div class="card-body">
+              <h3 class="student-name">Raj Kumar</h3>
+              <p class="student-program">Information Technology, Year 1</p>
+              <div class="student-interests">
+                <span class="interest-tag">Coding</span>
+                <span class="interest-tag">Reading</span>
+                <span class="interest-tag">Chess</span>
+              </div>
+              <p>"New to programming and looking for study partners. Also interested in joining chess club."</p>
+            </div>
+            <div class="card-footer">
+              <button class="connect-btn">Connect</button>
+              <button class="message-btn">Message</button>
+            </div>
+          </div>
+          
+          <!-- More student cards can be added here -->
+        </div>
+        
+        <!-- Pagination -->
+        <ul class="pagination">
+          <li><a href="#">1</a></li>
+          <li class="active"><a href="#">2</a></li>
+          <li><a href="#">3</a></li>
+          <li><a href="#">4</a></li>
+          <li><a href="#">5</a></li>
+        </ul>
+      </div>
+      
+      <!-- Discover Events Tab -->
+      <div id="discover-events" class="tab-content">
+        <div class="search-container">
+          <form class="search-form">
+            <div class="form-group">
+              <label for="event-type">Event Type</label>
+              <select id="event-type" class="form-control">
+                <option value="">All Events</option>
+                <option value="academic">Academic</option>
+                <option value="social">Social</option>
+                <option value="sports">Sports</option>
+                <option value="cultural">Cultural</option>
+                <option value="career">Career</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="event-date">Date</label>
+              <input type="date" id="event-date" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="event-location">Location</label>
+              <select id="event-location" class="form-control">
+                <option value="">Any Location</option>
+                <option value="cyberjaya">Cyberjaya Campus</option>
+                <option value="melaka">Melaka Campus</option>
+                <option value="virtual">Virtual Event</option>
+                <option value="off-campus">Off Campus</option>
+              </select>
+            </div>
+            <button type="submit" class="search-button">Find Events</button>
+          </form>
+        </div>
+        
+        <div class="card-grid">
+          <!-- Event Card 1 -->
+          <div class="event-card">
+            <div class="event-image"></div>
+            <div class="event-details">
+              <h3 class="event-title">Web Development Workshop</h3>
+              <div class="event-meta">
+                <div class="event-meta-item">
+                  <span>April 25, 2025</span>
+                </div>
+                <div class="event-meta-item">
+                  <span>2:00 PM - 5:00 PM</span>
+                </div>
+              </div>
+              <div class="event-meta">
+                <div class="event-meta-item">
+                  <span>FIT Lecture Hall 3</span>
+                </div>
+                <div class="event-meta-item">
+                  <span>20 attending</span>
+                </div>
+              </div>
+              <p class="event-description">Learn the fundamentals of web development with HTML, CSS and JavaScript. Bring your laptop!</p>
+              <div class="event-footer">
+                <div class="event-organizer">
+                  <div class="organizer-pic"></div>
+                  <span class="organizer-name">IT Society</span>
+                </div>
+                <button class="attend-btn">Attend</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Event Card 2 -->
+          <div class="event-card">
+            <div class="event-image"></div>
+            <div class="event-details">
+              <h3 class="event-title">Basketball Tournament</h3>
+              <div class="event-meta">
+                <div class="event-meta-item">
+                  <span>April 28, 2025</span>
+                </div>
+                <div class="event-meta-item">
+                  <span>10:00 AM - 4:00 PM</span>
+                </div>
+              </div>
+              <div class="event-meta">
+                <div class="event-meta-item">
+                  <span>MMU Sports Complex</span>
+                </div>
+                <div class="event-meta-item">
+                  <span>32 attending</span>
+                </div>
+              </div>
+              <p class="event-description">Inter-faculty basketball tournament. Form your team or come support your faculty!</p>
+              <div class="event-footer">
+                <div class="event-organizer">
+                  <div class="organizer-pic"></div>
+                  <span class="organizer-name">Sports Club</span>
+                </div>
+                <button class="attend-btn">Attend</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Event Card 3 -->
+          <div class="event-card">
+            <div class="event-image"></div>
+            <div class="event-details">
+              <h3 class="event-title">Study Group: Database Systems</h3>
+              <div class="event-meta">
+                <div class="event-meta-item">
+                  <span>April 22, 2025</span>
+                </div>
+                <div class="event-meta-item">
+                  <span>7:00 PM - 9:00 PM</span>
+                </div>
+              </div>
+              <div class="event-meta">
+                <div class="event-meta-item">
+                  <span>Library Discussion Room 2</span>
+                </div>
+                <div class="event-meta-item">
+                  <span>8 attending</span>
+                </div>
+              </div>
+              <p class="event-description">Preparing for the upcoming Database Systems mid-term exam. All FIT students welcome!</p>
+              <div class="event-footer">
+                <div class="event-organizer">
+                  <div class="organizer-pic"></div>
+                  <span class="organizer-name">Sarah Tan</span>
+                </div>
+                <button class="attend-btn">Attend</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Event Card 4 -->
+          <div class="event-card">
+            <div class="event-image"></div>
+            <div class="event-details">
+              <h3 class="event-title">Movie Night: Sci-Fi Classics</h3>
+              <div class="event-meta">
+                <div class="event-meta-item">
+                  <span>April 26, 2025</span>
+                </div>
+                <div class="event-meta-item">
+                  <span>8:00 PM - 11:00 PM</span>
+                </div>
+              </div>
+              <div class="event-meta">
+                <div class="event-meta-item">
+                  <span>Student Lounge</span>
+                </div>
+                <div class="event-meta-item">
+                  <span>15 attending</span>
+                </div>
+              </div>
+              <p class="event-description">Join us for a night of sci-fi classics! Snacks and drinks provided.</p>
+              <div class="event-footer">
+                <div class="event-organizer">
+                  <div class="organizer-pic"></div>
+                  <span class="organizer-name">Film Club</span>
+                </div>
+                <button class="attend-btn">Attend</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- More event cards can be added here -->
+        </div>
+        
+        <!-- Pagination -->
+        <ul class="pagination">
+          <li class="active"><a href="#">1</a></li>
+          <li><a href="#">2</a></li>
+          <li><a href="#">3</a></li>
+        </ul>
+      </div>
+      
+      <!-- Create Gathering Tab -->
+      <div id="create-gathering" class="tab-content">
+        <div class="create-section">
+          <h2 class="section-title">Create a New Gathering</h2>
+          <form class="create-form">
+            <div class="form-group">
+              <label for="gathering-type">Gathering Type</label>
+              <select id="gathering-type" class="form-control" required>
+                <option value="">Select Type</option>
+                <option value="study">Study Session</option>
+                <option value="project">Project Collaboration</option>
+                <option value="social">Social Gathering</option>
+                <option value="sport">Sports Activity</option>
+                <option value="workshop">Workshop/Seminar</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="gathering-title">Title</label>
+              <input type="text" id="gathering-title" class="form-control" placeholder="E.g., Java Programming Study Group" required>
+            </div>
+            
+            <div class="form-group-full">
+              <label for="gathering-description">Description</label>
+              <textarea id="gathering-description" class="form-control textarea-control" placeholder="Describe your
