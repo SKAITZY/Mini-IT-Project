@@ -80,4 +80,3 @@ def logout():
 @auth.route('/sign-up')
 def sign_up():
     return "<p>Sign Up</p>"
->>>>>>> ae62c351791c9179b24ed1305466e143f4ab68e1
