@@ -1,0 +1,183 @@
+import React, { useState, useEffect } from 'react';
+
+// =======================
+// Profile Page Component
+// =======================
+function ProfilePage({ userId }) {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/users/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch profile data');
+        }
+        const data = await response.json();
+        setProfile(data);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching profile:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProfile();
+  }, [userId]);
+
+  if (loading) return <div>Loading profile...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!profile) return <div>No profile found</div>;
+
+  return ()
+    <div className="profile-container">
+      <div className="profile-header">
+        <img
+          src={profile.avatarUrl || '/default-avatar.png'}
+          alt={`${profile.name}'s avatar`}
+          className="profile-avatar"
+        />
+        <h1>{profile.name}</h1>
+        <p className="profile-username">@{profile.username}</p>
+      </div>
+
+      <div className="profile-bio">
+        <h3>About</h3>
+        <p>{profile.bio || 'No bio provided'}</p>
+      </div>
+
+      <div className="profile-stats">
+        <div className="stat">
+          <span className="stat-value">{profile.followers}</span>
+          <span className="stat-label">Followers</span>
+        </div>
+        <div className="stat">
+          <span className="stat-value">{profile.following}</span>
+          <span className="stat-label">Following</span>
+        </div>
+        <div className="stat">
+          <span className="stat-value">{profile.posts}</span>
+          <span className="stat-label">Posts</span>
+        </div>
+      </div>
+
+      <div className="profile-actions">
+        <button className="btn-primary">Edit Profile</button>
+        <button className="btn-secondary">Share Profile</button>
+      </div>
+    </div>
+  ();
+
+// =======================
+// Invite Users Component
+// =======================
+function InviteUsers() {
+  const [email, setEmail] = useState('');
+  const [inviteList, setInviteList] = useState([]);
+  const [status, setStatus] = useState(null);
+
+  const handleEmailChange = (e) => setEmail(e.target.value);
+
+  const addToInviteList = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      setStatus({ type: 'error', message: 'Please enter a valid email address' });
+      return;
+    }
+
+    if (inviteList.includes(email)) {
+      setStatus({ type: 'error', message: 'This email is already in your invite list' });
+      return;
+    }
+
+    setInviteList((prev) => [...prev, email]);
+    setEmail('');
+    setStatus({ type: 'success', message: 'Email added to invite list' });
+  };
+
+  const removeFromInviteList = (emailToRemove) => {
+    setInviteList((prev) => prev.filter((e) => e !== emailToRemove));
+  };
+
+  const sendInvites = async () => {
+    if (inviteList.length === 0) {
+      setStatus({ type: 'error', message: 'Add at least one email to send invites' });
+      return;
+    }
+
+    try {
+      setStatus({ type: 'loading', message: 'Sending invites...' });
+
+      const response = await fetch('/api/invites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emails: inviteList }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send invites');
+      }
+
+      const result = await response.json();
+      setStatus({
+        type: 'success',
+        message: `Successfully sent ${result.sent} invites!`,
+      });
+      setInviteList([]);
+    } catch (error) {
+      setStatus({ type: 'error', message: `Error sending invites: ${error.message}` });
+      console.error('Invite error:', error);
+    }
+  };
+
+  return (
+    <div className="invite-container">
+      <h2>Invite Friends</h2>
+
+      <div className="invite-form">
+        <input
+          type="email"
+          value={email}
+          onChange={handleEmailChange}
+          placeholder="Enter email address"
+          className="email-input"
+        />
+        <button onClick={addToInviteList} className="btn-add">
+          Add
+        </button>
+      </div>
+
+      {status && ()
+        <div className={`status-message ${status.type}`}>
+          {status.message}
+        </div>
+      )}
+
+      {inviteList.length > 0 && (
+          <div className="invite-list">
+            <h3>Emails to invite ({inviteList.length})</h3>
+            <ul>
+              {inviteList.map(email, index) => ()
+                <li key={index} className="invite-item">
+                  <span>{email}</span>
+                  <button
+                    onClick={(email) => removeFromInviteList(email)}
+                    className="btn-remove"
+                  >
+                    Remove
+                  </button>
+                </li>
+              )}
+            </ul>
+          </div>
+
+          <button onClick={sendInvites} className="btn-send-invites">
+            Send Invites
+          </button>
+    </div>;
+export { ProfilePage, InviteUsers };
