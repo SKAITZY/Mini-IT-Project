@@ -1,12 +1,17 @@
+<<<<<<< HEAD
 from flask import Blueprint, render_template, request, flash, jsonify
 from flask_login import login_required, current_user
 from .models import Note
 from . import db
 import json
+=======
+from flask import Blueprint
+>>>>>>> beta_v
 
 views = Blueprint('views', __name__)
 
 
+<<<<<<< HEAD
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
@@ -35,3 +40,8 @@ def delete_note():
             db.session.commit()
 
     return jsonify({})
+=======
+@views.route('/')
+def home():
+    return "<h1>Test</h1>"
+>>>>>>> beta_v

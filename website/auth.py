@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -65,6 +66,8 @@ def sign_up():
 
     return render_template("sign_up.html", user=current_user)
 =======
+=======
+>>>>>>> beta_v
 from flask import Blueprint
 
 auth = Blueprint('auth', __name__)
@@ -79,4 +82,8 @@ def logout():
 
 @auth.route('/sign-up')
 def sign_up():
+<<<<<<< HEAD
     return "<p>Sign Up</p>"
+=======
+    return "<p>Sign Up</p>"
+>>>>>>> beta_v
