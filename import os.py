@@ -34,4 +34,6 @@ VALUES (?, ?, ?, ?, ?, ?, ?)
 connection.commit()
 connection.close()
 
+9854wyar7gy898
+
 print("Database setup complete.")
