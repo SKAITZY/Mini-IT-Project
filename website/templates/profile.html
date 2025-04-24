@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>import React, { useState, useEffect } from 'react';</title>
+</head>
 
-// =======================
-// Profile Page Component
-// =======================
+<body>
 function ProfilePage({ userId }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+}
   useEffect(() => {
     async function fetchProfile() {
       try {
@@ -37,8 +40,8 @@ function ProfilePage({ userId }) {
     <div className="profile-container">
       <div className="profile-header">
         <img
-          src={profile.avatarUrl || '/default-avatar.png'}
-          alt={`${profile.name}'s avatar`}
+          src="profile.avatarUrl" >'default-avatar.png'
+          alt={`${profile.name} avatar`}
           className="profile-avatar"
         />
         <h1>{profile.name}</h1>
@@ -166,7 +169,7 @@ function InviteUsers() {
                 <li key={index} className="invite-item">
                   <span>{email}</span>
                   <button
-                    onClick={(email) => removeFromInviteList(email)}
+                    onClick={(email) > removeFromInviteList(email)}
                     className="btn-remove"
                   >
                     Remove
@@ -181,3 +184,4 @@ function InviteUsers() {
           </button>
     </div>;
 export { ProfilePage, InviteUsers };
+</body>
