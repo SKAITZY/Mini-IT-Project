@@ -1,3 +1,13 @@
+<<<<<<< HEAD
+function deleteNote(noteId) {
+    fetch("/delete-note", {
+      method: "POST",
+      body: JSON.stringify({ noteId: noteId }),
+    }).then((_res) => {
+      window.location.href = "/";
+    });
+  }
+=======
 To get the latest code from your team member on GitHub, follow these steps:
 
 1. Open a terminal or command prompt.
@@ -12,3 +22,4 @@ To get the latest code from your team member on GitHub, follow these steps:
     Replace `main` with the branch name your team is working on if it's different.
 
 Make sure you have Git installed and configured, and that you have access to the repository.
+>>>>>>> beta_v
