@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover Events - MMU JomGather</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    .navbar {
+      background-color: #0927af;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    
+    .navbar__container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1300px;
+      padding: 0 50px;
+    }
+    
+    #navbar__logo {
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    
+    .navbar__menu {
+      display: flex;
+      align-items: center;
+      list-style: none;
+    }
+    
+    .navbar__item {
+      height: 80px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar__links {
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      padding: 0 1rem;
+      height: 100%;
+      transition: all 1s ease;
+      font-size: 2rem;
+    }
+    
+    .navbar__links:hover {
+      color: #ff0000;
+    }
+    
+    .button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      padding: 10px 20px;
+      height: 100%;
+      width: 100%;
+      border: none;
+      outline: none;
+      border-radius: 4px;
+      background: #ff0000;
+      color: #fff;
+      transition: all 1s ease;
+    }
+    
+    .button:hover {
+      background: #ff5100;
+    }
+    
+    .page-header {
+      background: linear-gradient(rgba(255, 0, 0, 0.856), rgba(42, 177, 255, 0.829)), url('/api/placeholder/1200/400') center/cover no-repeat;
+      height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 20px;
+    }
+    
+    .page-header h1 {
+      color: #fff;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      
+    }
+    
+    .page-header p {
+      color: #fff;
+      font-size: 1.2rem;
+      max-width: 700px;
+    }
+    
+    .events-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    .filters {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+      box-shadow: 0 5px 10px #0927af;
+    }
+    
+    .filter-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-label {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    
+    .filter-btn {
+      padding: 8px 16px;
+      background: #f0f0f0;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .filter-btn:hover, .filter-btn.active {
+      background: #0927af;
+      color: #fff;
+    }
+    
+    .search-bar {
+      flex-grow: 1;
+      min-width: 200px;
+      position: relative;
+    }
+    
+    .search-bar input {
+      width: 100%;
+      padding: 10px 15px;
+      border-radius: 25px;
+      border: 1px solid #ddd;
+      outline: none;
+      font-size: 1rem;
+    }
+    
+    .search-bar button {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 30px;
+    }
+    
+    .event-card {
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .event-card:hover {
+      transform: translateY(-10px);
+    }
+    
+    .event-image {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+    }
+    
+    .event-details {
+      padding: 20px;
+    }
+    
+    .event-category {
+      display: inline-block;
+      background: #0927af;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      margin-bottom: 10px;
+    }
+    
+    .event-title {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #0a192f;
+    }
+    
+    .event-meta {
+      display: flex;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .event-meta div {
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .event-meta i {
+      margin-right: 5px;
+    }
+    
+    .event-description {
+      margin-bottom: 20px;
+      line-height: 1.5;
+      color: #333;
+    }
+    
+    .event-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .event-btn {
+      padding: 8px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .primary-btn {
+      background: #ff0000;
+      color: #fff;
+    }
+    
+    .primary-btn:hover {
+      background: #ff6a00;
+    }
+    
+    .secondary-btn {
+      color: #0a192f;
+    }
+    
+    .secondary-btn:hover {
+      text-decoration: underline;
+    }
+    
+    .load-more {
+      display: block;
+      margin: 40px auto 0;
+      padding: 12px 30px;
+      background: transparent;
+      border: 2px solid #0a192f;
+      color: #0a192f;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 1s ease;
+    }
+    
+    .load-more:hover {
+      background: #0927af;
+      color: #fff;
+    }
+    
+    .create-event {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #0927af;
+      color: #fff;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .create-event:hover {
+      background: #ff6a00;
+      transform: scale(1.1);
+    }
+    
+    footer {
+        
+      background: #0927af;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar__container">
+        <a href="/home.html" id="navbar__logo">JomGather</a>
+        <div class="navbar__toggle" id="mobile-menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+        <ul class="navbar__menu">
+            <li class="navbar__item">
+                <a href="/home.html" class="navbar__links">Home</a>
+            </li>            
+            <li class="navbar__item">
+                <a href="/customise.html" class="navbar__links">Customize Profile</a>
+            </li>
+            <li class="navbar__item">
+                <a href="/jomgather.html" class="navbar__links">Jom Gather</a>
+            </li>
+            <li class="navbar__btn">
+              <a href="/register.html" class="button">Sign Up/Log In</a>
+            </li>
+        </ul>
+    </div>
+  </nav>
+
+  <section class="page-header">
+    <h1>Discover Campus Happenings</h1>
+    <p>Find exciting events, meetups, and activities organized by fellow MMU students or create your own gathering!</p>
+  </section>
+
+  <section class="events-container">
+    <div class="filters">
+      <div class="filter-group">
+        <span class="filter-label">Category:</span>
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Academic</button>
+        <button class="filter-btn">Sports</button>
+        <button class="filter-btn">Arts</button>
+        <button class="filter-btn">Social</button>
+        <button class="filter-btn">Tech</button>
+      </div>
+      
+      <div class="search-bar">
+        <input type="text" placeholder="Search events...">
+        <button>🔍</button>
+      </div>
+    </div>
+
+    <div class="events-grid">
+      <div class="event-card">
+        <div class="event-image" style="background-image: url('/api/placeholder/350/200')"></div>
+        <div class="event-details">
+          <span class="event-category">Tech</span>
+          <h3 class="event-title">Hackathon 2025: Innovate for Tomorrow</h3>
+          <div class="event-meta">
+            <div><i>📅</i> April 25, 2025</div>
+            <div><i>⏰</i> 9:00 AM - 9:00 PM</div>
+            <div><i>👥</i> 120 going</div>
+          </div>
+          <p class="event-description">Join the biggest student hackathon at MMU! Form teams, solve challenges, and win amazing prizes while building tech solutions for real-world problems.</p>
+          <div class="event-actions">
+            <a href="#" class="event-btn primary-btn">Join Event</a>
+            <a href="#" class="event-btn secondary-btn">Details</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-image" style="background-image: url('/api/placeholder/350/200')"></div>
+        <div class="event-details">
+          <span class="event-category">Social</span>
+          <h3 class="event-title">International Food Festival</h3>
+          <div class="event-meta">
+            <div><i>📅</i> April 23, 2025</div>
+            <div><i>⏰</i> 11:00 AM - 4:00 PM</div>
+            <div><i>👥</i> 87 going</div>
+          </div>
+          <p class="event-description">Experience culinary delights from around the world prepared by your fellow students! Come hungry and ready to explore diverse cultures through food.</p>
+          <div class="event-actions">
+            <a href="#" class="event-btn primary-btn">Join Event</a>
+            <a href="#" class="event-btn secondary-btn">Details</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-image" style="background-image: url('/api/placeholder/350/200')"></div>
+        <div class="event-details">
+          <span class="event-category">Academic</span>
+          <h3 class="event-title">Final Exam Study Group: Computer Science</h3>
+          <div class="event-meta">
+            <div><i>📅</i> April 28, 2025</div>
+            <div><i>⏰</i> 2:00 PM - 6:00 PM</div>
+            <div><i>👥</i> 34 going</div>
+          </div>
+          <p class="event-description">Preparing for final exams? Join our collaborative study session for Computer Science subjects. Bring your questions and help others with theirs!</p>
+          <div class="event-actions">
+            <a href="#" class="event-btn primary-btn">Join Event</a>
+            <a href="#" class="event-btn secondary-btn">Details</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-image" style="background-image: url('/api/placeholder/350/200')"></div>
+        <div class="event-details">
+          <span class="event-category">Sports</span>
+          <h3 class="event-title">Intramural Basketball Tournament</h3>
+          <div class="event-meta">
+            <div><i>📅</i> April 24-26, 2025</div>
+            <div><i>⏰</i> 3:00 PM - 8:00 PM</div>
+            <div><i>👥</i> 78 going</div>
+          </div>
+          <p class="event-description">Show off your basketball skills in this 3-day tournament! Form your team of 5 players or join as an individual. All skill levels welcome.</p>
+          <div class="event-actions">
+            <a href="#" class="event-btn primary-btn">Join Event</a>
+            <a href="#" class="event-btn secondary-btn">Details</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-image" style="background-image: url('/api/placeholder/350/200')"></div>
+        <div class="event-details">
+          <span class="event-category">Arts</span>
+          <h3 class="event-title">Open Mic Night: Express Yourself</h3>
+          <div class="event-meta">
+            <div><i>📅</i> April 22, 2025</div>
+            <div><i>⏰</i> 7:00 PM - 10:00 PM</div>
+            <div><i>👥</i> 45 going</div>
+          </div>
+          <p class="event-description">Poets, musicians, comedians, and performers of all kinds are welcome to share their talents in this supportive community event.</p>
+          <div class="event-actions">
+            <a href="#" class="event-btn primary-btn">Join Event</a>
+            <a href="#" class="event-btn secondary-btn">Details</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-image" style="background-image: url('/api/placeholder/350/200')"></div>
+        <div class="event-details">
+          <span class="event-category">Tech</span>
+          <h3 class="event-title">AI Workshop: Building Your First ML Model</h3>
+          <div class="event-meta">
+            <div><i>📅</i> April 27, 2025</div>
+            <div><i>⏰</i> 1:00 PM - 4:00 PM</div>
+            <div><i>👥</i> 52 going</div>
+          </div>
+          <p class="event-description">Learn the basics of machine learning and build a simple classification model. No prior experience required, just bring your laptop!</p>
+          <div class="event-actions">
+            <a href="#" class="event-btn primary-btn">Join Event</a>
+            <a href="#" class="event-btn secondary-btn">Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="load-more">Load More Events</button>
+  </section>
+
+  <a href="/create-event.html" class="create-event" title="Create New Event">+</a>
+
+  <footer>
+    <p>&copy; 2025 MMU JomGather - Where MMU Students Connect</p>
+  </footer>
+</body>
+</html>

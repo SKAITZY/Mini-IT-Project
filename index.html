@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MMU JomGathert - Connect with Fellow Students</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    .navbar {
+      background-color: #0a192f;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    
+    .navbar__container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1300px;
+      padding: 0 50px;
+    }
+    
+    #navbar__logo {
+      color: #ff8c00;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    
+    .navbar__menu {
+      display: flex;
+      align-items: center;
+      list-style: none;
+    }
+    
+    .navbar__item {
+      height: 80px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar__links {
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      padding: 0 1rem;
+      height: 100%;
+      transition: all 0.3s ease;
+    }
+    
+    .navbar__links:hover {
+      color: #ff8c00;
+    }
+    
+    .button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      padding: 10px 20px;
+      height: 100%;
+      width: 100%;
+      border: none;
+      outline: none;
+      border-radius: 4px;
+      background: #ff8c00;
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+    
+    .button:hover {
+      background: #ff6a00;
+    }
+    
+    .hero {
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('/api/placeholder/1200/600') center/cover no-repeat;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 20px;
+    }
+    
+    .hero h1 {
+      color: #fff;
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .hero h2 {
+      color: #ff8c00;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .hero p {
+      color: #fff;
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin-bottom: 2rem;
+    }
+    
+    .hero-btns {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .hero-btn {
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .primary-btn {
+      background: #ff8c00;
+      color: #fff;
+    }
+    
+    .primary-btn:hover {
+      background: #ff6a00;
+    }
+    
+    .secondary-btn {
+      background: transparent;
+      border: 2px solid #fff;
+      color: #fff;
+    }
+    
+    .secondary-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .features {
+      padding: 60px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .section-title {
+      text-align: center;
+      margin-bottom: 40px;
+      color: #0a192f;
+    }
+    
+    .features-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+    }
+    
+    .feature-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 300px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+    }
+    
+    .feature-icon {
+      font-size: 40px;
+      color: #ff8c00;
+      margin-bottom: 15px;
+    }
+    
+    .feature-title {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: #0a192f;
+    }
+    
+    .feature-desc {
+      color: #666;
+      line-height: 1.6;
+    }
+    
+    .cta {
+      background: #0a192f;
+      padding: 80px 20px;
+      text-align: center;
+      color: #fff;
+    }
+    
+    .cta h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    
+    .cta p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+    
+    footer {
+      background: #0a192f;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar__container">
+        <a href="/index.html" id="navbar__logo">JomGather</a>
+        <div class="navbar__toggle" id="mobile-menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+        <ul class="navbar__menu">
+            <li class="navbar__item">
+                <a href="/home.html" class="navbar__links">Home</a>
+            </li>            
+            <li class="navbar__item">
+                <a href="/customise.html" class="navbar__links">Customize Profile</a>
+            </li>
+            <li class="navbar__item">
+                <a href="/jomgather.html" class="navbar__links">Jom Gather</a>
+            </li>
+            <li class="navbar__btn">
+              <a href="/register.html" class="button">Sign Up/Log In</a>
+            </li>
+        </ul>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <h1>Connect, Meet, and Thrive at MMU</h1>
+    <h2>Find Your People. Create Your Experiences.</h2>
+    <p>JomGather is the ultimate platform for MMU students to connect with like-minded people, discover new friendships, and create meaningful memories together.</p>
+    <div class="hero-btns">
+      <a href="/register.html" class="hero-btn primary-btn">Join Now</a>
+      <a href="/jomgather.html" class="hero-btn secondary-btn">Explore Events</a>
+    </div>
+  </section>
+
+  <section class="features">
+    <h2 class="section-title">Why Choose JomGather?</h2>
+    <div class="features-container">
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3 class="feature-title">Match Your Interests</h3>
+        <p class="feature-desc">Connect with students who share your passions, hobbies, and academic interests.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3 class="feature-title">Find Hangout Partners</h3>
+        <p class="feature-desc">Meet new people to do activities that you love with you to make the overall experiences better.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎉</div>
+        <h3 class="feature-title">Discover Events</h3>
+        <p class="feature-desc">Stay updated on campus activities and organize your own gatherings.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Ready to Make Connections That Matter?</h2>
+    <p>Join thousands of MMU students already creating meaningful connections on campus.</p>
+    <a href="/register.html" class="hero-btn primary-btn">Get Started Today</a>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 MMU JomGather - Where MMU Students Connect</p>
+  </footer>
+</body>
+</html>
