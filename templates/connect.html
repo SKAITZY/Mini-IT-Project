@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MMU JomGather - Chat Interface</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/connect.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar__container">
+      <a href="{{ url_for('index') }}" id="navbar__logo">JomGather</a>
+      <div class="navbar__toggle" id="mobile-menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+      <ul class="navbar__menu">
+        <li class="navbar__item">
+          <a href="{{ url_for('index') }}" class="navbar__links">Home</a>
+        </li>
+        <li class="navbar__item">
+          <a href="{{ url_for('customise') }}" class="navbar__links">Customize Profile</a>
+        </li>
+        <li class="navbar__item">
+          <a href="{{ url_for('jomgather') }}" class="navbar__links">Jom Gather</a>
+        </li>
+        <li class="navbar__btn">
+          <a href="{{ url_for('register') }}" class="button">Sign Up/Log In</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="chat-container">
+    <div class="sidebar">
+      <div class="search-box">
+        <input type="text" class="search-input" placeholder="Search chats...">
+      </div>
+      <div class="chat-list">
+        <div class="chat-header">Recent Chats</div>
+        <!-- Chat list items will be dynamically added here -->
+      </div>
+    </div>
+    <div class="main-chat">
+      <div class="chat-header-main">
+        <div class="user-info">
+          <div class="user-avatar">JD</div>
+          <div class="user-details">
+            <div class="user-name">John Doe</div>
+            <div class="user-status">Online</div>
+          </div>
+        </div>
+        <div class="chat-header-actions">
+          <button class="action-btn">📞</button>
+          <button class="action-btn">📹</button>
+          <button class="action-btn">⋮</button>
+        </div>
+      </div>
+      <!-- Chat messages will be dynamically added here -->
+    </div>
+  </div>
+</body>
+</html>
