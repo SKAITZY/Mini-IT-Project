@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JomGather - My Connections</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    .navbar {
+      background-color: #0927af;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    
+    .navbar__container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1300px;
+      padding: 0 50px;
+    }
+    
+    #navbar__logo {
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    
+    .navbar__menu {
+      display: flex;
+      align-items: center;
+      list-style: none;
+    }
+    
+    .navbar__item {
+      height: 80px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar__links {
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      padding: 0 1rem;
+      height: 100%;
+      transition: all 0.3s ease;
+    }
+    
+    .navbar__links:hover {
+      color: #ff0000;
+    }
+    
+    .button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      padding: 10px 20px;
+      height: 100%;
+      width: 100%;
+      border: none;
+      outline: none;
+      border-radius: 4px;
+      background: #ff0000;
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+    
+    .button:hover {
+      background: #ff5100;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .page-header h1 {
+      color: #0927af;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    
+    .page-header p {
+      color: #666;
+    }
+    
+    .connections-wrapper {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+    
+    @media (min-width: 768px) {
+      .connections-wrapper {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      }
+    }
+    
+    .connection-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    
+    .connection-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .connection-header {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .connection-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #eee;
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    
+    .connection-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .connection-user-info {
+      flex: 1;
+    }
+    
+    .connection-username {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #0927af;
+      margin-bottom: 4px;
+    }
+    
+    .connection-faculty {
+      color: #ff0000;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    
+    .connection-course {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .connection-status {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+    
+    .status-pending {
+      background-color: #ffd700;
+      color: #333;
+    }
+    
+    .status-accepted {
+      background-color: #4caf50;
+      color: white;
+    }
+    
+    .status-rejected {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    .connection-body {
+      padding: 15px;
+    }
+    
+    .connection-interests {
+      margin-bottom: 15px;
+    }
+    
+    .connection-interests-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+    
+    .interest-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    
+    .interest-tag {
+      background-color: #f0f0f0;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+    
+    .connection-actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .connection-btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      flex: 1;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .chat-btn {
+      background-color: #0927af;
+      color: white;
+    }
+    
+    .chat-btn:hover {
+      background-color: #071c80;
+    }
+    
+    .accept-btn {
+      background-color: #4caf50;
+      color: white;
+    }
+    
+    .accept-btn:hover {
+      background-color: #3d8b40;
+    }
+    
+    .reject-btn {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    .reject-btn:hover {
+      background-color: #d32f2f;
+    }
+    
+    .no-connections {
+      text-align: center;
+      padding: 40px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .no-connections h3 {
+      margin-bottom: 15px;
+      color: #666;
+    }
+    
+    .no-connections p {
+      margin-bottom: 20px;
+      color: #888;
+    }
+    
+    .find-students-btn {
+      background-color: #0927af;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 4px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.3s ease;
+    }
+    
+    .find-students-btn:hover {
+      background-color: #071c80;
+    }
+    
+    .connections-count {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .flash-messages {
+      max-width: 1200px;
+      margin: 20px auto 0;
+      padding: 0 20px;
+    }
+
+    .flash-message {
+      padding: 12px 20px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+
+    .flash-success {
+      background-color: #dff0d8;
+      color: #3c763d;
+      border: 1px solid #d6e9c6;
+    }
+
+    .flash-error {
+      background-color: #f2dede;
+      color: #a94442;
+      border: 1px solid #ebccd1;
+    }
+
+    .flash-info {
+      background-color: #d9edf7;
+      color: #31708f;
+      border: 1px solid #bce8f1;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar__container">
+      <a href="{{ url_for('index') }}" id="navbar__logo">JomGather</a>
+      <div class="navbar__toggle" id="mobile-menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+      <ul class="navbar__menu">
+        <li class="navbar__item">
+          <a href="{{ url_for('index') }}" class="navbar__links">Home</a>
+        </li>
+        <li class="navbar__item">
+          <a href="{{ url_for('customise') }}" class="navbar__links">Customize Profile</a>
+        </li>
+        <li class="navbar__item">
+          <a href="{{ url_for('jomgather') }}" class="navbar__links">Jom Gather</a>
+        </li>
+        <li class="navbar__item">
+          <a href="{{ url_for('view_connections') }}" class="navbar__links">My Connections</a>
+        </li>
+        <li class="navbar__btn">
+          <a href="{{ url_for('logout') }}" class="button">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash-message flash-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="container">
+    <div class="page-header">
+      <h1>My Connections</h1>
+      <p>Manage your connections with other MMU students</p>
+    </div>
+
+    {% if connections %}
+      <div class="connections-count">
+        You have {{ connections|length }} connection{% if connections|length != 1 %}s{% endif %}
+      </div>
+
+      <div class="connections-wrapper">
+        {% for connection in connections %}
+          <div class="connection-card">
+            <div class="connection-header">
+              <div class="connection-avatar">
+                {% if connection.user.customisation and connection.user.customisation.profile_picture %}
+                  <img src="{{ url_for('static', filename='uploads/' + connection.user.customisation.profile_picture) }}" alt="{{ connection.user.username }}">
+                {% else %}
+                  <div style="font-size: 1.5rem;">👤</div>
+                {% endif %}
+              </div>
+              <div class="connection-user-info">
+                <div class="connection-username">{{ connection.user.username }}</div>
+                {% if connection.user.customisation %}
+                  {% if connection.user.customisation.faculty %}
+                    <div class="connection-faculty">{{ connection.user.customisation.faculty }}</div>
+                  {% endif %}
+                  {% if connection.user.customisation.course %}
+                    <div class="connection-course">{{ connection.user.customisation.course }}
+                      {% if connection.user.customisation.year_of_study %}
+                        • {{ connection.user.customisation.year_of_study }}{% if connection.user.customisation.year_of_study == 1 %}st{% elif connection.user.customisation.year_of_study == 2 %}nd{% elif connection.user.customisation.year_of_study == 3 %}rd{% else %}th{% endif %} Year
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                {% endif %}
+                <div class="connection-status status-{{ connection.status }}">
+                  {% if connection.status == 'pending' %}
+                    {% if connection.initiator %}
+                      Request Sent
+                    {% else %}
+                      Request Received
+                    {% endif %}
+                  {% else %}
+                    {{ connection.status|capitalize }}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="connection-body">
+              {% if connection.user.customisation and connection.user.customisation.interests %}
+                <div class="connection-interests">
+                  <div class="connection-interests-title">Interests:</div>
+                  <div class="interest-tags">
+                    {% for interest in connection.user.customisation.interests.split(',') %}
+                      {% if interest.strip() %}
+                        <span class="interest-tag">{{ interest.strip() }}</span>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+              <div class="connection-actions">
+                {% if connection.status == 'accepted' %}
+                  <a href="{{ url_for('chat', user_id=connection.user.id) }}" class="connection-btn chat-btn">Chat</a>
+                {% elif connection.status == 'pending' and not connection.initiator %}
+                  <form action="{{ url_for('accept_connection', connection_id=connection.connection_id) }}" method="POST" style="flex: 1;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="connection-btn accept-btn" style="width: 100%;">Accept</button>
+                  </form>
+                  <form action="{{ url_for('reject_connection', connection_id=connection.connection_id) }}" method="POST" style="flex: 1;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="connection-btn reject-btn" style="width: 100%;">Reject</button>
+                  </form>
+                {% elif connection.status == 'pending' and connection.initiator %}
+                  <div class="connection-btn" style="background-color: #f0f0f0; color: #666;">Awaiting Response</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-connections">
+        <h3>You don't have any connections yet</h3>
+        <p>Connect with other MMU students to start chatting and collaborating</p>
+        <a href="{{ url_for('jomgather') }}" class="find-students-btn">Find Students</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    // Mobile menu toggle
+    const menu = document.querySelector('#mobile-menu');
+    const menuLinks = document.querySelector('.navbar__menu');
+    
+    if (menu) {
+      menu.addEventListener('click', function() {
+        menu.classList.toggle('is-active');
+        menuLinks.classList.toggle('active');
+      });
+    }
+  </script>
+  
+  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+</body>
+</html> 

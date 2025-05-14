@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MMU JomGather - Find and Connect</title>
+  <title>JomGather - Connect with Fellow Students</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jomgather.css') }}">
   <style>
     * {
       margin: 0;
@@ -486,7 +488,7 @@
 <body>
   <nav class="navbar">
     <div class="navbar__container">
-        <a href="/index2.html" id="navbar__logo">JomGather</a>
+        <a href="{{ url_for('index') }}" id="navbar__logo">JomGather</a>
         <div class="navbar__toggle" id="mobile-menu">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -494,20 +496,42 @@
         </div>
         <ul class="navbar__menu">
             <li class="navbar__item">
-                <a href="/index2.html" class="navbar__links">Home</a>
+                <a href="{{ url_for('index') }}" class="navbar__links">Home</a>
             </li>            
             <li class="navbar__item">
-                <a href="/customise.html" class="navbar__links">Customize Profile</a>
+                <a href="{{ url_for('customise') }}" class="navbar__links">Customize Profile</a>
             </li>
             <li class="navbar__item">
-                <a href="/jomgather.html" class="navbar__links">Jom Gather</a>
+                <a href="{{ url_for('jomgather') }}" class="navbar__links">Jom Gather</a>
+            </li>
+            <li class="navbar__item">
+                <a href="{{ url_for('view_connections') }}" class="navbar__links">My Connections</a>
             </li>
             <li class="navbar__btn">
-              <a href="/register.html" class="button">Sign Up/Log In</a>
+              <a href="{{ url_for('logout') }}" class="button">Logout</a>
             </li>
         </ul>
     </div>
   </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages" style="max-width: 1200px; margin: 20px auto 0; padding: 0 20px;">
+        {% for category, message in messages %}
+          <div class="flash-message" style="padding: 12px 20px; border-radius: 4px; margin-bottom: 15px;
+                 {% if category == 'success' %}
+                   background-color: #dff0d8; color: #3c763d; border: 1px solid #d6e9c6;
+                 {% elif category == 'error' %}
+                   background-color: #f2dede; color: #a94442; border: 1px solid #ebccd1;
+                 {% else %}
+                   background-color: #d9edf7; color: #31708f; border: 1px solid #bce8f1;
+                 {% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
 
   <div class="page-title">
     <h1>Jom Gather</h1>
@@ -516,275 +540,178 @@
 
   <div class="container">
     <div class="tabs">
-      <button class="tab active" onclick="openTab(event, 'findPartners')">Find Partners</button>
-      <button class="tab" onclick="openTab(event, 'myPartners')">My Partners</button>
-      <button class="tab" onclick="openTab(event, 'createGathering')">Create Gathering</button>
-      <button class="tab" onclick="openTab(event, 'myGatherings')">My Gatherings</button>
-      <button class="tab" onclick="openTab(event, 'findGatherings')">Find Gatherings</button>
+      <button class="tab {% if active_tab == 'find-partners' %}active{% endif %}" onclick="showTab('find-partners')" data-tab-id="find-partners">Find Partners</button>
+      <button class="tab {% if active_tab == 'my-partners' %}active{% endif %}" onclick="showTab('my-partners')" data-tab-id="my-partners">My Partners</button>
+      <button class="tab {% if active_tab == 'create-gathering' %}active{% endif %}" onclick="showTab('create-gathering')" data-tab-id="create-gathering">Create Gathering</button>
+      <button class="tab {% if active_tab == 'my-gatherings' %}active{% endif %}" onclick="showTab('my-gatherings')" data-tab-id="my-gatherings">My Gatherings</button>
+      <button class="tab {% if active_tab == 'find-gatherings' %}active{% endif %}" onclick="showTab('find-gatherings')" data-tab-id="find-gatherings">Find Gatherings</button>
     </div>
 
-    <!-- Find Partners Tab -->
-    <div id="findPartners" class="tab-content active">
+    <div id="find-partners" class="tab-content {% if active_tab == 'find-partners' %}active{% endif %}">
       <div class="filter-section">
         <h3 class="filter-title">Find Students By:</h3>
-        <div class="filter-form">
-          <div class="form-group">
-            <label for="faculty">Faculty</label>
-            <select id="faculty" name="faculty">
-              <option value="">All Faculties</option>
-              <option value="fci">Faculty of Computing & Informatics</option>
-              <option value="fom">Faculty of Management</option>
-              <option value="foe">Faculty of Engineering</option>
-              <option value="fcm">Faculty of Creative Multimedia</option>
-              <option value="fca">Faculty of Cinematic Arts</option>
-              <option value="fac">Faculty of Apllied Communication</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="course">Course</label>
-            <select id="course" name="course">
-              <option value="">All Courses</option>
-              <option value="se">Software Engineering</option>
-              <option value="it">Cybersecurity</option>
-              <option value="gd">Game Development</option>
-              <option value="ds">Data Science</option>
-              <option value="bm">Business Management</option>
-              <option value="ai">Artificial Intelligence</option>
-              <option value="anim.">Animation</option>
-              <option value="imd">Immersive Media Design</option>
-              <option value="ad">Advertising Design</option>
-              <option value="vfx">Visual Effects</option>
-              <option value="sc">Strategic Communication</option>
-              <option value="fin">Finance</option>
-              <option value="ba">Business Administration</option>
-              <option value="at">Accounting</option>
-              <option value="mt">Marketing</option>
-              <option value="da">Digital Analytics</option>
-              <option value="cm">Cinematography</option>
-              
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="year">Year of Study</label>
-            <select id="year" name="year">
-              <option value="">Any Year</option>
-              <option value="1">Year 1</option>
-              <option value="2">Year 2</option>
-              <option value="3">Year 3</option>
-              <option value="4">Year 4</option>
-              <option value="4">Postgraduate</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="interests">Interests</label>
-            <input type="text" id="interests" name="interests" placeholder="E.g. programming, sports, music">
-          </div>
-        </div>
-        <button class="search-btn">Find Students</button>
-      </div>
-
-      <div class="results-grid">
-        <!-- Student Card 1 -->
-        <div class="student-card">
-          <div class="student-image">
-            <img src="/api/placeholder/300/200" alt="Student profile">
-          </div>
-          <div class="student-info">
-            <h3 class="student-name">Ahmad Firdaus</h3>
-            <p class="student-faculty">Faculty of Computing & Informatics</p>
-            <p>3rd Year • Computer Science</p>
-            <div class="student-interests">
-              <span class="interest-tag">Programming</span>
-              <span class="interest-tag">AI</span>
-              <span class="interest-tag">Mobile Legends</span>
-            </div>
-            <p class="student-bio">Looking for study partners for AI projects and weekend basketball games on campus.</p>
-            
-<button class="connect-btn" onclick="redirectToPage()">Connect</button>
-
-    <script>
-        function redirectToPage() {
-            window.location.href = "connect1.html";
-        }
-    </script>
-
-              
-          </div>
-        </div>
-
-        <!-- Student Card 2 -->
-        <div class="student-card">
-          <div class="student-image">
-            <img src="/api/placeholder/300/200" alt="Student profile">
-          </div>
-          <div class="student-info">
-            <h3 class="student-name">Sarah Wong</h3>
-            <p class="student-faculty">Faculty of Creative Multimedia</p>
-            <p>2nd Year • Animation</p>
-            <div class="student-interests">
-              <span class="interest-tag">Digital Art</span>
-              <span class="interest-tag">Movies</span>
-              <span class="interest-tag">Graphic Design</span>
-            </div>
-            <p class="student-bio">Passionate about animation and looking for creative collaborators for multimedia projects.</p>
-            <button class="connect-btn">Connect</button>
-          </div>
-        </div>
-
-        <!-- Student Card 3 -->
-        <div class="student-card">
-          <div class="student-image">
-            <img src="/api/placeholder/300/200" alt="Student profile">
-          </div>
-          <div class="student-info">
-            <h3 class="student-name">Raj Kumar</h3>
-            <p class="student-faculty">Faculty of Engineering</p>
-            <p>4th Year • Mechanical Engineering</p>
-            <div class="student-interests">
-              <span class="interest-tag">Robotics</span>
-              <span class="interest-tag">Football</span>
-              <span class="interest-tag">Chess</span>
-            </div>
-            <p class="student-bio">Working on robotics projects and looking for teammates for weekly football matches.</p>
-            <button class="connect-btn">Connect</button>
-          </div>
-        </div>
-
-        <!-- Student Card 4 -->
-        <div class="student-card">
-          <div class="student-image">
-            <img src="/api/placeholder/300/200" alt="Student profile">
-          </div>
-          <div class="student-info">
-            <h3 class="student-name">Li Mei</h3>
-            <p class="student-faculty">Faculty of Management</p>
-            <p>2nd Year • Business Administration</p>
-            <div class="student-interests">
-              <span class="interest-tag">Finance</span>
-              <span class="interest-tag">Photography</span>
-              <span class="interest-tag">Hiking</span>
-            </div>
-            <p class="student-bio">Interested in finance club activities and weekend hiking trips around Cyberjaya.</p>
-            <button class="connect-btn">Connect</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- My Partners Tab -->
-    <div id="myPartners" class="tab-content">
-        <div class="filter-section">
-          <h3 class="filter-title">Find Students By:</h3>
+        <form action="{{ url_for('jomgather') }}" method="GET" id="student-search-form">
+          <input type="hidden" name="tab" value="find-partners">
           <div class="filter-form">
             <div class="form-group">
               <label for="faculty">Faculty</label>
               <select id="faculty" name="faculty">
                 <option value="">All Faculties</option>
-                <option value="fci">Faculty of Computing & Informatics</option>
-                <option value="fom">Faculty of Management</option>
-                <option value="foe">Faculty of Engineering</option>
-                <option value="fcm">Faculty of Creative Multimedia</option>
-                <option value="fca">Faculty of Cinematic Arts</option>
-                <option value="fac">Faculty of Apllied Communication</option>
+                {% for faculty in faculties %}
+                  <option value="{{ faculty }}">{{ faculty }}</option>
+                {% endfor %}
               </select>
             </div>
             <div class="form-group">
-                <label for="course">Course</label>
-                <select id="course" name="course">
-                  <option value="">All Courses</option>
-                  <option value="se">Software Engineering</option>
-                  <option value="it">Cybersecurity</option>
-                  <option value="gd">Game Development</option>
-                  <option value="ds">Data Science</option>
-                  <option value="bm">Business Management</option>
-                  <option value="ai">Artificial Intelligence</option>
-                  <option value="anim.">Animation</option>
-                  <option value="imd">Immersive Media Design</option>
-                  <option value="ad">Advertising Design</option>
-                  <option value="vfx">Visual Effects</option>
-                  <option value="sc">Strategic Communication</option>
-                  <option value="fin">Finance</option>
-                  <option value="ba">Business Administration</option>
-                  <option value="at">Accounting</option>
-                  <option value="mt">Marketing</option>
-                  <option value="da">Digital Analytics</option>
-                  <option value="cm">Cinematography</option>
-                  
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="year">Year of Study</label>
-                <select id="year" name="year">
-                  <option value="">Any Year</option>
-                  <option value="1">Year 1</option>
-                  <option value="2">Year 2</option>
-                  <option value="3">Year 3</option>
-                  <option value="4">Year 4</option>
-                  <option value="4">Postgraduate</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="interests">Interests</label>
-                <input type="text" id="interests" name="interests" placeholder="E.g. programming, sports, music">
-              </div>
+              <label for="course">Course</label>
+              <select id="course" name="course">
+                <option value="">All Courses</option>
+                {% for course in courses %}
+                  <option value="{{ course }}">{{ course }}</option>
+                {% endfor %}
+              </select>
             </div>
-            <button class="search-btn">Find Students</button>
+            <div class="form-group">
+              <label for="year">Year of Study</label>
+              <select id="year" name="year">
+                <option value="">Any Year</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+                <option value="5">5th Year</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="interests">Interests</label>
+              <input type="text" id="interests" name="interests" placeholder="E.g. programming, sports, music">
+            </div>
           </div>
-  
-      <div class="results-grid">
-        <!-- Student Card 1 -->
-            <div class="student-card">
-            <div class="student-image">
-              <img src="/api/placeholder/300/200" alt="Student profile">
-            </div>
-            <div class="student-info">
-              <h3 class="student-name">Ahmad Firdaus</h3>
-              <p class="student-faculty">Faculty of Computing & Informatics</p>
-              <p>3rd Year • Computer Science</p>
-              <div class="student-interests">
-                <span class="interest-tag">Programming</span>
-                <span class="interest-tag">AI</span>
-                <span class="interest-tag">Mobile Legends</span>
-              </div>
-              <p class="student-bio">Looking for study partners for AI projects and weekend basketball games on campus.</p>
-              <button class="connect-btn" onclick="redirectToPage()">Connect</button>
+          <button type="submit" class="search-btn">Find Students</button>
+        </form>
+      </div>
 
-    <script>
-        function redirectToPage() {
-            window.location.href = "connect1.html";
-        }
-    </script>
-            </div>
-            </div>
-        
-  
-    
-            <!-- Student Card 2 -->
-            <div class="student-card">
+      <div class="results-section" id="search-results">
+        {% if students %}
+          <div class="results-count">
+            Found {{ students|length }} student{% if students|length != 1 %}s{% endif %}
+          </div>
+          
+          <div class="results-grid">
+            {% for student in students %}
+              <div class="student-card">
                 <div class="student-image">
-                  <img src="/api/placeholder/300/200" alt="Student profile">
+                  {% if student.customisation.profile_picture %}
+                    <img src="{{ url_for('static', filename='uploads/' + student.customisation.profile_picture) }}" alt="{{ student.username }}'s profile">
+                  {% else %}
+                    <div style="font-size: 50px; color: #aaa;">👤</div>
+                  {% endif %}
                 </div>
                 <div class="student-info">
-                  <h3 class="student-name">Sarah Wong</h3>
-                  <p class="student-faculty">Faculty of Creative Multimedia</p>
-                  <p>2nd Year • Animation</p>
-                  <div class="student-interests">
-                    <span class="interest-tag">Digital Art</span>
-                    <span class="interest-tag">Movies</span>
-                    <span class="interest-tag">Graphic Design</span>
+                  <h3 class="student-name">{{ student.username }}</h3>
+                  {% if student.customisation.faculty %}
+                    <div class="student-faculty">{{ student.customisation.faculty }}</div>
+                  {% endif %}
+                  <div class="student-details">
+                    {% if student.customisation.course %}
+                      {{ student.customisation.course }}
+                    {% endif %}
+                    {% if student.customisation.year_of_study %}
+                      • {{ student.customisation.year_of_study }}{% if student.customisation.year_of_study == 1 %}st{% elif student.customisation.year_of_study == 2 %}nd{% elif student.customisation.year_of_study == 3 %}rd{% else %}th{% endif %} Year
+                    {% endif %}
                   </div>
-                  <p class="student-bio">Passionate about animation and looking for creative collaborators for multimedia projects.</p>
-                  <button class="connect-btn">Connect</button>
+                  
+                  {% if student.customisation.interests %}
+                    <div class="student-interests">
+                      {% for interest in student.customisation.interests.split(',') %}
+                        {% if interest.strip() %}
+                          <span class="interest-tag">{{ interest.strip() }}</span>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  
+                  {% if student.customisation.bio %}
+                    <div class="student-bio">
+                      {{ student.customisation.bio|truncate(150) }}
+                    </div>
+                  {% endif %}
+                  
+                  <form action="{{ url_for('connect_with_user', user_id=student.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="connect-btn">Connect</button>
+                  </form>
                 </div>
               </div>
-        </div>
-            
+            {% endfor %}
+          </div>
+        {% elif search_performed %}
+          <div class="no-results">
+            <h3>No matching students found</h3>
+            <p>Try adjusting your search filters or check back later as more students join!</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
 
+    <!-- My Partners Tab -->
+    <div id="my-partners" class="tab-content {% if active_tab == 'my-partners' %}active{% endif %}">
+        <div class="filter-section">
+          <h3 class="filter-title">Find Students By:</h3>
+          <form action="{{ url_for('jomgather') }}" method="GET" id="student-search-form-partners">
+            <input type="hidden" name="tab" value="my-partners">
+            <div class="filter-form">
+              <div class="form-group">
+                <label for="faculty">Faculty</label>
+                <select id="faculty" name="faculty">
+                  <option value="">All Faculties</option>
+                  {% for faculty in faculties %}
+                    <option value="{{ faculty }}">{{ faculty }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                  <label for="course">Course</label>
+                  <select id="course" name="course">
+                    <option value="">All Courses</option>
+                    {% for course in courses %}
+                      <option value="{{ course }}">{{ course }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="year">Year of Study</label>
+                  <select id="year" name="year">
+                    <option value="">Any Year</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                    <option value="5">5th Year</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="interests">Interests</label>
+                  <input type="text" id="interests" name="interests" placeholder="E.g. programming, sports, music">
+                </div>
+              </div>
+              <button type="submit" class="search-btn">Find Students</button>
+            </div>
+          </form>
+          </div>
+  
+      <div class="results-section" id="search-results-partners">
+        <!-- My Partners tab - This section will be built differently in the future to show connected students -->
+        <div class="no-results">
+          <h3>Connected students will appear here</h3>
+          <p>Use the search feature to find and connect with students first.</p>
+        </div>
+      </div>
     </div>
           
   
     <!-- Create Gathering Tab -->
-    <div id="createGathering" class="tab-content">
+    <div id="create-gathering" class="tab-content {% if active_tab == 'create-gathering' %}active{% endif %}">
         <div class="event-form">
           <h3 class="filter-title">Create a New Gathering</h3>
           <div class="form-row">
@@ -855,7 +782,7 @@
       </div>
   
       <!-- My Gatherings Tab -->
-      <div id="myGatherings" class="tab-content">
+      <div id="my-gatherings" class="tab-content {% if active_tab == 'my-gatherings' %}active{% endif %}">
         <!-- Hosting Gathering -->
         <div class="gathering-card hosting">
           <div class="gathering-header">
@@ -988,7 +915,7 @@
   
           
   
-    <div id="findGatherings" class="tab-content">
+    <div id="find-gatherings" class="tab-content {% if active_tab == 'find-gatherings' %}active{% endif %}">
         <!-- Finding Gathering -->
         <div class="filter-section">
           <h3 class="filter-title">Find Gatherings By:</h3>
@@ -1109,32 +1036,80 @@
     </div>
   
     <script>
-      function openTab(evt, tabName) {
-        // Declare variables
-        var i, tabcontent, tablinks;
-  
-        // Get all elements with class="tab-content" and hide them
-        tabcontent = document.getElementsByClassName("tab-content");
-        for (i = 0; i < tabcontent.length; i++) {
-          tabcontent[i].style.display = "none";
-        }
-  
-        // Get all elements with class="tab" and remove the class "active"
-        tablinks = document.getElementsByClassName("tab");
-        for (i = 0; i < tablinks.length; i++) {
-          tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-  
-        // Show the current tab, and add an "active" class to the button that opened the tab
-        document.getElementById(tabName).style.display = "block";
-        evt.currentTarget.className += " active";
-
-            
-       function redirectToPage() {
-              window.location.href = "connect1.html";
-          }
-      
+      // Function to show the selected tab
+      function showTab(tabId) {
+        // Hide all tab contents
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabContents.forEach(tab => {
+          tab.classList.remove('active');
+        });
+        
+        // Remove active class from all tabs
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+          tab.classList.remove('active');
+        });
+        
+        // Show the selected tab content
+        document.getElementById(tabId).classList.add('active');
+        
+        // Add active class to clicked tab
+        event.currentTarget.classList.add('active');
+        
+        // Update URL with the tab parameter
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('tab', tabId);
+        window.history.pushState({}, '', currentUrl);
+        
+        // Add a hidden input to any forms in the active tab to maintain tab state
+        const forms = document.getElementById(tabId).querySelectorAll('form');
+        forms.forEach(form => {
+          // Check if the form already has a tab input
+          let tabInput = form.querySelector('input[name="tab"]');
+          if (!tabInput) {
+            tabInput = document.createElement('input');
+            tabInput.type = 'hidden';
+            tabInput.name = 'tab';
+            form.appendChild(tabInput);
+          }
+          tabInput.value = tabId;
+        });
       }
+
+      // Mobile menu toggle
+      const menu = document.querySelector('#mobile-menu');
+      const menuLinks = document.querySelector('.navbar__menu');
+      
+      if (menu) {
+        menu.addEventListener('click', function() {
+          menu.classList.toggle('is-active');
+          menuLinks.classList.toggle('active');
+        });
+      }
+      
+      // Add tab input to all forms initially
+      document.addEventListener('DOMContentLoaded', function() {
+        const activeTab = document.querySelector('.tab.active');
+        if (activeTab) {
+          const tabId = activeTab.getAttribute('data-tab-id') || 'find-partners';
+          
+          const forms = document.querySelectorAll('form');
+          forms.forEach(form => {
+            if (!form.querySelector('input[name="tab"]')) {
+              const tabInput = document.createElement('input');
+              tabInput.type = 'hidden';
+              tabInput.name = 'tab';
+              tabInput.value = tabId;
+              form.appendChild(tabInput);
+            }
+          });
+        }
+      });
+
+      // Call the updateStudentCards function when the page loads
+      window.onload = updateStudentCards;
     </script>
+  
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
   </body>
   </html>

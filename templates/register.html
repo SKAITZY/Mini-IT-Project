@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up / Login - MMU JomGather</title>
+  <title>JomGather - Sign Up/Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
 </head>
 <body>
@@ -34,6 +35,19 @@
 
   <div class="auth-container">
     <div class="auth-box">
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="flash-message {{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      
       <div class="auth-image">
         <h1>Welcome to JomGather</h1>
         <p>Connect with fellow MMU students and create meaningful experiences together.</p>
@@ -52,9 +66,10 @@
 
         <div id="login-form" class="form-container active">
           <form id="loginForm" action="{{ url_for('login') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
               <label for="login-student-id">Student ID</label>
-              <input type="text" id="login-student-id" name="student_id" pattern="[A-Za-z0-9]{1,15}" placeholder="Enter your email or student ID " required>
+              <input type="text" id="login-student-id" name="student_id" pattern="[A-Za-z0-9]{8,12}" placeholder="Enter your student ID (8-12 characters)" required>
             </div>
 
             <div class="form-group">
@@ -70,13 +85,14 @@
 
         <div id="signup-form" class="form-container">
           <form id="signupForm" action="{{ url_for('register') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
               <label for="signup-name">Full Name</label>
               <input type="text" id="signup-name" name="username" placeholder= "Enter your full name" required>
             </div>
             <div class="form-group">
               <label for="signup-student-id">Student ID</label>
-              <input type="text" id="signup-student-id" name="student_id" pattern="[A-Za-z0-9]{1,15}" placeholder="Enter your MMU student ID " required>
+              <input type="text" id="signup-student-id" name="student_id" pattern="[A-Za-z0-9]{8,12}" placeholder="Enter your MMU student ID (8-12 characters)" required>
             </div>
             <div class="form-group">
               <label for="signup-email">Email Address</label>
@@ -117,7 +133,7 @@
 
     // Validate MMU Student ID format
     function validateStudentId(studentId) {
-      const studentIdRegex = /^[A-Za-z0-9]{1,15}$/;
+      const studentIdRegex = /^[A-Za-z0-9]{8,12}$/;
       return studentIdRegex.test(studentId);
     }
 
@@ -128,7 +144,7 @@
       const password = document.getElementById('login-password').value;
 
       if (!validateStudentId(studentId)) {
-        alert('Please enter a valid MMU student ID (up to 15 characters, letters and numbers)');
+        alert('Please enter a valid MMU student ID (8-12 alphanumeric characters)');
         event.preventDefault();
         return false;
       }
@@ -145,7 +161,7 @@
       const confirmPassword = document.getElementById('signup-confirm-password').value;
 
       if (!validateStudentId(studentId)) {
-        alert('Please enter a valid MMU student ID (up to 15 characters, letters and numbers)');
+        alert('Please enter a valid MMU student ID (8-12 alphanumeric characters)');
         event.preventDefault();
         return false;
       }
@@ -161,11 +177,13 @@
 
     // Add input validation for student ID fields
     document.getElementById('login-student-id').addEventListener('input', function(e) {
-      this.value = this.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 15);
+      // Allow only alphanumeric characters, max 12
+      this.value = this.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 12);
     });
 
     document.getElementById('signup-student-id').addEventListener('input', function(e) {
-      this.value = this.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 15);
+      // Allow only alphanumeric characters, max 12
+      this.value = this.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 12);
     });
 
     // Mobile menu toggle
@@ -174,5 +192,7 @@
       this.classList.toggle('is-active');
     });
   </script>
+
+  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
 </body>
 </html>

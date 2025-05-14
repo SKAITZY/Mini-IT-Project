@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Customize Your Profile - MMU JomGather</title>
+  <title>JomGather - Customize Profile</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
   <style>
     * {
       margin: 0;
@@ -67,8 +68,7 @@
       text-decoration: none;
       padding: 0 1rem;
       height: 100%;
-      transition: all 1s ease;
-      font-size: 2rem;
+      transition: all 0.3s ease;
     }
     
     .navbar__links:hover {
@@ -88,7 +88,7 @@
       border-radius: 4px;
       background: #ff0000;
       color: #fff;
-      transition: all 1s ease;
+      transition: all 0.3s ease;
     }
     
     .button:hover {
@@ -101,7 +101,7 @@
       padding: 20px;
       background: #fff;
       border-radius: 10px;
-      box-shadow: 0 5px 15px #0927af;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     
     .profile-header {
@@ -120,7 +120,6 @@
     
     .profile-form {
       display: grid;
-      grid-template-columns: 1fr;
       gap: 30px;
     }
     
@@ -137,8 +136,7 @@
     
     .form-group input[type="text"],
     .form-group input[type="email"],
-    .form-group textarea,
-    .form-group select {
+    .form-group textarea {
       width: 100%;
       padding: 12px;
       border: 1px solid #ddd;
@@ -149,105 +147,6 @@
     .form-group textarea {
       min-height: 100px;
       resize: vertical;
-    }
-    
-    .interests-section h3 {
-      margin-bottom: 15px;
-      color: #0a192f;
-    }
-    
-    .interest-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    
-    .interest-btn {
-      background: #f0f0f0;
-      border: 1px solid #ddd;
-      border-radius: 30px;
-      padding: 8px 16px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 1s ease;
-    }
-    
-    .interest-btn:hover {
-      background: #e0e0e0;
-    }
-    
-    .interest-btn.active {
-      background: #0927af;
-      color: white;
-      border-color: #000000;
-    }
-    
-    .custom-interest {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-    
-    .custom-interest input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-    
-    .add-btn {
-      background: #0927af;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 15px;
-      cursor: pointer;
-      transition: all 1s ease;
-    }
-    
-    .add-btn:hover {
-      background: #0066ff;
-    }
-    
-    .selected-interests {
-      margin-top: 20px;
-    }
-    
-    .selected-interests h4 {
-      margin-bottom: 10px;
-      color: #0a192f;
-    }
-    
-    .interest-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    
-    .interest-tag {
-      background: #0927af;
-      color: white;
-      border-radius: 30px;
-      padding: 8px 16px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .remove-tag {
-      background: rgba(255, 255, 255, 0.3);
-      border: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: bold;
     }
     
     .profile-photo {
@@ -265,7 +164,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     }
     
     .photo-container img {
@@ -284,10 +182,9 @@
       color: white;
       border: none;
       border-radius: 5px;
-      padding: 10px 15px;
+      padding: 10px 20px;
       cursor: pointer;
-      transition: all 1s ease;
-      margin-top: 10px;
+      transition: all 0.3s ease;
     }
     
     .upload-btn:hover {
@@ -308,7 +205,7 @@
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      transition: all 1s ease;
+      transition: all 0.3s ease;
     }
     
     .save-btn:hover {
@@ -319,6 +216,89 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
+    }
+    
+    /* Interest buttons and tags styling */
+    .interest-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .interest-btn {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 8px 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .interest-btn.active {
+      background: #0927af;
+      color: white;
+      border-color: #0927af;
+    }
+    
+    .category-heading {
+      font-weight: bold;
+      margin: 15px 0 10px;
+      color: #0a192f;
+    }
+    
+    .custom-interest {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .custom-interest input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    .add-btn {
+      background: #0927af;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 0 15px;
+      cursor: pointer;
+    }
+    
+    .selected-interests {
+      margin: 20px 0;
+    }
+    
+    .interest-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .interest-tag {
+      background: #0927af;
+      color: white;
+      border-radius: 20px;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .remove-tag {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     @media screen and (max-width: 768px) {
@@ -335,26 +315,35 @@
 <body>
   <nav class="navbar">
     <div class="navbar__container">
-        <a href="/home.html" id="navbar__logo">JomGather</a>
-        <div class="navbar__toggle" id="mobile-menu">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-        </div>
-        <ul class="navbar__menu">
-            <li class="navbar__item">
-                <a href="/index2.html" class="navbar__links">Home</a>
-            </li>            
-            <li class="navbar__item">
-                <a href="/customise.html" class="navbar__links">Customize Profile</a>
-            </li>
-            <li class="navbar__item">
-                <a href="/jomgather.html" class="navbar__links">Jom Gather</a>
-            </li>
-            <li class="navbar__btn">
-              <a href="/register.html" class="button">Sign Up/Log In</a>
-            </li>
-        </ul>
+      <a href="{{ url_for('index') }}" id="navbar__logo">JomGather</a>
+      <div class="navbar__toggle" id="mobile-menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+      <ul class="navbar__menu">
+        <li class="navbar__item">
+          <a href="{{ url_for('index') }}" class="navbar__links">Home</a>
+        </li>
+        <li class="navbar__item">
+          <a href="{{ url_for('customise') }}" class="navbar__links">Customize Profile</a>
+        </li>
+        <li class="navbar__item">
+          <a href="{{ url_for('jomgather') }}" class="navbar__links">Jom Gather</a>
+        </li>
+        {% if current_user.is_authenticated %}
+        <li class="navbar__item">
+          <a href="{{ url_for('view_connections') }}" class="navbar__links">My Connections</a>
+        </li>
+        <li class="navbar__btn">
+          <a href="{{ url_for('logout') }}" class="button">Logout</a>
+        </li>
+        {% else %}
+        <li class="navbar__btn">
+          <a href="{{ url_for('register') }}" class="button">Sign Up/Log In</a>
+        </li>
+        {% endif %}
+      </ul>
     </div>
   </nav>
 
@@ -365,185 +354,196 @@
     </div>
     
     <div class="profile-form">
-      <div class="profile-photo">
-        <div class="photo-container">
-          <div class="photo-placeholder">👤</div>
-        </div>
-        <input type="file" id="photo-upload" accept="image/*" style="display: none;">
-        <button class="upload-btn" onclick="document.getElementById('photo-upload').click()">Upload Photo</button>
-      </div>
-
-      <div class="two-columns">
-        <div class="form-group">
-          <label for="name">Full Name</label>
-          <input type="text" id="name" placeholder="Enter your name">
-        </div>
-        
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="Enter your email">
-        </div>
-      </div>
-      
-      <div class="two-columns">
-        <div class="form-group">
-          <label for="faculty">Faculty</label>
-          <select id="faculty">
-            <option value="">Select your faculty</option>
-            <option value="fci">Faculty of Comuting & Informatics</option>
-            <option value="foe">Faculty of Engineering</option>
-            <option value="fob">Faculty of Business</option>
-            <option value="fom">Faculty of Management</option>
-            <option value="focs">Faculty of Creative Multimedia</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="year">Year of Study</label>
-          <select id="year">
-            <option value="">Select your year</option>
-            <option value="1">Year 1</option>
-            <option value="2">Year 2</option>
-            <option value="3">Year 3</option>
-            <option value="4">Year 4</option>
-            <option value="postgrad">Postgraduate</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-section">
-        <h2>About Me</h2>
-        <div class="form-group">
-          <label for="bio">Bio</label>
-          <textarea id="bio" class="form-control" placeholder="Tell others about yourself in a few sentences..."></textarea>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <h3>Select Your Interests</h3>
-        <p>Select all that apply to help us match you with like-minded students</p>
-
-        <div class="category-heading">Academic</div>
-        <div class="interest-buttons">
-          <!-- Academic Interests -->
-          <button class="interest-btn" onclick="toggleInterest(this)">Programming</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Data Science</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Artificial Intelligence</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Cybersecurity</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Engineering</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Business</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Marketing</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Finance</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Animation</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Game Development</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Mass Communication</button>
+      <form action="{{ url_for('customise') }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="profile-photo">
+          <div class="photo-container">
+            {% if user.customisation.profile_picture %}
+              <img src="{{ url_for('static', filename='uploads/' + user.customisation.profile_picture) }}" alt="Profile Picture">
+            {% else %}
+              <div class="photo-placeholder">👤</div>
+            {% endif %}
+          </div>
+          <input type="file" id="photo-upload" name="profile_picture" accept="image/*" style="display: none;">
+          <button type="button" class="upload-btn" onclick="document.getElementById('photo-upload').click()">Upload Photo</button>
         </div>
 
-        <div class="category-heading">Study Preferences</div>
-        <div class="interest-buttons">
-          <!-- Study Preferences -->
-          <button class="interest-btn" onclick="toggleInterest(this)">Group Study</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Solo Study</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Library</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Learning Point</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Early Bird</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Night Owl</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Weekend Study</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Weekday Study</button>
-        </div>
+        <div class="two-columns">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" value="{{ user.username }}" placeholder="Enter your name">
+          </div>
           
-
-        <div class="category-heading">Sports & Fitness</div>
-        <div class="interest-buttons">
-          <!-- Sports -->
-          <button class="interest-btn" onclick="toggleInterest(this)">Basketball</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Football</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Badminton</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Tennis</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Swimming</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Volleyball</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Table Tennis</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Martial Arts</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Yoga</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Gym</button>
-          
-        </div>
-          
-        <div class="category-heading">Arts & Entertainment</div>
-        <div class="interest-buttons">
-          <!-- Arts & Entertainment -->
-          <button class="interest-btn" onclick="toggleInterest(this)">Photography</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Content Creation</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Music</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Singing</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Dancing</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Painting</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Drawing</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Acting</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Theater</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Video editing</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Playing Instruments</button>
-          
-        </div>
-          
-        <div class="category-heading">Other Hobbies</div>
-        <div class="interest-buttons">
-          <!-- Other Hobbies -->
-          <button class="interest-btn" onclick="toggleInterest(this)">Reading</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Writing</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">PC Gaming</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Mobile Gaming</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Console Gaming</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">AR/VR Gaming</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Cooking</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Baking</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Travel</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Hiking</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Board Games</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Anime</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Movies</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Series</button>
-          
-        </div>
-        
-          
-        <div class="category-heading">Social Activities</div>
-        <div class="interest-buttons">
-          <!-- Social Activities -->
-          <button class="interest-btn" onclick="toggleInterest(this)">Volunteering</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Event Planning</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Public Speaking</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Leadership</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Entrepreneurship</button>
-          <button class="interest-btn" onclick="toggleInterest(this)">Student Clubs</button>
-        </div>
-        
-        <div class="custom-interest">
-          <input type="text" id="custom-interest" placeholder="Add your own interest">
-          <button class="add-btn" onclick="addCustomInterest()">Add</button>
-        </div>
-        
-        <div class="selected-interests">
-          <h4>Your Selected Interests</h4>
-          <div class="interest-tags" id="selected-tags">
-            <!-- Selected interests will appear here -->
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" placeholder="Enter your email">
           </div>
         </div>
-      </div>
-      
-      <div class="form-group">
-        <label for="preferences">Gathering Preferences</label>
-        <textarea id="preferences" placeholder="What kind of gatherings are you interested in? E.g., study groups, sports activities, gaming sessions..."></textarea>
-      </div>
-      
-      <div class="save-section">
-        <button class="save-btn">Save Profile</button>
-      </div>
+
+        <div class="two-columns">
+          <div class="form-group">
+            <label for="faculty">Faculty</label>
+            <select id="faculty" name="faculty">
+              <option value="" {% if not user.customisation.faculty %}selected{% endif %}>Select Faculty</option>
+              <option value="Faculty of Computing & Informatics" {% if user.customisation.faculty == "Faculty of Computing & Informatics" %}selected{% endif %}>Faculty of Computing & Informatics</option>
+              <option value="Faculty of Creative Multimedia" {% if user.customisation.faculty == "Faculty of Creative Multimedia" %}selected{% endif %}>Faculty of Creative Multimedia</option>
+              <option value="Faculty of Engineering" {% if user.customisation.faculty == "Faculty of Engineering" %}selected{% endif %}>Faculty of Engineering</option>
+              <option value="Faculty of Management" {% if user.customisation.faculty == "Faculty of Management" %}selected{% endif %}>Faculty of Management</option>
+              <option value="Faculty of Applied Communication" {% if user.customisation.faculty == "Faculty of Applied Communication" %}selected{% endif %}>Faculty of Applied Communication</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="course">Course</label>
+            <input type="text" id="course" name="course" value="{{ user.customisation.course }}" placeholder="Enter your course (e.g. Computer Science)">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="year_of_study">Year of Study</label>
+          <select id="year_of_study" name="year_of_study">
+            <option value="" {% if not user.customisation.year_of_study %}selected{% endif %}>Select Year</option>
+            <option value="1" {% if user.customisation.year_of_study == 1 %}selected{% endif %}>1st Year</option>
+            <option value="2" {% if user.customisation.year_of_study == 2 %}selected{% endif %}>2nd Year</option>
+            <option value="3" {% if user.customisation.year_of_study == 3 %}selected{% endif %}>3rd Year</option>
+            <option value="4" {% if user.customisation.year_of_study == 4 %}selected{% endif %}>4th Year</option>
+            <option value="5" {% if user.customisation.year_of_study == 5 %}selected{% endif %}>5th Year</option>
+          </select>
+        </div>
+
+        <div class="form-section">
+          <h2>About Me</h2>
+          <div class="form-group">
+            <label for="bio">Bio</label>
+            <textarea id="bio" name="bio" class="form-control" placeholder="Tell others about yourself in a few sentences...">{{ user.customisation.bio }}</textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Select Your Interests</h3>
+          <p>Select all that apply to help us match you with like-minded students</p>
+
+          <div class="category-heading">Academic</div>
+          <div class="interest-buttons">
+            <!-- Academic Interests -->
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Programming</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Data Science</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Artificial Intelligence</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Cybersecurity</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Engineering</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Business</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Marketing</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Finance</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Animation</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Game Development</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Mass Communication</button>
+          </div>
+
+          <div class="category-heading">Study Preferences</div>
+          <div class="interest-buttons">
+            <!-- Study Preferences -->
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Group Study</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Solo Study</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Library</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Learning Point</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Early Bird</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Night Owl</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Weekend Study</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Weekday Study</button>
+          </div>
+
+          <div class="category-heading">Sports & Fitness</div>
+          <div class="interest-buttons">
+            <!-- Sports -->
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Basketball</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Football</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Badminton</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Tennis</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Swimming</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Volleyball</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Table Tennis</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Martial Arts</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Yoga</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Gym</button>
+          </div>
+
+          <div class="category-heading">Arts & Entertainment</div>
+          <div class="interest-buttons">
+            <!-- Arts & Entertainment -->
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Photography</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Content Creation</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Music</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Singing</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Dancing</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Painting</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Drawing</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Acting</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Theater</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Video editing</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Playing Instruments</button>
+          </div>
+
+          <div class="category-heading">Other Hobbies</div>
+          <div class="interest-buttons">
+            <!-- Other Hobbies -->
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Reading</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Writing</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">PC Gaming</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Mobile Gaming</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Console Gaming</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">AR/VR Gaming</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Cooking</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Baking</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Travel</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Hiking</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Board Games</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Anime</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Movies</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Series</button>
+          </div>
+
+          <div class="category-heading">Social Activities</div>
+          <div class="interest-buttons">
+            <!-- Social Activities -->
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Volunteering</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Event Planning</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Public Speaking</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Leadership</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Entrepreneurship</button>
+            <button class="interest-btn" type="button" onclick="toggleInterest(this)">Student Clubs</button>
+          </div>
+
+          <div class="custom-interest">
+            <input type="text" id="custom-interest" placeholder="Add your own interest">
+            <button class="add-btn" type="button" onclick="addCustomInterest()">Add</button>
+          </div>
+
+          <div class="selected-interests">
+            <h4>Your Selected Interests</h4>
+            <div class="interest-tags" id="selected-tags">
+              <!-- Selected interests will appear here -->
+            </div>
+          </div>
+          <input type="hidden" id="interests" name="interests" value="{{ user.customisation.interests }}">
+        </div>
+
+        <div class="save-section">
+          <button type="submit" class="save-btn" onclick="updateInterestsField()">Save Profile</button>
+        </div>
+      </form>
     </div>
   </section>
 
   <script>
+    // Function to update the hidden interests field before form submission
+    function updateInterestsField() {
+      console.log("Updating interests field...");
+      const selectedTags = document.querySelectorAll('.interest-tag');
+      const interests = Array.from(selectedTags).map(tag => tag.getAttribute('data-interest')).join(',');
+      document.getElementById('interests').value = interests;
+      console.log("Interests to be saved:", interests);
+    }
+    
     // Toggle interest selection
     function toggleInterest(button) {
       button.classList.toggle('active');
@@ -568,6 +568,9 @@
         // Remove tag from selected interests
         existingTag.remove();
       }
+      
+      // Update the hidden interests field immediately
+      updateInterestsField();
     }
     
     // Add custom interest
@@ -594,6 +597,9 @@
           
           // Clear input
           customInput.value = '';
+          
+          // Update the hidden interests field
+          updateInterestsField();
         }
       }
     }
@@ -604,10 +610,15 @@
       tagElement.remove();
       
       // Deselect the corresponding button if it exists
-      const button = document.querySelector(`.interest-btn:not(.custom-added)`);
-      if (button && button.innerText === interestText) {
+      const button = Array.from(document.querySelectorAll('.interest-btn'))
+        .find(btn => btn.innerText === interestText);
+        
+      if (button) {
         button.classList.remove('active');
       }
+      
+      // Update the hidden interests field immediately
+      updateInterestsField();
     }
     
     // Handle Enter key in custom interest input
@@ -618,7 +629,7 @@
       }
     });
     
-    // Mobile menu toggle (from your original code)
+    // Mobile menu toggle
     const menu = document.querySelector('#mobile-menu');
     const menuLinks = document.querySelector('.navbar__menu');
     
@@ -628,6 +639,93 @@
         menuLinks.classList.toggle('active');
       });
     }
+
+    // Preview uploaded image
+    document.getElementById('photo-upload').addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.querySelector('.photo-container img') || document.createElement('img');
+          img.src = e.target.result;
+          img.alt = 'Profile Picture';
+          const container = document.querySelector('.photo-container');
+          container.innerHTML = '';
+          container.appendChild(img);
+        }
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    // Initialize selected interests from user data
+    window.addEventListener('load', function() {
+      const interests = document.getElementById('interests').value;
+      console.log("Loaded interests:", interests);
+      
+      if (interests && interests.trim()) {
+        const interestList = interests.split(',').map(i => i.trim()).filter(i => i); // Filter out empty strings
+        console.log("Interest list:", interestList);
+        
+        interestList.forEach(interest => {
+          // Find matching button if any
+          const button = Array.from(document.querySelectorAll('.interest-btn'))
+            .find(btn => btn.innerText === interest);
+          
+          if (button) {
+            // If there's a matching button, activate it (but don't call toggleInterest to avoid duplication)
+            button.classList.add('active');
+            console.log("Activating existing interest:", interest);
+            
+            // Manually create the tag for the interest
+            const selectedTags = document.getElementById('selected-tags');
+            const existingTag = document.querySelector(`.interest-tag[data-interest="${interest}"]`);
+            
+            if (!existingTag) {
+              const tag = document.createElement('div');
+              tag.className = 'interest-tag';
+              tag.setAttribute('data-interest', interest);
+              tag.innerHTML = `
+                ${interest}
+                <button class="remove-tag" onclick="removeInterest(this.parentElement, '${interest}')">×</button>
+              `;
+              selectedTags.appendChild(tag);
+            }
+          } else {
+            // If no matching button, create as custom interest
+            console.log("Adding custom interest:", interest);
+            const selectedTags = document.getElementById('selected-tags');
+            
+            // Create new interest tag
+            const tag = document.createElement('div');
+            tag.className = 'interest-tag';
+            tag.setAttribute('data-interest', interest);
+            tag.innerHTML = `
+              ${interest}
+              <button class="remove-tag" onclick="removeInterest(this.parentElement, '${interest}')">×</button>
+            `;
+            selectedTags.appendChild(tag);
+          }
+        });
+        
+        // Make sure the interests field is updated after initialization
+        updateInterestsField();
+      }
+    });
+
+    // Add form submit event listener
+    document.querySelector('form').addEventListener('submit', function(e) {
+      // Prevent the default form submission
+      e.preventDefault();
+      
+      // Make sure interests are updated before submission
+      updateInterestsField();
+      
+      console.log("Form is being submitted with interests:", document.getElementById('interests').value);
+      
+      // Continue with the form submission
+      this.submit();
+    });
   </script>
+  
+  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
 </body>
 </html>
