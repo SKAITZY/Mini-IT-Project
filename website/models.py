@@ -1,9 +1,11 @@
+from flask import app
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://wilson:JOMBETA06.!1123localhost/db_name'
 
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
