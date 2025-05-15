@@ -11,8 +11,9 @@ auth = Blueprint('auth', __name__)
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email or student_id = request.form.get('login-email')
-        password = request.form.get('password')
+        student_id = request.form.get('login-student-id')
+        email = request.form.get('login-email')
+        password = request.form.get('login-password')
 
         user = User.query.filter_by(email=email).first()
         if user:
@@ -38,29 +39,26 @@ def logout():
 @auth.route('/signup', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
-        full_name = request.form.get('fullname')
-        student_id = request.form.get('student-id')
-        signup_email = request.form.get('signup-email')
-        signup_password = request.form.get('signup-password')
-        confirm_password = request.form.get('confirm-password')
+        student_id = request.form.get('signup-student-id')
+        full_name = request.form.get('signup-name')
+        email = request.form.get('signup-email')
+        password = request.form.get('signup-password')
+        confirm_password = request.form.get('signup-confirm-password')
 
         user = User.query.filter_by(email=email).first()
         if user:
             flash('Email already exists.', category='error')
+        elif len(email) < 4:
+            flash('Email must be greater than 3 characters.', category='error')
         elif len(full_name) < 2:
             flash('Full name must be greater than 1 character.', category='error')
-        elif flash('Email already exists.', category='error')
-        elif len(student_id) < 2:
-            flash('Student ID must be greater than 1 character.', category='error')
-        elif len(signup_email) < 4:
-            flash('Email must be greater than 3 characters.', category='error')
-        elif signup_password != confirm_password:
+        elif password != confirm_password:
             flash('Passwords don\'t match.', category='error')
-        elif len(signup_password) < 7:
+        elif len(password) < 7:
             flash('Password must be at least 7 characters.', category='error')
         else:
-            new_user = User(email=email, first_name=first_name, password=generate_password_hash(
-                password1, method='sha256'))
+            new_user = User(email=email, first_name=full_name, password=generate_password_hash(
+                password, method='sha256'))
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)
@@ -68,3 +66,31 @@ def sign_up():
             return redirect(url_for('views.home'))
 
     return render_template("register.html", user=current_user)
+
+
+@auth.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            # Here you would typically send a password reset email
+            flash('Password reset instructions have been sent to your email.', category='success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Email not found.', category='error')
+    
+    return render_template("forgot_password.html", user=current_user)
+
+
+@auth.route('/google-login')
+def google_login():
+    flash('Google login not implemented yet.', category='error')
+    return redirect(url_for('auth.login'))
+
+
+@auth.route('/facebook-login')
+def facebook_login():
+    flash('Facebook login not implemented yet.', category='error')
+    return redirect(url_for('auth.login'))
