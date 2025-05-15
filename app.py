@@ -68,11 +68,13 @@ def customise():
         course = request.form.get('course')
         year_of_study = request.form.get('year_of_study')
         profile_picture = request.files.get('profile_picture')
+        name = request.form.get('name')  # Get the name field
         
         # Debug information
-        print(f"Received POST data: bio={bio[:20]}..., interests={interests[:50]}...")
+        print(f"Received POST data: bio={bio[:20] if bio else 'None'}..., interests={interests[:50] if interests else 'None'}...")
         print(f"Faculty: {faculty}, Course: {course}, Year: {year_of_study}")
         print(f"Profile picture: {profile_picture.filename if profile_picture else 'None'}")
+        print(f"Name: {name}")
         
         # Process profile picture if uploaded
         if profile_picture and profile_picture.filename:
@@ -103,6 +105,10 @@ def customise():
         current_user.customisation.interests = interests
         current_user.customisation.faculty = faculty
         current_user.customisation.course = course
+        
+        # Update username if name field is provided
+        if name and name.strip():
+            current_user.username = name.strip()
         
         # Convert year_of_study to integer if it has a value
         if year_of_study:
@@ -203,7 +209,6 @@ def register():
             db.session.rollback()
             flash(f'An error occurred during registration: {str(e)}. Please try again.', 'error')
             return render_template('register.html')
-            
     return render_template('register.html')
 
 @app.route('/logout')
