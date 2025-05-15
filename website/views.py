@@ -1,17 +1,12 @@
-<<<<<<< HEAD
-from flask import Blueprint, render_template, request, flash, jsonify
+from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
-from .models import Note
+from .models import Note, User
 from . import db
 import json
-=======
-from flask import Blueprint
->>>>>>> beta_v
 
 views = Blueprint('views', __name__)
 
 
-<<<<<<< HEAD
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
@@ -26,7 +21,7 @@ def home():
             db.session.commit()
             flash('Note added!', category='success')
 
-    return render_template("home.html", user=current_user)
+    return render_template("index2.html", user=current_user)
 
 
 @views.route('/delete-note', methods=['POST'])
@@ -40,8 +35,3 @@ def delete_note():
             db.session.commit()
 
     return jsonify({})
-=======
-@views.route('/')
-def home():
-    return "<h1>Test</h1>"
->>>>>>> beta_v

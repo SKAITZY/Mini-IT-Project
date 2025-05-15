@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,8 +11,9 @@ auth = Blueprint('auth', __name__)
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+        student_id = request.form.get('login-student-id')
+        email = request.form.get('login-email')
+        password = request.form.get('login-password')
 
         user = User.query.filter_by(email=email).first()
         if user:
@@ -26,7 +26,7 @@ def login():
         else:
             flash('Email does not exist.', category='error')
 
-    return render_template("login.html", user=current_user)
+    return render_template("register.html", user=current_user)
 
 
 @auth.route('/logout')
@@ -36,54 +36,61 @@ def logout():
     return redirect(url_for('auth.login'))
 
 
-@auth.route('/sign-up', methods=['GET', 'POST'])
+@auth.route('/signup', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
-        email = request.form.get('email')
-        first_name = request.form.get('firstName')
-        password1 = request.form.get('password1')
-        password2 = request.form.get('password2')
+        student_id = request.form.get('signup-student-id')
+        full_name = request.form.get('signup-name')
+        email = request.form.get('signup-email')
+        password = request.form.get('signup-password')
+        confirm_password = request.form.get('signup-confirm-password')
 
         user = User.query.filter_by(email=email).first()
         if user:
             flash('Email already exists.', category='error')
         elif len(email) < 4:
             flash('Email must be greater than 3 characters.', category='error')
-        elif len(first_name) < 2:
-            flash('First name must be greater than 1 character.', category='error')
-        elif password1 != password2:
+        elif len(full_name) < 2:
+            flash('Full name must be greater than 1 character.', category='error')
+        elif password != confirm_password:
             flash('Passwords don\'t match.', category='error')
-        elif len(password1) < 7:
+        elif len(password) < 7:
             flash('Password must be at least 7 characters.', category='error')
         else:
-            new_user = User(email=email, first_name=first_name, password=generate_password_hash(
-                password1, method='sha256'))
+            new_user = User(email=email, first_name=full_name, password=generate_password_hash(
+                password, method='sha256'))
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))
 
-    return render_template("sign_up.html", user=current_user)
-=======
-=======
->>>>>>> beta_v
-from flask import Blueprint
+    return render_template("register.html", user=current_user)
 
-auth = Blueprint('auth', __name__)
 
-@auth.route('/login')
-def login():
-    return "<p>Login</p>"
+@auth.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            # Here you would typically send a password reset email
+            flash('Password reset instructions have been sent to your email.', category='success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Email not found.', category='error')
+    
+    return render_template("forgot_password.html", user=current_user)
 
-@auth.route('/logout')
-def logout():
-    return "<p>Logout</p>"
 
-@auth.route('/sign-up')
-def sign_up():
-<<<<<<< HEAD
-    return "<p>Sign Up</p>"
-=======
-    return "<p>Sign Up</p>"
->>>>>>> beta_v
+@auth.route('/google-login')
+def google_login():
+    flash('Google login not implemented yet.', category='error')
+    return redirect(url_for('auth.login'))
+
+
+@auth.route('/facebook-login')
+def facebook_login():
+    flash('Facebook login not implemented yet.', category='error')
+    return redirect(url_for('auth.login'))
