@@ -197,3 +197,5 @@ INSERT INTO user (id, name, faculty_id, interest_id, tbc_id) VALUES
         (SELECT id FROM interest WHERE interest = 'Reading'),
         (SELECT id FROM TBC WHERE interest_category = 'Other Hobbies')
     );
+
+

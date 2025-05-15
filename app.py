@@ -1,12 +1,16 @@
 from flask import Flask, redirect, url_for, render_template, request, flash, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from extensions import db, login_manager, csrf, init_extensions
+from extensions import db,login_manager, csrf, init_extensions
 from config import Config
 import os
 import re
 from werkzeug.utils import secure_filename
 from datetime import datetime
+from flask import Flask
+from flask_mysqldb import MySQL
+
+app = Flask(__name__)
 
 # Create a Flask app instance
 app = Flask(__name__)
