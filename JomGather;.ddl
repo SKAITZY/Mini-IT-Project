@@ -1,3 +1,4 @@
+-- Active: 1746064849072@@127.0.0.1@3306@jomgather
 CREATE DATABASE IF NOT EXISTS JomGather;
 
 DROP TABLE interest;

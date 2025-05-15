@@ -170,27 +170,33 @@ CREATE TABLE user (
     FOREIGN KEY (tbc_id) REFERENCES TBC(id)
 );
 
+ALTER TABLE user ADD `Student_ID` VARCHAR(10) AFTER name;
+ALTER TABLE user ADD PRIMARY KEY(`Student_ID`);
+
 SELECT * FROM user;
 
 INSERT INTO user (id, name, faculty_id, interest_id, tbc_id) VALUES
     ('0001', 'Sarah Tan', 
         (SELECT id FROM faculty WHERE programe = 'Software Engineering'),
         (SELECT id FROM interest WHERE interest = 'Programming'),
-        (SELECT id FROM TBC WHERE interest_category = 'Academic')
-    ),
+        (SELECT id FROM TBC WHERE interest_category = 'Academic Interests')
+    );
 
-    ('0002', 'Ahmad Rizal', 
+INSERT INTO user (id, name, faculty_id, interest_id, tbc_id) VALUES
+     ('0002', 'Ahmad Rizal', 
         (SELECT id FROM faculty WHERE programe = 'Software Engineering'),
         (SELECT id FROM interest WHERE interest = 'Basketball'),
         (SELECT id FROM TBC WHERE interest_category = 'Sports & Fitness')
-    ),
+    );
 
+Insert INTO user (id, name, faculty_id, interest_id, tbc_id) VALUES
     ('0003', 'Michelle Wong', 
         (SELECT id FROM faculty WHERE programe = 'Business Management'),
         (SELECT id FROM interest WHERE interest = 'Marketing'),
-        (SELECT id FROM TBC WHERE interest_category = 'Social Activities')
-    ),
+        (SELECT id FROM TBC WHERE interest_category = 'Academic Interests')
+    );
 
+INSERT INTO user (id, name, faculty_id, interest_id, tbc_id) VALUES
     ('0004', 'Raj Kumar', 
         (SELECT id FROM faculty WHERE programe = 'Business Management'),
         (SELECT id FROM interest WHERE interest = 'Reading'),
