@@ -7,4 +7,5 @@ email-validator==2.1.0.post1
 Jinja2==3.1.2
 itsdangerous==2.1.2
 click==8.1.7
-SQLAlchemy==2.0.23 
+SQLAlchemy==2.0.23
+Flask-MySQLdb==1.2.4 
