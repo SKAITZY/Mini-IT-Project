@@ -1,6 +1,6 @@
 // Sound effects for UI interactions
 const clickSound = new Audio('/static/sounds/click.mp3');
-const hoverSound = new Audio('/static/sounds/hover.mp3');
+const hoverSound = new Audio('/static/sounds/click.mp3');
 
 // Function to play click sound
 function playClickSound() {
@@ -8,10 +8,10 @@ function playClickSound() {
     clickSound.play();
 }
 
-// Function to play hover sound
+// Function to play hover sound (now using click sound)
 function playHoverSound() {
-    hoverSound.currentTime = 0;
-    hoverSound.play();
+    clickSound.currentTime = 0;
+    clickSound.play();
 }
 
 // Add click sound to all buttons

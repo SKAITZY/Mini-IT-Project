@@ -247,6 +247,8 @@ def jomgather():
     ])
     
     students = []
+    connected_partners = []
+    
     # Only search for students if in find-partners tab to avoid duplicate display
     if current_user.is_authenticated and active_tab == 'find-partners':
         # Initialize filters
@@ -279,8 +281,55 @@ def jomgather():
         # Execute query
         students = query.all()
     
+    # Fetch connected partners if in my-partners tab
+    elif current_user.is_authenticated and active_tab == 'my-partners':
+        # Initialize filters
+        faculty_filter = request.args.get('faculty', '')
+        course_filter = request.args.get('course', '')
+        year_filter = request.args.get('year', '')
+        interests_filter = request.args.get('interests', '')
+        
+        # Get all accepted connections where the current user is involved
+        connections_made = Connection.query.filter_by(user_id=current_user.id, status='accepted').all()
+        connections_received = Connection.query.filter_by(connected_user_id=current_user.id, status='accepted').all()
+        
+        # Get the users involved in these connections
+        partner_ids = []
+        
+        for conn in connections_made:
+            partner_ids.append(conn.connected_user_id)
+            
+        for conn in connections_received:
+            partner_ids.append(conn.user_id)
+        
+        # Query for partners with filters
+        if partner_ids:
+            query = User.query.join(Customisation).filter(User.id.in_(partner_ids))
+            
+            # Apply filters if specified
+            if faculty_filter:
+                query = query.filter(Customisation.faculty == faculty_filter)
+            
+            if course_filter:
+                query = query.filter(Customisation.course == course_filter)
+            
+            if year_filter and year_filter.isdigit():
+                query = query.filter(Customisation.year_of_study == int(year_filter))
+            
+            if interests_filter:
+                # Search for interests as substring
+                interest_terms = interests_filter.lower().split(',')
+                for term in interest_terms:
+                    term = term.strip()
+                    if term:
+                        query = query.filter(Customisation.interests.ilike(f'%{term}%'))
+            
+            # Execute query
+            connected_partners = query.all()
+    
     return render_template('jomgather.html', 
                            students=students,
+                           connected_partners=connected_partners,
                            faculties=faculties,
                            courses=courses,
                            search_performed=search_performed,
