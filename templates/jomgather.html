@@ -595,7 +595,11 @@
       <div class="results-section" id="search-results">
         {% if students %}
           <div class="results-count">
-            Found {{ students|length }} student{% if students|length != 1 %}s{% endif %}
+            {% if search_performed %}
+              Found {{ students|length }} student{% if students|length != 1 %}s{% endif %} matching your criteria
+            {% else %}
+              Showing all {{ students|length }} student{% if students|length != 1 %}s{% endif %}
+            {% endif %}
           </div>
           
           <div class="results-grid">

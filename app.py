@@ -248,7 +248,7 @@ def jomgather():
     
     students = []
     # Only search for students if in find-partners tab to avoid duplicate display
-    if search_performed and current_user.is_authenticated and active_tab == 'find-partners':
+    if current_user.is_authenticated and active_tab == 'find-partners':
         # Initialize filters
         faculty_filter = request.args.get('faculty', '')
         course_filter = request.args.get('course', '')
@@ -258,7 +258,7 @@ def jomgather():
         # Start with all users
         query = User.query.join(Customisation).filter(User.id != current_user.id)
         
-        # Apply filters
+        # Only apply filters if they're not empty
         if faculty_filter:
             query = query.filter(Customisation.faculty == faculty_filter)
         
