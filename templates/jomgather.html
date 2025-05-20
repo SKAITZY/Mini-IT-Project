@@ -6,6 +6,7 @@
   <title>JomGather - Connect with Fellow Students</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/jomgather.css') }}">
+  <script src="{{ url_for('static', filename='js/sound.js') }}"></script>
   <style>
     * {
       margin: 0;
@@ -594,7 +595,11 @@
       <div class="results-section" id="search-results">
         {% if students %}
           <div class="results-count">
-            Found {{ students|length }} student{% if students|length != 1 %}s{% endif %}
+            {% if search_performed %}
+              Found {{ students|length }} student{% if students|length != 1 %}s{% endif %} matching your criteria
+            {% else %}
+              Showing all {{ students|length }} student{% if students|length != 1 %}s{% endif %}
+            {% endif %}
           </div>
           
           <div class="results-grid">
@@ -701,256 +706,111 @@
           </div>
   
       <div class="results-section" id="search-results-partners">
-        <!-- My Partners tab - This section will be built differently in the future to show connected students -->
-        <div class="no-results">
-
-        </div>
+        {% if connected_partners %}
+          <div class="results-count">
+            {% if search_performed %}
+              Found {{ connected_partners|length }} partner{% if connected_partners|length != 1 %}s{% endif %} matching your criteria
+            {% else %}
+              Showing all {{ connected_partners|length }} partner{% if connected_partners|length != 1 %}s{% endif %}
+            {% endif %}
+          </div>
+          
+          <div class="results-grid">
+            {% for partner in connected_partners %}
+              <div class="student-card">
+                <div class="student-image">
+                  {% if partner.customisation and partner.customisation.profile_picture %}
+                    <img src="{{ url_for('static', filename='uploads/' + partner.customisation.profile_picture) }}" alt="{{ partner.username }}'s profile">
+                  {% else %}
+                    <div style="font-size: 50px; color: #aaa;">👤</div>
+                  {% endif %}
+                </div>
+                <div class="student-info">
+                  <h3 class="student-name">{{ partner.username }}</h3>
+                  {% if partner.customisation and partner.customisation.faculty %}
+                    <div class="student-faculty">{{ partner.customisation.faculty }}</div>
+                  {% endif %}
+                  <div class="student-details">
+                    {% if partner.customisation and partner.customisation.course %}
+                      {{ partner.customisation.course }}
+                    {% endif %}
+                    {% if partner.customisation and partner.customisation.year_of_study %}
+                      • {{ partner.customisation.year_of_study }}{% if partner.customisation.year_of_study == 1 %}st{% elif partner.customisation.year_of_study == 2 %}nd{% elif partner.customisation.year_of_study == 3 %}rd{% else %}th{% endif %} Year
+                    {% endif %}
+                  </div>
+                  
+                  {% if partner.customisation and partner.customisation.interests %}
+                    <div class="student-interests">
+                      {% for interest in partner.customisation.interests.split(',') %}
+                        {% if interest.strip() and interest.strip() != 'None' %}
+                          <span class="interest-tag">{{ interest.strip() }}</span>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  
+                  {% if partner.customisation and partner.customisation.bio %}
+                    <div class="student-bio">
+                      {{ partner.customisation.bio|truncate(150) }}
+                    </div>
+                  {% endif %}
+                  
+                  <a href="{{ url_for('chat', user_id=partner.id) }}" class="connect-btn">Message</a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% elif search_performed %}
+          <div class="no-results">
+            <h3>No matching partners found</h3>
+            <p>Try adjusting your search filters or connect with more students!</p>
+          </div>
+        {% else %}
+          <div class="no-results"></div>
+        {% endif %}
       </div>
     </div>
-          
   
-    <!-- Create Gathering Tab -->
-    <div id="create-gathering" class="tab-content {% if active_tab == 'create-gathering' %}active{% endif %}">
-        <div class="event-form">
-          <h3 class="filter-title">Create a New Gathering</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="eventTitle">Gathering Title</label>
-              <input type="text" id="eventTitle" name="eventTitle" placeholder="E.g. Programming Study Group">
-            </div>
-            <div class="form-group">
-              <label for="eventType">Gathering Type</label>
-              <select id="eventType" name="eventType">
-                <option value="study">Study Session</option>
-                <option value="project">Project Collaboration</option>
-                <option value="social">Social Hangout</option>
-                <option value="sports">Sports Activity</option>
-                <option value="sports">Gaming Hangout</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-                <label for="eventTitle">Faculty Focus</label>
+      <!-- Create Gathering Tab -->
+      <div id="create-gathering" class="tab-content {% if active_tab == 'create-gathering' %}active{% endif %}">
+          <div class="event-form">
+            <h3 class="filter-title">Create a New Gathering</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="eventTitle">Gathering Title</label>
+                <input type="text" id="eventTitle" name="eventTitle" placeholder="E.g. Programming Study Group">
+              </div>
+              <div class="form-group">
+                <label for="eventType">Gathering Type</label>
                 <select id="eventType" name="eventType">
-                    <option value="study">Faculty of Multimedia</option>
-                    <option value="project">Faculty of Computing Informatics</option>
-                    <option value="social">Faculty of Management</option>
-                    <option value="sports">Faculty of Engineering</option>
-                    <option value="sports">Faculty of Applied Communication</option>
-                    <option value="sports">Faculty of Cinematic Arts</option>
-                    <option value="other">Other</option>
-                  </select>
-            </div>
-            <div class="form-group">
-                <label for="eventTitle">Year & Semester</label>
-                <input type="text" id="eventTitle" name="eventTitle" placeholder="E.g. Year 1 Sem 3">
-            </div>       
-        </div>  
-          <div class="form-row">
-            <div class="form-group">
-              <label for="eventDate">Date</label>
-              <input type="date" id="eventDate" name="eventDate">
-            </div>
-            <div class="form-group">
-              <label for="eventTime">Time</label>
-              <input type="time" id="eventTime" name="eventTime">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="eventLocation">Location</label>
-              <input type="text" id="eventLocation" name="eventLocation" placeholder="E.g. Library Study Room 3, FCI Building">
-            </div>
-            <div class="form-group">
-              <label for="maxAttendees">Maximum Participants</label>
-              <input type="number" id="maxAttendees" name="maxAttendees" min="1" max="50" placeholder="E.g. 10">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="eventDescription">Description</label>
-            <textarea id="eventDescription" name="eventDescription" placeholder="Describe your gathering, its purpose, and what participants should expect or bring..."></textarea>
-          </div>
-          <div class="form-group">
-            <label for="targetAudience">Target Audience (Optional)</label>
-            <input type="text" id="targetAudience" name="targetAudience" placeholder="E.g. Software Development students, 2nd year Advertising Design students">
-          </div>
-          <button class="create-btn">Create Gathering</button>
-        </div>
-      </div>
-  
-      <!-- My Gatherings Tab -->
-      <div id="my-gatherings" class="tab-content {% if active_tab == 'my-gatherings' %}active{% endif %}">
-        <!-- Hosting Gathering -->
-        <div class="gathering-card hosting">
-          <div class="gathering-header">
-            <div>
-              <h3 class="gathering-title">Web Development Project Group</h3>
-              <span class="gathering-status hosting">Hosting</span>
-            </div>
-            <div>
-              <p>Created on: August 20, 2025</p>
-            </div>
-          </div>
-          <div class="gathering-details">
-            <div class="detail-item">
-              <span class="detail-label">Faculty:</span>
-              <span>Faculty of Computing and Informatics</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Year & Semester:</span>
-              <span>Year 2 Sem 2</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Date:</span>
-              <span>August 25, 2025</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Time:</span>
-              <span>2:00 PM - 5:00 PM</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Location:</span>
-              <span>FCI Lounge</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Gathering Type:</span>
-              <span>Project Collaboration</span>
-            </div>
-            
-          </div>
-          <p class="gathering-description">Working on the semester project for Web Application Development. We'll be discussing the frontend implementation using React and planning the backend architecture. Please bring your laptops with the dev environment set up.</p>
-          <div class="attendees-list">
-            <h4 class="attendees-title">Participants (3/5):</h4>
-            <div class="attendees">
-              <div class="attendee">
-                <img src="/api/placeholder/50/50" alt="profile">
-                <span>You (Host)</span>
-              </div>
-              <div class="attendee">
-                <img src="/api/placeholder/50/50" alt="profile">
-                <span>Ahmad</span>
-              </div>
-              <div class="attendee">
-                <img src="/api/placeholder/50/50" alt="profile">
-                <span>Sarah</span>
+                  <option value="study">Study Session</option>
+                  <option value="project">Project Collaboration</option>
+                  <option value="social">Social Hangout</option>
+                  <option value="sports">Sports Activity</option>
+                  <option value="sports">Gaming Hangout</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
             </div>
-          </div>
-          <div class="gathering-actions">
-            <button class="action-btn primary-btn">Edit Details</button>
-            <button class="action-btn secondary-btn">Message All</button>
-            <button class="action-btn danger-btn">Cancel Gathering</button>
-          </div>
-        </div>
-  
-        <!-- Attending Gathering -->
-        <div class="gathering-card">
-          <div class="gathering-header">
-            <div>
-              <h3 class="gathering-title">AI Study Group</h3>
-              <span class="gathering-status">Attending</span>
-            </div>
-            <div>
-              <p>Hosted by: Wesley </p>
-            </div>
-          </div>
-          <div class="gathering-details">
-            <div class="detail-item">
-              <span class="detail-label">Faculty:</span>
-              <span>Other</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Year & Semester:</span>
-              <span>No specifications</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Date:</span>
-              <span>Septemer 23, 2025</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Time:</span>
-              <span>9:00 AM - 11:00 AM</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Location:</span>
-              <span>MMU Field</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Gathering Type:</span>
-              <span>Sports Activity</span>
-            </div>
-          </div>
-          <p class="gathering-description">Interested in playing football and also making friends in general? Come join us playing football and make new friends!</p>
-          <div class="attendees-list">
-            <h4 class="attendees-title">Participants (8/15):</h4>
-            <div class="attendees">
-              <div class="attendee">
-                <img src="/api/placeholder/50/50" alt="profile">
-                <span>Wesley (Host)</span>
-              </div>
-              <div class="attendee">
-                <img src="/api/placeholder/50/50" alt="profile">
-                <span>You</span>
-              </div>
-              <div class="attendee">
-                <img src="/api/placeholder/50/50" alt="profile">
-                <span>Raj</span>
-              </div>
-              <div class="attendee">
-                <img src="/api/placeholder/50/50" alt="profile">
-                <span>+5 others</span>
-              </div>
-            </div>
-          </div>
-          <div class="gathering-actions">
-            <button class="action-btn primary-btn">View Details</button>
-            <button class="action-btn secondary-btn">Message Host</button>
-            <button class="action-btn danger-btn">Leave Gathering</button>
-          </div>
-        </div>
-      </div>
-  
-          
-  
-    <div id="find-gatherings" class="tab-content {% if active_tab == 'find-gatherings' %}active{% endif %}">
-        <!-- Finding Gathering -->
-        <div class="filter-section">
-          <h3 class="filter-title">Find Gatherings By:</h3>
-          <div class="form-row">
-              <div class="filter-form">
-                  <div class="form-group">
-                    <label for="faculty">Gathering Type</label>
-                    <select id="faculty" name="faculty">
-                        <option value="study">Study Session</option>
-                        <option value="project">Project Collaboration</option>
-                        <option value="social">Social Hangout</option>
-                        <option value="sports">Sports Activity</option>
-                        <option value="sports">Gaming Hangout</option>
-                        <option value="other">Other</option>
+            <div class="form-row">
+              <div class="form-group">
+                  <label for="eventTitle">Faculty Focus</label>
+                  <select id="eventType" name="eventType">
+                      <option value="study">Faculty of Multimedia</option>
+                      <option value="project">Faculty of Computing Informatics</option>
+                      <option value="social">Faculty of Management</option>
+                      <option value="sports">Faculty of Engineering</option>
+                      <option value="sports">Faculty of Applied Communication</option>
+                      <option value="sports">Faculty of Cinematic Arts</option>
+                      <option value="other">Other</option>
                     </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="course">Faculty Focus</label>
-                    <select id="course" name="course">
-                        <option value="study">Faculty of Multimedia</option>
-                        <option value="project">Faculty of Computing Informatics</option>
-                        <option value="social">Faculty of Management</option>
-                        <option value="sports">Faculty of Engineering</option>
-                        <option value="sports">Faculty of Applied Communication</option>
-                        <option value="sports">Faculty of Cinematic Arts</option>
-                        <option value="other">Other</option>
-                      
-                    </select>
-                  </div>
-                  <div class="form-group">
-                      <label for="eventTitle">Year & Semester</label>
-                      <input type="text" id="eventTitle" name="eventTitle" placeholder="E.g. Year 1 Sem 3">
-                  </div>
               </div>
-          </div>
-          <div class="form-row">
+              <div class="form-group">
+                  <label for="eventTitle">Year & Semester</label>
+                  <input type="text" id="eventTitle" name="eventTitle" placeholder="E.g. Year 1 Sem 3">
+              </div>       
+          </div>  
+            <div class="form-row">
               <div class="form-group">
                 <label for="eventDate">Date</label>
                 <input type="date" id="eventDate" name="eventDate">
@@ -959,156 +819,359 @@
                 <label for="eventTime">Time</label>
                 <input type="time" id="eventTime" name="eventTime">
               </div>
+            </div>
+            <div class="form-row">
               <div class="form-group">
-                  <label for="interests">Interests</label>
-                  <input type="text" id="interests" name="interests" placeholder="E.g. programming, sports, music">
-                </div>
-          </div>
-              
-          <button class="search-btn">Find Students</button>
-          </div>
-          
-        
-  
-        <!-- Hosting Gathering -->
-        <div class="gathering-card hosting">
-          <div class="gathering-header">
-            <div>
-              <h3 class="gathering-title">MLBB Rank Stack</h3>
-              <span class="gathering-status hosting">Hosting</span>
-            </div>
-            <div>
-              <p>Created by: Keith Chong</p>
-            </div>
-          </div>
-          <div class="gathering-details">
-            <div class="detail-item">
-              <span class="detail-label">Faculty:</span>
-              <span>Faculty of Computing and Informatics</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Year & Semester:</span>
-              <span>Year 2 Sem 1</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Date:</span>
-              <span>August 25, 2025</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Time:</span>
-              <span>2:00 PM - 5:00 PM</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Location:</span>
-              <span>FCI Lounge</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Gathering Type:</span>
-              <span>Gaming Hangout</span>
-            </div>
-            
-          </div>
-          <p class="gathering-description">Tired of noobs random teammates that is making you have no progress in rank up and also want to find some friends that plays mlbb? Join us to right here and we will rank up together :D.</p>
-          <div class="attendees-list">
-            <h4 class="attendees-title">Participants (3/5):</h4>
-            <div class="attendees">
-              <div class="attendee">
-                <img src="/api/placeholder/50/50" alt="profile">
-                <span>You (Host)</span>
+                <label for="eventLocation">Location</label>
+                <input type="text" id="eventLocation" name="eventLocation" placeholder="E.g. Library Study Room 3, FCI Building">
               </div>
-              <div class="attendee">
-                <img src="/api/placeholder/50/50" alt="profile">
-                <span>Ahmad</span>
-              </div>
-              <div class="attendee">
-                <img src="/api/placeholder/50/50" alt="profile">
-                <span>Sarah</span>
+              <div class="form-group">
+                <label for="maxAttendees">Maximum Participants</label>
+                <input type="number" id="maxAttendees" name="maxAttendees" min="1" max="50" placeholder="E.g. 10">
               </div>
             </div>
-          </div>
-          <div class="gathering-actions">
-            <button class="action-btn primary-btn">View Details</button>
-            <button class="action-btn secondary-btn">Message Host</button>
-            <button class="action-btn danger-btn">Join Gathering</button>
+            <div class="form-group">
+              <label for="eventDescription">Description</label>
+              <textarea id="eventDescription" name="eventDescription" placeholder="Describe your gathering, its purpose, and what participants should expect or bring..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="targetAudience">Target Audience (Optional)</label>
+              <input type="text" id="targetAudience" name="targetAudience" placeholder="E.g. Software Development students, 2nd year Advertising Design students">
+            </div>
+            <button class="create-btn">Create Gathering</button>
           </div>
         </div>
-    </div>
-  
-    <script>
-      // Function to show the selected tab
-      function showTab(tabId) {
-        // Hide all tab contents
-        const tabContents = document.querySelectorAll('.tab-content');
-        tabContents.forEach(tab => {
-          tab.classList.remove('active');
-        });
-        
-        // Remove active class from all tabs
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(tab => {
-          tab.classList.remove('active');
-        });
-        
-        // Show the selected tab content
-        document.getElementById(tabId).classList.add('active');
-        
-        // Add active class to clicked tab
-        event.currentTarget.classList.add('active');
-        
-        // Update URL with the tab parameter
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set('tab', tabId);
-        window.history.pushState({}, '', currentUrl);
-        
-        // Add a hidden input to any forms in the active tab to maintain tab state
-        const forms = document.getElementById(tabId).querySelectorAll('form');
-        forms.forEach(form => {
-          // Check if the form already has a tab input
-          let tabInput = form.querySelector('input[name="tab"]');
-          if (!tabInput) {
-            tabInput = document.createElement('input');
-            tabInput.type = 'hidden';
-            tabInput.name = 'tab';
-            form.appendChild(tabInput);
-          }
-          tabInput.value = tabId;
-        });
-      }
-
-      // Mobile menu toggle
-      const menu = document.querySelector('#mobile-menu');
-      const menuLinks = document.querySelector('.navbar__menu');
-      
-      if (menu) {
-        menu.addEventListener('click', function() {
-          menu.classList.toggle('is-active');
-          menuLinks.classList.toggle('active');
-        });
-      }
-      
-      // Add tab input to all forms initially
-      document.addEventListener('DOMContentLoaded', function() {
-        const activeTab = document.querySelector('.tab.active');
-        if (activeTab) {
-          const tabId = activeTab.getAttribute('data-tab-id') || 'find-partners';
+    
+        <!-- My Gatherings Tab -->
+        <div id="my-gatherings" class="tab-content {% if active_tab == 'my-gatherings' %}active{% endif %}">
+          <!-- Hosting Gathering -->
+          <div class="gathering-card hosting">
+            <div class="gathering-header">
+              <div>
+                <h3 class="gathering-title">Web Development Project Group</h3>
+                <span class="gathering-status hosting">Hosting</span>
+              </div>
+              <div>
+                <p>Created on: August 20, 2025</p>
+              </div>
+            </div>
+            <div class="gathering-details">
+              <div class="detail-item">
+                <span class="detail-label">Faculty:</span>
+                <span>Faculty of Computing and Informatics</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Year & Semester:</span>
+                <span>Year 2 Sem 2</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Date:</span>
+                <span>August 25, 2025</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Time:</span>
+                <span>2:00 PM - 5:00 PM</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Location:</span>
+                <span>FCI Lounge</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Gathering Type:</span>
+                <span>Project Collaboration</span>
+              </div>
+              
+            </div>
+            <p class="gathering-description">Working on the semester project for Web Application Development. We'll be discussing the frontend implementation using React and planning the backend architecture. Please bring your laptops with the dev environment set up.</p>
+            <div class="attendees-list">
+              <h4 class="attendees-title">Participants (3/5):</h4>
+              <div class="attendees">
+                <div class="attendee">
+                  <img src="/api/placeholder/50/50" alt="profile">
+                  <span>You (Host)</span>
+                </div>
+                <div class="attendee">
+                  <img src="/api/placeholder/50/50" alt="profile">
+                  <span>Ahmad</span>
+                </div>
+                <div class="attendee">
+                  <img src="/api/placeholder/50/50" alt="profile">
+                  <span>Sarah</span>
+                </div>
+              </div>
+            </div>
+            <div class="gathering-actions">
+              <button class="action-btn primary-btn">Edit Details</button>
+              <button class="action-btn secondary-btn">Message All</button>
+              <button class="action-btn danger-btn">Cancel Gathering</button>
+            </div>
+          </div>
+    
+          <!-- Attending Gathering -->
+          <div class="gathering-card">
+            <div class="gathering-header">
+              <div>
+                <h3 class="gathering-title">AI Study Group</h3>
+                <span class="gathering-status">Attending</span>
+              </div>
+              <div>
+                <p>Hosted by: Wesley </p>
+              </div>
+            </div>
+            <div class="gathering-details">
+              <div class="detail-item">
+                <span class="detail-label">Faculty:</span>
+                <span>Other</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Year & Semester:</span>
+                <span>No specifications</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Date:</span>
+                <span>Septemer 23, 2025</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Time:</span>
+                <span>9:00 AM - 11:00 AM</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Location:</span>
+                <span>MMU Field</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Gathering Type:</span>
+                <span>Sports Activity</span>
+              </div>
+            </div>
+            <p class="gathering-description">Interested in playing football and also making friends in general? Come join us playing football and make new friends!</p>
+            <div class="attendees-list">
+              <h4 class="attendees-title">Participants (8/15):</h4>
+              <div class="attendees">
+                <div class="attendee">
+                  <img src="/api/placeholder/50/50" alt="profile">
+                  <span>Wesley (Host)</span>
+                </div>
+                <div class="attendee">
+                  <img src="/api/placeholder/50/50" alt="profile">
+                  <span>You</span>
+                </div>
+                <div class="attendee">
+                  <img src="/api/placeholder/50/50" alt="profile">
+                  <span>Raj</span>
+                </div>
+                <div class="attendee">
+                  <img src="/api/placeholder/50/50" alt="profile">
+                  <span>+5 others</span>
+                </div>
+              </div>
+            </div>
+            <div class="gathering-actions">
+              <button class="action-btn primary-btn">View Details</button>
+              <button class="action-btn secondary-btn">Message Host</button>
+              <button class="action-btn danger-btn">Leave Gathering</button>
+            </div>
+          </div>
+        </div>
+    
+            
+    
+      <div id="find-gatherings" class="tab-content {% if active_tab == 'find-gatherings' %}active{% endif %}">
+          <!-- Finding Gathering -->
+          <div class="filter-section">
+            <h3 class="filter-title">Find Gatherings By:</h3>
+            <div class="form-row">
+                <div class="filter-form">
+                    <div class="form-group">
+                      <label for="faculty">Gathering Type</label>
+                      <select id="faculty" name="faculty">
+                          <option value="study">Study Session</option>
+                          <option value="project">Project Collaboration</option>
+                          <option value="social">Social Hangout</option>
+                          <option value="sports">Sports Activity</option>
+                          <option value="sports">Gaming Hangout</option>
+                          <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="course">Faculty Focus</label>
+                      <select id="course" name="course">
+                          <option value="study">Faculty of Multimedia</option>
+                          <option value="project">Faculty of Computing Informatics</option>
+                          <option value="social">Faculty of Management</option>
+                          <option value="sports">Faculty of Engineering</option>
+                          <option value="sports">Faculty of Applied Communication</option>
+                          <option value="sports">Faculty of Cinematic Arts</option>
+                          <option value="other">Other</option>
+                        
+                      </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventTitle">Year & Semester</label>
+                        <input type="text" id="eventTitle" name="eventTitle" placeholder="E.g. Year 1 Sem 3">
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                  <label for="eventDate">Date</label>
+                  <input type="date" id="eventDate" name="eventDate">
+                </div>
+                <div class="form-group">
+                  <label for="eventTime">Time</label>
+                  <input type="time" id="eventTime" name="eventTime">
+                </div>
+                <div class="form-group">
+                    <label for="interests">Interests</label>
+                    <input type="text" id="interests" name="interests" placeholder="E.g. programming, sports, music">
+                  </div>
+            </div>
+                
+            <button class="search-btn">Find Students</button>
+            </div>
+            
           
-          const forms = document.querySelectorAll('form');
+    
+          <!-- Hosting Gathering -->
+          <div class="gathering-card hosting">
+            <div class="gathering-header">
+              <div>
+                <h3 class="gathering-title">MLBB Rank Stack</h3>
+                <span class="gathering-status hosting">Hosting</span>
+              </div>
+              <div>
+                <p>Created by: Keith Chong</p>
+              </div>
+            </div>
+            <div class="gathering-details">
+              <div class="detail-item">
+                <span class="detail-label">Faculty:</span>
+                <span>Faculty of Computing and Informatics</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Year & Semester:</span>
+                <span>Year 2 Sem 1</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Date:</span>
+                <span>August 25, 2025</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Time:</span>
+                <span>2:00 PM - 5:00 PM</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Location:</span>
+                <span>FCI Lounge</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Gathering Type:</span>
+                <span>Gaming Hangout</span>
+              </div>
+              
+            </div>
+            <p class="gathering-description">Tired of noobs random teammates that is making you have no progress in rank up and also want to find some friends that plays mlbb? Join us to right here and we will rank up together :D.</p>
+            <div class="attendees-list">
+              <h4 class="attendees-title">Participants (3/5):</h4>
+              <div class="attendees">
+                <div class="attendee">
+                  <img src="/api/placeholder/50/50" alt="profile">
+                  <span>You (Host)</span>
+                </div>
+                <div class="attendee">
+                  <img src="/api/placeholder/50/50" alt="profile">
+                  <span>Ahmad</span>
+                </div>
+                <div class="attendee">
+                  <img src="/api/placeholder/50/50" alt="profile">
+                  <span>Sarah</span>
+                </div>
+              </div>
+            </div>
+            <div class="gathering-actions">
+              <button class="action-btn primary-btn">View Details</button>
+              <button class="action-btn secondary-btn">Message Host</button>
+              <button class="action-btn danger-btn">Join Gathering</button>
+            </div>
+          </div>
+      </div>
+    
+      <script>
+        // Function to show the selected tab
+        function showTab(tabId) {
+          // Hide all tab contents
+          const tabContents = document.querySelectorAll('.tab-content');
+          tabContents.forEach(tab => {
+            tab.classList.remove('active');
+          });
+          
+          // Remove active class from all tabs
+          const tabs = document.querySelectorAll('.tab');
+          tabs.forEach(tab => {
+            tab.classList.remove('active');
+          });
+          
+          // Show the selected tab content
+          document.getElementById(tabId).classList.add('active');
+          
+          // Add active class to clicked tab
+          event.currentTarget.classList.add('active');
+          
+          // Update URL with the tab parameter
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('tab', tabId);
+          window.history.pushState({}, '', currentUrl);
+          
+          // Add a hidden input to any forms in the active tab to maintain tab state
+          const forms = document.getElementById(tabId).querySelectorAll('form');
           forms.forEach(form => {
-            if (!form.querySelector('input[name="tab"]')) {
-              const tabInput = document.createElement('input');
+            // Check if the form already has a tab input
+            let tabInput = form.querySelector('input[name="tab"]');
+            if (!tabInput) {
+              tabInput = document.createElement('input');
               tabInput.type = 'hidden';
               tabInput.name = 'tab';
-              tabInput.value = tabId;
               form.appendChild(tabInput);
             }
+            tabInput.value = tabId;
           });
         }
-      });
 
-      // Call the updateStudentCards function when the page loads
-      window.onload = updateStudentCards;
-    </script>
-  
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+        // Mobile menu toggle
+        const menu = document.querySelector('#mobile-menu');
+        const menuLinks = document.querySelector('.navbar__menu');
+        
+        if (menu) {
+          menu.addEventListener('click', function() {
+            menu.classList.toggle('is-active');
+            menuLinks.classList.toggle('active');
+          });
+        }
+        
+        // Add tab input to all forms initially
+        document.addEventListener('DOMContentLoaded', function() {
+          const activeTab = document.querySelector('.tab.active');
+          if (activeTab) {
+            const tabId = activeTab.getAttribute('data-tab-id') || 'find-partners';
+            
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+              if (!form.querySelector('input[name="tab"]')) {
+                const tabInput = document.createElement('input');
+                tabInput.type = 'hidden';
+                tabInput.name = 'tab';
+                tabInput.value = tabId;
+                form.appendChild(tabInput);
+              }
+            });
+          }
+        });
+
+        // Call the updateStudentCards function when the page loads
+        window.onload = updateStudentCards;
+      </script>
+    
+      <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    </div>
   </body>
   </html>

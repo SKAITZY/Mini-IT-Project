@@ -71,11 +71,13 @@ def customise():
         course = request.form.get('course')
         year_of_study = request.form.get('year_of_study')
         profile_picture = request.files.get('profile_picture')
+        name = request.form.get('name')  # Get the name field
         
         # Debug information
-        print(f"Received POST data: bio={bio[:20]}..., interests={interests[:50]}...")
+        print(f"Received POST data: bio={bio[:20] if bio else 'None'}..., interests={interests[:50] if interests else 'None'}...")
         print(f"Faculty: {faculty}, Course: {course}, Year: {year_of_study}")
         print(f"Profile picture: {profile_picture.filename if profile_picture else 'None'}")
+        print(f"Name: {name}")
         
         # Process profile picture if uploaded
         if profile_picture and profile_picture.filename:
@@ -106,6 +108,10 @@ def customise():
         current_user.customisation.interests = interests
         current_user.customisation.faculty = faculty
         current_user.customisation.course = course
+        
+        # Update username if name field is provided
+        if name and name.strip():
+            current_user.username = name.strip()
         
         # Convert year_of_study to integer if it has a value
         if year_of_study:
@@ -206,7 +212,6 @@ def register():
             db.session.rollback()
             flash(f'An error occurred during registration: {str(e)}. Please try again.', 'error')
             return render_template('register.html')
-            
     return render_template('register.html')
 
 @app.route('/logout')
@@ -241,8 +246,10 @@ def jomgather():
     ])
     
     students = []
+    connected_partners = []
+    
     # Only search for students if in find-partners tab to avoid duplicate display
-    if search_performed and current_user.is_authenticated and active_tab == 'find-partners':
+    if current_user.is_authenticated and active_tab == 'find-partners':
         # Initialize filters
         faculty_filter = request.args.get('faculty', '')
         course_filter = request.args.get('course', '')
@@ -252,7 +259,7 @@ def jomgather():
         # Start with all users
         query = User.query.join(Customisation).filter(User.id != current_user.id)
         
-        # Apply filters
+        # Only apply filters if they're not empty
         if faculty_filter:
             query = query.filter(Customisation.faculty == faculty_filter)
         
@@ -273,8 +280,55 @@ def jomgather():
         # Execute query
         students = query.all()
     
+    # Fetch connected partners if in my-partners tab
+    elif current_user.is_authenticated and active_tab == 'my-partners':
+        # Initialize filters
+        faculty_filter = request.args.get('faculty', '')
+        course_filter = request.args.get('course', '')
+        year_filter = request.args.get('year', '')
+        interests_filter = request.args.get('interests', '')
+        
+        # Get all accepted connections where the current user is involved
+        connections_made = Connection.query.filter_by(user_id=current_user.id, status='accepted').all()
+        connections_received = Connection.query.filter_by(connected_user_id=current_user.id, status='accepted').all()
+        
+        # Get the users involved in these connections
+        partner_ids = []
+        
+        for conn in connections_made:
+            partner_ids.append(conn.connected_user_id)
+            
+        for conn in connections_received:
+            partner_ids.append(conn.user_id)
+        
+        # Query for partners with filters
+        if partner_ids:
+            query = User.query.join(Customisation).filter(User.id.in_(partner_ids))
+            
+            # Apply filters if specified
+            if faculty_filter:
+                query = query.filter(Customisation.faculty == faculty_filter)
+            
+            if course_filter:
+                query = query.filter(Customisation.course == course_filter)
+            
+            if year_filter and year_filter.isdigit():
+                query = query.filter(Customisation.year_of_study == int(year_filter))
+            
+            if interests_filter:
+                # Search for interests as substring
+                interest_terms = interests_filter.lower().split(',')
+                for term in interest_terms:
+                    term = term.strip()
+                    if term:
+                        query = query.filter(Customisation.interests.ilike(f'%{term}%'))
+            
+            # Execute query
+            connected_partners = query.all()
+    
     return render_template('jomgather.html', 
                            students=students,
+                           connected_partners=connected_partners,
                            faculties=faculties,
                            courses=courses,
                            search_performed=search_performed,
