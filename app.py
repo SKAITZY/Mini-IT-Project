@@ -12,6 +12,13 @@ from datetime import datetime
 app = Flask(__name__)
 app.config.from_object(Config)
 
+class Config:
+    SQLALCHEMY_DATABASE_URI = 'mysql://wilson:JOMBETA06.!1123@localhost/jomgather'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = 'your-secret-key'
+    UPLOAD_FOLDER = 'uploads'
+
+
 # Initialize extensions
 init_extensions(app)
 
