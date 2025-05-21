@@ -147,13 +147,13 @@ def login():
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
             user.update_last_login()
-            # Always redirect to customise after successful login
             return redirect(url_for('customise'))
         else:
             flash('Invalid student ID or password', 'error')
             return redirect(url_for('login'))
             
-    return render_template('register.html')
+    return render_template('login.html')  # ✅ Corrected from register.html
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -579,3 +579,100 @@ if __name__ == '__main__':
         # List the tables that were created
         print(f"Tables created: {', '.join(db.metadata.tables.keys())}")
     app.run(debug=True)
+
+@app.route('/match')
+def match():
+    return render_template('match.html')
+
+@app.route('/api/match/<match_type>')
+@login_required
+def match_users(match_type):
+    try:
+        # 获取筛选条件
+        faculty = request.args.get('faculty')
+        year = request.args.get('year')
+        
+        # 基础查询
+        query = User.query.filter(
+            User.id != current_user.id,
+            User.is_active == True
+        ).join(Customisation)
+        
+        # 应用筛选
+        if faculty:
+            query = query.filter(Customisation.faculty == faculty)
+        if year:
+            query = query.filter(Customisation.year_of_study == int(year))
+        
+        if match_type == 'random':
+            # 随机匹配
+            available_users = query.all()
+            if not available_users:
+                return jsonify({'success': False, 'error': '没有可匹配的用户'})
+            
+            matched_user = random.choice(available_users)
+            return jsonify({
+                'success': True,
+                'user': format_user(matched_user)
+            })
+            
+        elif match_type == 'smart':
+            # 智能匹配（基于共同兴趣）
+            current_interests = set()
+            if current_user.customisation and current_user.customisation.interests:
+                current_interests = set(current_user.customisation.interests.split(','))
+            
+            best_match = None
+            highest_score = 0
+            
+            for user in query.all():
+                user_interests = set()
+                if user.customisation and user.customisation.interests:
+                    user_interests = set(user.customisation.interests.split(','))
+                
+                # 计算匹配分数
+                common_interests = current_interests & user_interests
+                score = len(common_interests)
+                
+                # 相同院系加分
+                if (current_user.customisation and user.customisation and 
+                    current_user.customisation.faculty == user.customisation.faculty):
+                    score += 2
+                
+                if score > highest_score:
+                    highest_score = score
+                    best_match = user
+            
+            if best_match:
+                result = format_user(best_match)
+                result['common_interests'] = list(common_interests)
+                return jsonify({'success': True, 'user': result})
+            else:
+                return jsonify({'success': False, 'error': '没有找到合适匹配'})
+                
+        else:
+            return jsonify({'success': False, 'error': '无效的匹配类型'}), 400
+            
+    except Exception as e:
+        app.logger.error(f"Match error: {str(e)}")
+        return jsonify({'success': False, 'error': '服务器错误'}), 500
+
+def format_user(user):
+    """格式化用户数据"""
+    return {
+        'id': user.id,
+        'username': user.username,
+        'faculty': user.customisation.faculty if user.customisation else None,
+        'interests': user.customisation.interests.split(',') if user.customisation and user.customisation.interests else [],
+        'avatar': url_for('static', filename=f"uploads/{user.customisation.profile_picture}") if user.customisation and user.customisation.profile_picture else None
+    }
+
+@app.errorhandler(404)
+@app.errorhandler(500)
+def handle_api_errors(e):
+    if request.path.startswith('/api/'):
+        return jsonify({
+            'success': False,
+            'error': str(e.description) if hasattr(e, 'description') else 'An error occurred'
+        }), e.code
+    return e
