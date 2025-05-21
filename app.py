@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request, flash, session, jsonify
+from flask import Flask, redirect, url_for, render_template, request, flash, session, jsonify, abort, send_from_directory
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db,login_manager, csrf, init_extensions
@@ -6,7 +6,7 @@ from config import Config
 import os
 import re
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask
 from flask_mysqldb import MySQL
 
@@ -24,6 +24,9 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Import models after db is initialized
 from models import User, Customisation, Connection, Message
+
+# Add timedelta to Jinja globals
+app.jinja_env.globals.update(timedelta=timedelta)
 
 @login_manager.user_loader
 def load_user(user_id):

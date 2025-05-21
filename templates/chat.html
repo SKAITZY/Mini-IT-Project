@@ -387,7 +387,7 @@
             <div class="message {% if message.sender_id == current_user.id %}sent{% else %}received{% endif %}">
               {{ message.content }}
               <div class="message-time">
-                {{ message.created_at.strftime('%H:%M | %d %b %Y') }}
+                {{ (message.created_at.replace(tzinfo=None) + timedelta(hours=8)).strftime('%H:%M | %d %b %Y') }} (GMT+8)
               </div>
             </div>
           </div>
