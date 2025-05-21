@@ -116,57 +116,23 @@
   </div>
 
   <script>
-    document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-
-  const studentId = document.getElementById('studentId').value.trim();
-  const newPassword = document.getElementById('newPassword').value;
-  const confirmPassword = document.getElementById('confirmPassword').value;
-  const statusMsg = document.getElementById('statusMsg');
-
-  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
-  if (!passwordRegex.test(newPassword)) {
-    statusMsg.style.color = 'red';
-    statusMsg.textContent = "Password must be at least 8 characters long, include uppercase, lowercase, a number, and a special character.";
-    return;
-  }
-
-  if (newPassword !== confirmPassword) {
-    statusMsg.style.color = 'red';
-    statusMsg.textContent = "Passwords do not match.";
-    return;
-  }
-
-  try {
-    const response = await fetch('/update-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ student_id: studentId, new_password: newPassword })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      statusMsg.style.color = 'red';
-      statusMsg.textContent = data.error || "Unexpected error.";
-      return;
+    function switchTab(tabName) {
+      // Hide all form containers
+      document.querySelectorAll('.form-container').forEach(container => {
+        container.classList.remove('active');
+      });
+      
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show the selected form container
+      document.getElementById(tabName + '-form').classList.add('active');
+      
+      // Set the clicked tab as active
+      event.currentTarget.classList.add('active');
     }
-
-    if (data.success) {
-      statusMsg.style.color = 'green';
-      statusMsg.textContent = "Password changed successfully! Redirecting to login...";
-      setTimeout(() => { window.location.href = "/login"; }, 2000);
-    } else {
-      statusMsg.style.color = 'red';
-      statusMsg.textContent = data.error || "Failed to update password.";
-    }
-  } catch (err) {
-    statusMsg.style.color = 'red';
-    statusMsg.textContent = "An error occurred. Please try again.";
-  }
-});
-
-document.querySelector('.submit-btn').click();
   </script>
 
   <script src="{{ url_for('static', filename='js/common.js') }}"></script>

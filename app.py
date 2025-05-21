@@ -1,17 +1,14 @@
 from flask import Flask, redirect, url_for, render_template, request, flash, session, jsonify, abort, send_from_directory
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from extensions import db,login_manager, csrf, init_extensions
+from extensions import db, login_manager, csrf, init_extensions
 from config import Config
 import os
 import re
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
-from flask import Flask
-from flask_mysqldb import MySQL
 
-app = Flask(__name__)
-# Create a Flask app instance
+# Create a Flask app instance (only once)
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -527,22 +524,9 @@ def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
 
-# Run the app if this file is executed
-if __name__ == '__main__':
-    with app.app_context():
-        # Check if tables need to be created
-        db.create_all()
-        print("Database tables created or confirmed to exist.")
-        print(f"Using database: {app.config['SQLALCHEMY_DATABASE_URI']}")
-        # List the tables that were created
-        print(f"Tables created: {', '.join(db.metadata.tables.keys())}")
-    app.run(debug=True)
-
-@app.route('/pass')
-def pass_page():
+@app.route('/pass', endpoint='pass_page')
+def password_reset_page():
     return render_template('pass.html')
-
-from flask_login import login_required, current_user
 
 @app.route('/update-password', methods=['POST'])
 def update_password():
@@ -584,3 +568,14 @@ def update_password():
             'success': False,
             'error': 'Failed to update password. Please try again.'
         }), 500
+
+# Run the app if this file is executed
+if __name__ == '__main__':
+    with app.app_context():
+        # Check if tables need to be created
+        db.create_all()
+        print("Database tables created or confirmed to exist.")
+        print(f"Using database: {app.config['SQLALCHEMY_DATABASE_URI']}")
+        # List the tables that were created
+        print(f"Tables created: {', '.join(db.metadata.tables.keys())}")
+    app.run(debug=True)
