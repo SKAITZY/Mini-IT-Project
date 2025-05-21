@@ -18,4 +18,4 @@ def init_extensions(app):
     # Configure login manager
     login_manager.login_view = 'login'
     login_manager.login_message = 'Please log in to access this page.'
-    login_manager.login_message_category = 'info' 
+    login_manager.login_message_category = 'info'

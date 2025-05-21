@@ -1,0 +1,176 @@
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mix & Match</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/match.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="navbar__container">
+        <a href="{{ url_for('index') }}" id="navbar__logo">JomGather</a>
+        <div class="navbar__toggle" id="mobile-menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+        <ul class="navbar__menu">
+            <li class="navbar__item">
+                <a href="{{ url_for('index') }}" class="navbar__links">Home</a>
+            </li>            
+            <li class="navbar__item">
+                <a href="{{ url_for('customise') }}" class="navbar__links">Customize Profile</a>
+            </li>
+            <li class="navbar__item">
+                <a href="{{ url_for('match') }}" class="navbar__links">Mix & Match</a>
+            </li>
+            <li class="navbar__item">
+                <a href="{{ url_for('view_connections') }}" class="navbar__links">My Connections</a>
+            </li>
+            <li class="navbar__btn">
+              <a href="{{ url_for('logout') }}" class="button">Logout</a>
+            </li>
+        </ul>
+    </div>
+  </nav>
+
+  <div class="match-container">
+    <div class="match-header">
+      <h2>Quick Match</h2>
+      <p>Click the button to find classmates with similar interests</p>
+    </div>
+    
+    <div class="match-filters">
+      <select id="facultyFilter" class="filter-select">
+        <option value="">All Faculties</option>
+        {% for faculty in faculties %}
+        <option value="{{ faculty }}">{{ faculty }}</option>
+        {% endfor %}
+      </select>
+      <select id="yearFilter" class="filter-select">
+        <option value="">All Years</option>
+        {% for year in range(2020, 2025) %}
+        <option value="{{ year }}">{{ year }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="match-actions">
+      <button id="randomMatchBtn" class="match-btn">
+        <i class="fas fa-random"></i> Random Match
+      </button>
+      <button id="smartMatchBtn" class="match-btn primary">
+        <i class="fas fa-brain"></i> Smart Recommendation
+      </button>
+    </div>
+
+    <div class="match-result" id="matchResult">
+      <div class="empty-state">
+        <i class="fas fa-users fa-3x"></i>
+        <p>Click the button above to start matching</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/match.js') }}"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const randomBtn = document.getElementById('randomMatchBtn');
+      const smartBtn = document.getElementById('smartMatchBtn');
+      const resultDiv = document.getElementById('matchResult');
+      const facultyFilter = document.getElementById('facultyFilter');
+      const yearFilter = document.getElementById('yearFilter');
+
+      // Loading animation template
+      const loadingHTML = `
+        <div class="loading">
+          <i class="fas fa-spinner loading-spinner fa-2x"></i>
+          <p>Searching for a match...</p>
+        </div>
+      `;
+
+      // Show match results
+      function showProfile(user) {
+        resultDiv.innerHTML = `
+          <div class="profile-card">
+            <div class="profile-header">
+              <h3>${user.username}</h3>
+              <p class="faculty">${user.faculty || 'Faculty not set'}</p>
+            </div>
+            ${user.interests ? `
+            <div class="interests">
+              <h4>Common Interests</h4>
+              <div class="tags">
+                ${user.interests.map(i => `<span class="tag">${i}</span>`).join('')}
+              </div>
+            </div>` : ''}
+            <button class="connect-btn" data-user-id="${user.id}">
+              <i class="fas fa-user-plus"></i> Add Friend
+            </button>
+          </div>
+        `;
+        
+        // Add connection event
+        resultDiv.querySelector('.connect-btn').addEventListener('click', connectWithUser);
+      }
+
+      // Connect users
+      async function connectWithUser(e) {
+        const userId = e.target.closest('button').dataset.userId;
+        try {
+          const response = await fetch(`/connect/${userId}`, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token() }}'
+            }
+          });
+          
+          const data = await response.json();
+          if (data.success) {
+            alert('Friend request sent!');
+          } else {
+            alert(data.error || 'Failed to send request');
+          }
+        } catch (err) {
+          console.error('Connection error:', err);
+          alert('Network error, please try again');
+        }
+      }
+
+      // Get match
+      async function getMatch(type) {
+        resultDiv.innerHTML = loadingHTML;
+        
+        try {
+          const params = new URLSearchParams();
+          if (facultyFilter.value) params.append('faculty', facultyFilter.value);
+          if (yearFilter.value) params.append('year', yearFilter.value);
+          
+          const response = await fetch(`/api/match/${type}?${params.toString()}`);
+          if (!response.ok) throw new Error('Server error');
+          
+          const data = await response.json();
+          if (data.success) {
+            showProfile(data.user);
+          } else {
+            resultDiv.innerHTML = `<div class="empty-state"><p>${data.error || 'No match found'}</p></div>`;
+          }
+        } catch (err) {
+          console.error('Match error:', err);
+          resultDiv.innerHTML = `<div class="error"><p>Match failed: ${err.message}</p></div>`;
+        }
+      }
+
+      // Event listeners
+      randomBtn.addEventListener('click', () => getMatch('random'));
+      smartBtn.addEventListener('click', () => getMatch('smart'));
+    });
+  </script>
+
+</body>
+</html>

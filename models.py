@@ -130,4 +130,36 @@ class Message(db.Model):
             'content': self.content,
             'is_read': self.is_read,
             'created_at': self.created_at.isoformat()
-        } 
+        }
+
+class Gathering(db.Model):
+    __tablename__ = 'gathering'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    gathering_type = db.Column(db.String(50), nullable=False)
+    faculty = db.Column(db.String(50), nullable=False)
+    year_semester = db.Column(db.String(50), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    max_participants = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    target_audience = db.Column(db.String(200))
+    status = db.Column(db.String(20), nullable=False, default='pending')
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='gatherings')
+
+class GatheringParticipant(db.Model):
+    __tablename__ = 'gathering_participant'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    gathering_id = db.Column(db.Integer, db.ForeignKey('gathering.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    joined_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    status = db.Column(db.String(20), nullable=False, default='joined')
+    
+    gathering = db.relationship('Gathering', backref='participants')
+    user = db.relationship('User', backref='gathering_participations')
