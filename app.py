@@ -534,4 +534,50 @@ if __name__ == '__main__':
         # List the tables that were created
         print(f"Tables created: {', '.join(db.metadata.tables.keys())}")
     app.run(debug=True)
-    
+
+    @app.route('/pass')
+    def pass_page():
+        return render_template('pass.html')
+
+from flask_login import login_required, current_user
+
+@app.route('/update-password', methods=['POST'])
+def update_password():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        # 使用正确的字段名 (student_id)
+        student_id = data.get('student_id')
+        new_password = data.get('new_password')
+
+        # 验证字段
+        if not all([student_id, new_password]):
+            return jsonify({'success': False, 'error': 'Missing student ID or new password'}), 400
+
+        # 查找用户
+        user = User.query.filter_by(student_id=student_id).first()
+        if not user:
+            return jsonify({'success': False, 'error': 'Student ID not found'}), 404
+
+        # 更新密码
+        user.password_hash = generate_password_hash(new_password)
+        db.session.commit()
+
+        # 记录成功日志
+        app.logger.info(f"Password updated for student_id: {student_id}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Password updated successfully!'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        # 记录详细错误信息
+        app.logger.error(f"Password update failed for {student_id}: {str(e)}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': 'Failed to update password. Please try again.'
+        }), 500
