@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+-- Active: 1746064849072@@127.0.0.1@3306@jomgather
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,7 +82,11 @@
             </div>
             <button type="submit" class="submit-btn">Login</button>
             <div class="forgot-password">
+<<<<<<< HEAD
               <a href="#">Forgot Password?</a>
+=======
+              <a href="{{ url_for('pass_page') }}">Forgot Password?</a>
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
             </div>
           </form>
         </div>
@@ -115,6 +123,7 @@
   </div>
 
   <script>
+<<<<<<< HEAD
     function switchTab(tab) {
       // Hide all forms
       document.querySelectorAll('.form-container').forEach(form => {
@@ -191,6 +200,25 @@
       document.querySelector('.navbar__menu').classList.toggle('active');
       this.classList.toggle('is-active');
     });
+=======
+    function switchTab(tabName) {
+      // Hide all form containers
+      document.querySelectorAll('.form-container').forEach(container => {
+        container.classList.remove('active');
+      });
+      
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show the selected form container
+      document.getElementById(tabName + '-form').classList.add('active');
+      
+      // Set the clicked tab as active
+      event.currentTarget.classList.add('active');
+    }
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
   </script>
 
   <script src="{{ url_for('static', filename='js/common.js') }}"></script>

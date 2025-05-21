@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import os
 import sqlite3
 
@@ -42,6 +43,8 @@ connection.close()
 
 print("Database setup complete.")
 =======
+=======
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 import os
 import sqlite3
 

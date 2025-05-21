@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from flask import Flask, redirect, url_for, render_template, request, flash, session
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user, UserMixin
 from extensions import db, init_extensions
@@ -28,11 +29,41 @@ def load_user(user_id):
         return None
 
 # Initialize other extensions after login manager
+=======
+from flask import Flask, redirect, url_for, render_template, request, flash, session, jsonify, abort, send_from_directory
+from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from extensions import db, login_manager, csrf, init_extensions
+from config import Config
+import os
+import re
+from werkzeug.utils import secure_filename
+from datetime import datetime, timedelta
+
+# Create a Flask app instance (only once)
+app = Flask(__name__)
+app.config.from_object(Config)
+
+# Initialize extensions
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 init_extensions(app)
 
 # Ensure the upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+<<<<<<< HEAD
+=======
+# Import models after db is initialized
+from models import User, Customisation, Connection, Message
+
+# Add timedelta to Jinja globals
+app.jinja_env.globals.update(timedelta=timedelta)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 def validate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
@@ -76,11 +107,21 @@ def customise():
         course = request.form.get('course')
         year_of_study = request.form.get('year_of_study')
         profile_picture = request.files.get('profile_picture')
+<<<<<<< HEAD
         
         # Debug information
         print(f"Received POST data: bio={bio[:20]}..., interests={interests[:50]}...")
         print(f"Faculty: {faculty}, Course: {course}, Year: {year_of_study}")
         print(f"Profile picture: {profile_picture.filename if profile_picture else 'None'}")
+=======
+        name = request.form.get('name')  # Get the name field
+        
+        # Debug information
+        print(f"Received POST data: bio={bio[:20] if bio else 'None'}..., interests={interests[:50] if interests else 'None'}...")
+        print(f"Faculty: {faculty}, Course: {course}, Year: {year_of_study}")
+        print(f"Profile picture: {profile_picture.filename if profile_picture else 'None'}")
+        print(f"Name: {name}")
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
         
         # Process profile picture if uploaded
         if profile_picture and profile_picture.filename:
@@ -112,6 +153,13 @@ def customise():
         current_user.customisation.faculty = faculty
         current_user.customisation.course = course
         
+<<<<<<< HEAD
+=======
+        # Update username if name field is provided
+        if name and name.strip():
+            current_user.username = name.strip()
+        
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
         # Convert year_of_study to integer if it has a value
         if year_of_study:
             try:
@@ -211,7 +259,10 @@ def register():
             db.session.rollback()
             flash(f'An error occurred during registration: {str(e)}. Please try again.', 'error')
             return render_template('register.html')
+<<<<<<< HEAD
             
+=======
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
     return render_template('register.html')
 
 @app.route('/logout')
@@ -221,6 +272,7 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/jomgather')
+<<<<<<< HEAD
 @login_required
 def jomgather():
     active_tab = request.args.get('tab', 'find-partners')
@@ -252,6 +304,120 @@ def jomgather():
                          my_hosted_gatherings=my_hosted_gatherings,
                          my_joined_gatherings=my_joined_gatherings,
                          available_gatherings=available_gatherings)
+=======
+def jomgather():
+    # If user is not authenticated, redirect to register/login page
+    if not current_user.is_authenticated:
+        flash('Please login to access JomGather features', 'info')
+        return redirect(url_for('register'))
+        
+    # Get all faculties, courses, and years for filter dropdowns
+    faculties = db.session.query(Customisation.faculty).filter(Customisation.faculty.isnot(None)).distinct().all()
+    faculties = [faculty[0] for faculty in faculties if faculty[0]]
+    
+    courses = db.session.query(Customisation.course).filter(Customisation.course.isnot(None)).distinct().all()
+    courses = [course[0] for course in courses if course[0]]
+    
+    # Determine which tab is active
+    active_tab = request.args.get('tab', 'find-partners')
+    
+    # Check if search was performed
+    search_performed = any([
+        request.args.get('faculty'), 
+        request.args.get('course'), 
+        request.args.get('year'), 
+        request.args.get('interests')
+    ])
+    
+    students = []
+    connected_partners = []
+    
+    # Only search for students if in find-partners tab to avoid duplicate display
+    if current_user.is_authenticated and active_tab == 'find-partners':
+        # Initialize filters
+        faculty_filter = request.args.get('faculty', '')
+        course_filter = request.args.get('course', '')
+        year_filter = request.args.get('year', '')
+        interests_filter = request.args.get('interests', '')
+        
+        # Start with all users
+        query = User.query.join(Customisation).filter(User.id != current_user.id)
+        
+        # Only apply filters if they're not empty
+        if faculty_filter:
+            query = query.filter(Customisation.faculty == faculty_filter)
+        
+        if course_filter:
+            query = query.filter(Customisation.course == course_filter)
+        
+        if year_filter and year_filter.isdigit():
+            query = query.filter(Customisation.year_of_study == int(year_filter))
+        
+        if interests_filter:
+            # Search for interests as substring
+            interest_terms = interests_filter.lower().split(',')
+            for term in interest_terms:
+                term = term.strip()
+                if term:
+                    query = query.filter(Customisation.interests.ilike(f'%{term}%'))
+        
+        # Execute query
+        students = query.all()
+    
+    # Fetch connected partners if in my-partners tab
+    elif current_user.is_authenticated and active_tab == 'my-partners':
+        # Initialize filters
+        faculty_filter = request.args.get('faculty', '')
+        course_filter = request.args.get('course', '')
+        year_filter = request.args.get('year', '')
+        interests_filter = request.args.get('interests', '')
+        
+        # Get all accepted connections where the current user is involved
+        connections_made = Connection.query.filter_by(user_id=current_user.id, status='accepted').all()
+        connections_received = Connection.query.filter_by(connected_user_id=current_user.id, status='accepted').all()
+        
+        # Get the users involved in these connections
+        partner_ids = []
+        
+        for conn in connections_made:
+            partner_ids.append(conn.connected_user_id)
+            
+        for conn in connections_received:
+            partner_ids.append(conn.user_id)
+        
+        # Query for partners with filters
+        if partner_ids:
+            query = User.query.join(Customisation).filter(User.id.in_(partner_ids))
+            
+            # Apply filters if specified
+            if faculty_filter:
+                query = query.filter(Customisation.faculty == faculty_filter)
+            
+            if course_filter:
+                query = query.filter(Customisation.course == course_filter)
+            
+            if year_filter and year_filter.isdigit():
+                query = query.filter(Customisation.year_of_study == int(year_filter))
+            
+            if interests_filter:
+                # Search for interests as substring
+                interest_terms = interests_filter.lower().split(',')
+                for term in interest_terms:
+                    term = term.strip()
+                    if term:
+                        query = query.filter(Customisation.interests.ilike(f'%{term}%'))
+            
+            # Execute query
+            connected_partners = query.all()
+    
+    return render_template('jomgather.html', 
+                           students=students,
+                           connected_partners=connected_partners,
+                           faculties=faculties,
+                           courses=courses,
+                           search_performed=search_performed,
+                           active_tab=active_tab)
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 
 @app.route('/find_students', methods=['GET', 'POST'])
 @login_required
@@ -433,6 +599,7 @@ def send_message(connection_id):
     other_user_id = connection.connected_user_id if connection.user_id == current_user.id else connection.user_id
     return redirect(url_for('chat', user_id=other_user_id))
 
+<<<<<<< HEAD
 @app.route('/create-gathering', methods=['POST'])
 @login_required
 def create_gathering():
@@ -504,6 +671,8 @@ def join_gathering(gathering_id):
     
     return redirect(url_for('jomgather', tab='my-gatherings'))
 
+=======
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 # Error handlers
 @app.errorhandler(404)
 def not_found_error(error):
@@ -514,6 +683,54 @@ def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
 
+<<<<<<< HEAD
+=======
+@app.route('/pass', endpoint='pass_page')
+def password_reset_page():
+    return render_template('pass.html')
+
+@app.route('/update-password', methods=['POST'])
+def update_password():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        # 使用正确的字段名 (student_id)
+        student_id = data.get('student_id')
+        new_password = data.get('new_password')
+
+        # 验证字段
+        if not all([student_id, new_password]):
+            return jsonify({'success': False, 'error': 'Missing student ID or new password'}), 400
+
+        # 查找用户
+        user = User.query.filter_by(student_id=student_id).first()
+        if not user:
+            return jsonify({'success': False, 'error': 'Student ID not found'}), 404
+
+        # 更新密码
+        user.password_hash = generate_password_hash(new_password)
+        db.session.commit()
+
+        # 记录成功日志
+        app.logger.info(f"Password updated for student_id: {student_id}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Password updated successfully!'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        # 记录详细错误信息
+        app.logger.error(f"Password update failed for {student_id}: {str(e)}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': 'Failed to update password. Please try again.'
+        }), 500
+
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 # Run the app if this file is executed
 if __name__ == '__main__':
     with app.app_context():
@@ -523,4 +740,8 @@ if __name__ == '__main__':
         print(f"Using database: {app.config['SQLALCHEMY_DATABASE_URI']}")
         # List the tables that were created
         print(f"Tables created: {', '.join(db.metadata.tables.keys())}")
+<<<<<<< HEAD
     app.run(debug=True)
+=======
+    app.run(debug=True)
+>>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
