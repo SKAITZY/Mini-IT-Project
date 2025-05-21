@@ -7,6 +7,7 @@ import os
 import re
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
+import random
 
 # Create a Flask app instance (only once)
 app = Flask(__name__)
@@ -152,8 +153,7 @@ def login():
             flash('Invalid student ID or password', 'error')
             return redirect(url_for('login'))
             
-    return render_template('login.html')  # ✅ Corrected from register.html
-
+    return render_template('register.html')  # Changed back to register.html
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -569,17 +569,6 @@ def update_password():
             'error': 'Failed to update password. Please try again.'
         }), 500
 
-# Run the app if this file is executed
-if __name__ == '__main__':
-    with app.app_context():
-        # Check if tables need to be created
-        db.create_all()
-        print("Database tables created or confirmed to exist.")
-        print(f"Using database: {app.config['SQLALCHEMY_DATABASE_URI']}")
-        # List the tables that were created
-        print(f"Tables created: {', '.join(db.metadata.tables.keys())}")
-    app.run(debug=True)
-
 @app.route('/match')
 def match():
     return render_template('match.html')
@@ -608,7 +597,7 @@ def match_users(match_type):
             # 随机匹配
             available_users = query.all()
             if not available_users:
-                return jsonify({'success': False, 'error': '没有可匹配的用户'})
+                return jsonify({'success': False, 'error': 'no match user'})
             
             matched_user = random.choice(available_users)
             return jsonify({
@@ -648,14 +637,14 @@ def match_users(match_type):
                 result['common_interests'] = list(common_interests)
                 return jsonify({'success': True, 'user': result})
             else:
-                return jsonify({'success': False, 'error': '没有找到合适匹配'})
+                return jsonify({'success': False, 'error': 'no suitable match found'}), 404
                 
         else:
-            return jsonify({'success': False, 'error': '无效的匹配类型'}), 400
+            return jsonify({'success': False, 'error': 'invalid match type'}), 400
             
     except Exception as e:
         app.logger.error(f"Match error: {str(e)}")
-        return jsonify({'success': False, 'error': '服务器错误'}), 500
+        return jsonify({'success': False, 'error': 'server error'}), 500
 
 def format_user(user):
     """格式化用户数据"""
@@ -676,3 +665,14 @@ def handle_api_errors(e):
             'error': str(e.description) if hasattr(e, 'description') else 'An error occurred'
         }), e.code
     return e
+
+# Run the app if this file is executed
+if __name__ == '__main__':
+    with app.app_context():
+        # Check if tables need to be created
+        db.create_all()
+        print("Database tables created or confirmed to exist.")
+        print(f"Using database: {app.config['SQLALCHEMY_DATABASE_URI']}")
+        # List the tables that were created
+        print(f"Tables created: {', '.join(db.metadata.tables.keys())}")
+    app.run(debug=True)
