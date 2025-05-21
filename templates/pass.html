@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Change Password</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pass.css') }}">
+</head>
+
+<body>
+  <div class="form-container">
+    <h2>Reset Your Password</h2>
+    <form id="changePasswordForm">
+      <div class="form-group">
+        <label for="userId">User ID</label>
+        <input type="text" id="userId" required>
+      </div>
+      <div class="form-group">
+        <label for="newPassword">New Password</label>
+        <input type="password" id="newPassword" required>
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm New Password</label>
+        <input type="password" id="confirmPassword" required>
+      </div>
+      <button type="submit" class="btn-submit">Change Password</button>
+      <div class="message" id="statusMsg"></div>
+    </form>
+  </div>
+
+  <div class="back-button-container">
+    <a href="{{ url_for('register') }}" class="back-button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+      <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+      </svg>
+      Back
+    </a>
+  </div>
+
+
+<script>
+  document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const userId = document.getElementById('userId').value.trim();
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const statusMsg = document.getElementById('statusMsg');
+
+    // 密码验证逻辑
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+        statusMsg.style.color = 'red';
+        statusMsg.textContent = "Password must be at least 8 characters long, include uppercase, lowercase, a number, and a special character.";
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        statusMsg.style.color = 'red';
+        statusMsg.textContent = "Passwords do not match.";
+        return;
+    }
+
+    try {
+        const response = await fetch('/update-password', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'  // 添加CSRF保护
+            },
+            body: JSON.stringify({
+                student_id: userId,  // 确保与后端一致
+                new_password: newPassword
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to update password");
+        }
+
+        if (data.success) {
+            statusMsg.style.color = 'green';
+            statusMsg.textContent = data.message || "Password changed successfully! Redirecting to login...";
+            setTimeout(() => { window.location.href = "/login"; }, 2000);
+        } else {
+            statusMsg.style.color = 'red';
+            statusMsg.textContent = data.error || "Failed to update password.";
+        }
+    } catch (err) {
+        statusMsg.style.color = 'red';
+        statusMsg.textContent = err.message || "An error occurred. Please try again.";
+        console.error("Password update error:", err);
+    }
+});
+</script>
+</body>
+</html>

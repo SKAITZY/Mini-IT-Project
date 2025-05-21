@@ -79,7 +79,7 @@
             </div>
             <button type="submit" class="submit-btn">Login</button>
             <div class="forgot-password">
-              <a href="#">Forgot Password?</a>
+              <a href="{{ url_for('pass_page') }}">Forgot Password?</a>
             </div>
           </form>
         </div>
@@ -116,82 +116,57 @@
   </div>
 
   <script>
-    function switchTab(tab) {
-      // Hide all forms
-      document.querySelectorAll('.form-container').forEach(form => {
-        form.classList.remove('active');
-      });
-      
-      // Remove active class from all tabs
-      document.querySelectorAll('.tab').forEach(t => {
-        t.classList.remove('active');
-      });
-      
-      // Show selected form and activate tab
-      document.getElementById(tab + '-form').classList.add('active');
-      event.target.classList.add('active');
-    }
+    document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
 
-    // Validate MMU Student ID format
-    function validateStudentId(studentId) {
-      const studentIdRegex = /^[A-Za-z0-9]{8,12}$/;
-      return studentIdRegex.test(studentId);
-    }
+  const studentId = document.getElementById('studentId').value.trim();
+  const newPassword = document.getElementById('newPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  const statusMsg = document.getElementById('statusMsg');
 
-    // Validate login form
-    function validateLoginForm(event) {
-      const studentId = document.getElementById('login-student-id').value;
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
+  if (!passwordRegex.test(newPassword)) {
+    statusMsg.style.color = 'red';
+    statusMsg.textContent = "Password must be at least 8 characters long, include uppercase, lowercase, a number, and a special character.";
+    return;
+  }
 
-      if (!validateStudentId(studentId)) {
-        alert('Please enter a valid MMU student ID (8-12 alphanumeric characters)');
-        event.preventDefault();
-        return false;
-      }
+  if (newPassword !== confirmPassword) {
+    statusMsg.style.color = 'red';
+    statusMsg.textContent = "Passwords do not match.";
+    return;
+  }
 
-      return true;
-    }
-
-    // Validate signup form
-    function validateSignupForm(event) {
-      const studentId = document.getElementById('signup-student-id').value;
-      const name = document.getElementById('signup-name').value;
-      const email = document.getElementById('signup-email').value;
-      const password = document.getElementById('signup-password').value;
-      const confirmPassword = document.getElementById('signup-confirm-password').value;
-
-      if (!validateStudentId(studentId)) {
-        alert('Please enter a valid MMU student ID (8-12 alphanumeric characters)');
-        event.preventDefault();
-        return false;
-      }
-
-      if (password !== confirmPassword) {
-        alert('Passwords do not match');
-        event.preventDefault();
-        return false;
-      }
-
-      return true;
-    }
-
-    // Add input validation for student ID fields
-    document.getElementById('login-student-id').addEventListener('input', function(e) {
-      // Allow only alphanumeric characters, max 12
-      this.value = this.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 12);
+  try {
+    const response = await fetch('/update-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ student_id: studentId, new_password: newPassword })
     });
 
-    document.getElementById('signup-student-id').addEventListener('input', function(e) {
-      // Allow only alphanumeric characters, max 12
-      this.value = this.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 12);
-    });
+    const data = await response.json();
 
-    // Mobile menu toggle
-    document.getElementById('mobile-menu').addEventListener('click', function() {
-      document.querySelector('.navbar__menu').classList.toggle('active');
-      this.classList.toggle('is-active');
-    });
+    if (!response.ok) {
+      statusMsg.style.color = 'red';
+      statusMsg.textContent = data.error || "Unexpected error.";
+      return;
+    }
+
+    if (data.success) {
+      statusMsg.style.color = 'green';
+      statusMsg.textContent = "Password changed successfully! Redirecting to login...";
+      setTimeout(() => { window.location.href = "/login"; }, 2000);
+    } else {
+      statusMsg.style.color = 'red';
+      statusMsg.textContent = data.error || "Failed to update password.";
+    }
+  } catch (err) {
+    statusMsg.style.color = 'red';
+    statusMsg.textContent = "An error occurred. Please try again.";
+  }
+});
+
+document.querySelector('.submit-btn').click();
   </script>
 
   <script src="{{ url_for('static', filename='js/common.js') }}"></script>
