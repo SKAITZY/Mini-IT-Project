@@ -1,35 +1,3 @@
-<<<<<<< HEAD
-from flask import Flask, redirect, url_for, render_template, request, flash, session
-from flask_login import LoginManager, login_required, current_user, login_user, logout_user, UserMixin
-from extensions import db, init_extensions
-from config import Config
-from models import User, Gathering, GatheringParticipant, Customisation, Message, Connection
-import os
-import re
-from werkzeug.utils import secure_filename
-from werkzeug.security import check_password_hash
-from datetime import datetime
-
-# Create a Flask app instance
-app = Flask(__name__)
-app.config.from_object(Config)
-
-# Initialize login manager before other extensions
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-login_manager.login_message = 'Please log in to access this page.'
-login_manager.login_message_category = 'error'
-
-@login_manager.user_loader
-def load_user(user_id):
-    try:
-        return User.query.get(int(user_id))
-    except:
-        return None
-
-# Initialize other extensions after login manager
-=======
 from flask import Flask, redirect, url_for, render_template, request, flash, session, jsonify, abort, send_from_directory
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -45,14 +13,11 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Initialize extensions
->>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 init_extensions(app)
 
 # Ensure the upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-<<<<<<< HEAD
-=======
 # Import models after db is initialized
 from models import User, Customisation, Connection, Message
 
@@ -63,7 +28,6 @@ app.jinja_env.globals.update(timedelta=timedelta)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
->>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 def validate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
@@ -107,13 +71,6 @@ def customise():
         course = request.form.get('course')
         year_of_study = request.form.get('year_of_study')
         profile_picture = request.files.get('profile_picture')
-<<<<<<< HEAD
-        
-        # Debug information
-        print(f"Received POST data: bio={bio[:20]}..., interests={interests[:50]}...")
-        print(f"Faculty: {faculty}, Course: {course}, Year: {year_of_study}")
-        print(f"Profile picture: {profile_picture.filename if profile_picture else 'None'}")
-=======
         name = request.form.get('name')  # Get the name field
         
         # Debug information
@@ -121,7 +78,6 @@ def customise():
         print(f"Faculty: {faculty}, Course: {course}, Year: {year_of_study}")
         print(f"Profile picture: {profile_picture.filename if profile_picture else 'None'}")
         print(f"Name: {name}")
->>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
         
         # Process profile picture if uploaded
         if profile_picture and profile_picture.filename:
@@ -153,13 +109,10 @@ def customise():
         current_user.customisation.faculty = faculty
         current_user.customisation.course = course
         
-<<<<<<< HEAD
-=======
         # Update username if name field is provided
         if name and name.strip():
             current_user.username = name.strip()
         
->>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
         # Convert year_of_study to integer if it has a value
         if year_of_study:
             try:
@@ -259,10 +212,6 @@ def register():
             db.session.rollback()
             flash(f'An error occurred during registration: {str(e)}. Please try again.', 'error')
             return render_template('register.html')
-<<<<<<< HEAD
-            
-=======
->>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
     return render_template('register.html')
 
 @app.route('/logout')
@@ -272,39 +221,6 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/jomgather')
-<<<<<<< HEAD
-@login_required
-def jomgather():
-    active_tab = request.args.get('tab', 'find-partners')
-    search_performed = False
-    students = []
-    connected_partners = []
-    
-    # Fetch gatherings for My Gatherings tab
-    my_hosted_gatherings = Gathering.query.filter_by(user_id=current_user.id).all()
-    
-    # Fetch gatherings user is participating in
-    my_joined_gatherings = Gathering.query\
-        .join(GatheringParticipant)\
-        .filter(
-            GatheringParticipant.user_id == current_user.id,
-            GatheringParticipant.status == 'joined'
-        ).all()
-
-    # Fetch all available gatherings for Find Gatherings tab
-    available_gatherings = Gathering.query.filter(
-        Gathering.user_id != current_user.id,
-        ~Gathering.id.in_([g.id for g in my_joined_gatherings])  # Exclude joined gatherings
-    ).all()
-
-    return render_template('jomgather.html',
-                         students=students,
-                         connected_partners=connected_partners,
-                         active_tab=active_tab,
-                         my_hosted_gatherings=my_hosted_gatherings,
-                         my_joined_gatherings=my_joined_gatherings,
-                         available_gatherings=available_gatherings)
-=======
 def jomgather():
     # If user is not authenticated, redirect to register/login page
     if not current_user.is_authenticated:
@@ -417,7 +333,6 @@ def jomgather():
                            courses=courses,
                            search_performed=search_performed,
                            active_tab=active_tab)
->>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 
 @app.route('/find_students', methods=['GET', 'POST'])
 @login_required
@@ -599,80 +514,6 @@ def send_message(connection_id):
     other_user_id = connection.connected_user_id if connection.user_id == current_user.id else connection.user_id
     return redirect(url_for('chat', user_id=other_user_id))
 
-<<<<<<< HEAD
-@app.route('/create-gathering', methods=['POST'])
-@login_required
-def create_gathering():
-    if request.method == 'POST':
-        try:
-            # Get form data
-            new_gathering = Gathering(
-                user_id=current_user.id,
-                title=request.form.get('eventTitle'),
-                gathering_type=request.form.get('eventType'),
-                faculty=request.form.get('faculty'),
-                year_semester=request.form.get('yearSemester'),
-                date=datetime.strptime(request.form.get('eventDate'), '%Y-%m-%d').date(),
-                time=datetime.strptime(request.form.get('eventTime'), '%H:%M').time(),
-                location=request.form.get('eventLocation'),
-                max_participants=int(request.form.get('maxAttendees')),
-                description=request.form.get('eventDescription'),
-                target_audience=request.form.get('targetAudience'),
-                status='pending'
-            )
-
-            db.session.add(new_gathering)
-            db.session.commit()
-
-            flash('Gathering created successfully!', 'success')
-            return redirect(url_for('jomgather', tab='my-gatherings'))
-
-        except Exception as e:
-            db.session.rollback()
-            flash('Error creating gathering. Please try again.', 'error')
-            print(f"Error: {str(e)}")
-            return redirect(url_for('jomgather', tab='create-gathering'))
-
-    return redirect(url_for('jomgather', tab='create-gathering'))
-
-@app.route('/join-gathering/<int:gathering_id>', methods=['POST'])
-@login_required
-def join_gathering(gathering_id):
-    gathering = Gathering.query.get_or_404(gathering_id)
-    
-    if gathering.user_id == current_user.id:
-        flash('You cannot join your own gathering!', 'error')
-        return redirect(url_for('jomgather', tab='find-gatherings'))
-        
-    # Check if already joined
-    existing_participant = GatheringParticipant.query.filter_by(
-        gathering_id=gathering_id,
-        user_id=current_user.id
-    ).first()
-    
-    if existing_participant:
-        flash('You have already joined this gathering!', 'info')
-        return redirect(url_for('jomgather', tab='my-gatherings'))
-    
-    # Create new participant entry
-    new_participant = GatheringParticipant(
-        gathering_id=gathering_id,
-        user_id=current_user.id
-    )
-    
-    try:
-        db.session.add(new_participant)
-        db.session.commit()
-        flash('Successfully joined the gathering!', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash('Error joining gathering!', 'error')
-        print(f"Error: {str(e)}")
-    
-    return redirect(url_for('jomgather', tab='my-gatherings'))
-
-=======
->>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 # Error handlers
 @app.errorhandler(404)
 def not_found_error(error):
@@ -683,8 +524,6 @@ def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
 
-<<<<<<< HEAD
-=======
 @app.route('/pass', endpoint='pass_page')
 def password_reset_page():
     return render_template('pass.html')
@@ -730,7 +569,6 @@ def update_password():
             'error': 'Failed to update password. Please try again.'
         }), 500
 
->>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 # Run the app if this file is executed
 if __name__ == '__main__':
     with app.app_context():
@@ -740,8 +578,4 @@ if __name__ == '__main__':
         print(f"Using database: {app.config['SQLALCHEMY_DATABASE_URI']}")
         # List the tables that were created
         print(f"Tables created: {', '.join(db.metadata.tables.keys())}")
-<<<<<<< HEAD
     app.run(debug=True)
-=======
-    app.run(debug=True)
->>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5

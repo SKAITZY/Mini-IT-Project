@@ -1,12 +1,7 @@
 from extensions import db
-<<<<<<< HEAD
-from flask_login import UserMixin
-from datetime import datetime
-=======
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
->>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
 import re
 
 class User(UserMixin, db.Model):
@@ -135,7 +130,6 @@ class Message(db.Model):
             'content': self.content,
             'is_read': self.is_read,
             'created_at': self.created_at.isoformat()
-<<<<<<< HEAD
         }
 
 class Gathering(db.Model):
@@ -169,6 +163,3 @@ class GatheringParticipant(db.Model):
     
     gathering = db.relationship('Gathering', backref='participants')
     user = db.relationship('User', backref='gathering_participations')
-=======
-        } 
->>>>>>> d8e3fcbb015c1439225646655db38ad2ea2f61a5
