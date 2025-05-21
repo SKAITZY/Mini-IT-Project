@@ -19,7 +19,7 @@ class Config:
     DEFAULT_PROFILE_PIC = 'default_profile.png'
     
     # Session settings
-    PERMANENT_SESSION_LIFETIME = 1800  # 30 minutes
+    PERMANENT_SESSION_LIFETIME = 31536000  # 1 year (effectively no timeout)
     SESSION_TYPE = 'filesystem'
     
     # Security settings
