@@ -535,9 +535,15 @@ if __name__ == '__main__':
         print(f"Tables created: {', '.join(db.metadata.tables.keys())}")
     app.run(debug=True)
 
+<<<<<<< HEAD
     @app.route('/pass')
     def pass_page():
         return render_template('pass.html')
+=======
+@app.route('/pass')
+def pass_page():
+    return render_template('pass.html')
+>>>>>>> beta_v
 
 from flask_login import login_required, current_user
 

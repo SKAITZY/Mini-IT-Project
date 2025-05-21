@@ -1,0 +1,108 @@
+body {
+  background: linear-gradient(135deg, #b22222, #1e90ff);
+  background-attachment: fixed;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.form-container {
+  max-width: 450px;
+  margin: 80px auto;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #0927af;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+input[type="text"], input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 12px;
+  background: #ff0000;
+  color: #fff;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-submit:hover {
+  background: #ff6a00;
+}
+
+.message {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 1rem;
+}
+
+/* 返回按钮样式 */
+.back-button-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.back-button {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #f8f9fa;
+  color: #333;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  border: 1px solid #ddd;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  text-decoration: none;
+}
+
+/* 确保导航栏不会覆盖返回按钮 */
+.navbar {
+  position: relative;
+  z-index: 999;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .back-button-container {
+    top: 15px;
+    left: 15px;
+  }
+  
+  .back-button {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}
