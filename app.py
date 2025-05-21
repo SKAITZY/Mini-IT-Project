@@ -138,13 +138,13 @@ def login():
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
             user.update_last_login()
-            # Always redirect to customise after successful login
             return redirect(url_for('customise'))
         else:
             flash('Invalid student ID or password', 'error')
             return redirect(url_for('login'))
             
-    return render_template('register.html')
+    return render_template('login.html')  # ✅ Corrected from register.html
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

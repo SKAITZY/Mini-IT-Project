@@ -166,8 +166,16 @@
   }
 });
 
-document.querySelector('.submit-btn').click();
-  </script>
+function switchTab(tab) {
+    // Remove 'active' class from all tabs and forms
+    document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.form-container').forEach(form => form.classList.remove('active'));
+
+    // Add 'active' class to the selected tab and corresponding form
+    document.getElementById(`${tab}-form`).classList.add('active');
+    document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+  } 
+</script>
 
   <script src="{{ url_for('static', filename='js/common.js') }}"></script>
 </body>
