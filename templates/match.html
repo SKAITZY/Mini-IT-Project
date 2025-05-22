@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -170,7 +170,50 @@
       randomBtn.addEventListener('click', () => getMatch('random'));
       smartBtn.addEventListener('click', () => getMatch('smart'));
     });
+
   </script>
+
+<script>
+  function showProfile(user) {
+    // 调试输出
+    console.log("User data:", user);
+    
+    // 处理头像URL
+    let avatarUrl;
+    if (user.avatar) {
+      avatarUrl = user.avatar;
+    } else {
+      // 使用默认头像SVG
+      avatarUrl = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='40' r='35' fill='%23ddd'/%3E%3Cpath d='M50 85c-15 0-25-10-25-20v-5h50v5c0 10-10 20-25 20z' fill='%23ddd'/%3E%3C/svg%3E";
+    }
+
+    resultDiv.innerHTML = `
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <img src="${avatarUrl}" alt="${user.username}" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'40\' r=\'35\' fill=\'%23ddd\'/%3E%3Cpath d=\'M50 85c-15 0-25-10-25-20v-5h50v5c0 10-10 20-25 20z\' fill=\'%23ddd\'/%3E%3C/svg%3E'">
+          </div>
+          <div>
+            <h3>${user.username}</h3>
+            <p class="faculty">${user.faculty || 'Faculty not set'}</p>
+          </div>
+        </div>
+        ${user.interests && user.interests.length ? `
+        <div class="interests">
+          <h4>Common Interests</h4>
+          <div class="tags">
+            ${user.interests.map(i => `<span class="tag">${i}</span>`).join('')}
+          </div>
+        </div>` : ''}
+        <button class="connect-btn" data-user-id="${user.id}">
+          <i class="fas fa-user-plus"></i> Add Friend
+        </button>
+      </div>
+    `;
+    
+    resultDiv.querySelector('.connect-btn').addEventListener('click', connectWithUser);
+  }
+</script>
 
 </body>
 </html>
