@@ -582,7 +582,15 @@ if __name__ == '__main__':
 
 @app.route('/match')
 def match():
-    return render_template('match.html')
+    if not current_user.is_authenticated:
+        flash('Please login to access matching features', 'info')
+        return redirect(url_for('login'))
+    
+    # 获取所有院系用于筛选
+    faculties = db.session.query(Customisation.faculty).filter(Customisation.faculty.isnot(None)).distinct().all()
+    faculties = [faculty[0] for faculty in faculties if faculty[0]]
+    
+    return render_template('match.html', faculties=faculties)
 
 @app.route('/api/match/<match_type>')
 @login_required
@@ -608,7 +616,7 @@ def match_users(match_type):
             # 随机匹配
             available_users = query.all()
             if not available_users:
-                return jsonify({'success': False, 'error': '没有可匹配的用户'})
+                return jsonify({'success': False, 'error': 'no match user'})
             
             matched_user = random.choice(available_users)
             return jsonify({
@@ -648,14 +656,14 @@ def match_users(match_type):
                 result['common_interests'] = list(common_interests)
                 return jsonify({'success': True, 'user': result})
             else:
-                return jsonify({'success': False, 'error': '没有找到合适匹配'})
+                return jsonify({'success': False, 'error': 'no suitable match found'}), 404
                 
         else:
-            return jsonify({'success': False, 'error': '无效的匹配类型'}), 400
+            return jsonify({'success': False, 'error': 'invalid match type'}), 400
             
     except Exception as e:
         app.logger.error(f"Match error: {str(e)}")
-        return jsonify({'success': False, 'error': '服务器错误'}), 500
+        return jsonify({'success': False, 'error': 'server error'}), 500
 
 def format_user(user):
     """格式化用户数据"""
