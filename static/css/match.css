@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+/* 蓝红主题 - 完整版 */
+>>>>>>> e957daf879ce208a7da3184ff9a32473185313e7
 body {
   background: linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%);
   min-height: 100vh;
@@ -95,6 +99,7 @@ body {
   padding: 25px;
   box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1);
   border: 1px solid #d6e7ff;
+<<<<<<< HEAD
   text-align: center;
 }
 
@@ -139,6 +144,54 @@ body {
   transform: translateY(-2px);
 }
 
+=======
+  text-align: left;
+}
+
+.profile-header h3 {
+  color: #e74c3c;
+  margin-bottom: 5px;
+}
+
+.profile-header .faculty {
+  color: #3498db;
+  font-style: italic;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.tag {
+  background: #ffeeee;
+  color: #d23c3c;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.connect-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 50px;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.connect-btn:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
+}
+
+/* 保留原有动画和响应式样式 */
+>>>>>>> e957daf879ce208a7da3184ff9a32473185313e7
 .loading-spinner {
   animation: spin 1s linear infinite;
   color: #3498db;
@@ -147,4 +200,21 @@ body {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* 添加在 match.css 中 */
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 15px;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

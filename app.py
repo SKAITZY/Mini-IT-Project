@@ -870,7 +870,15 @@ def update_password():
 
 @app.route('/match')
 def match():
-    return render_template('match.html')
+    if not current_user.is_authenticated:
+        flash('Please login to access matching features', 'info')
+        return redirect(url_for('login'))
+    
+    # 获取所有院系用于筛选
+    faculties = db.session.query(Customisation.faculty).filter(Customisation.faculty.isnot(None)).distinct().all()
+    faculties = [faculty[0] for faculty in faculties if faculty[0]]
+    
+    return render_template('match.html', faculties=faculties)
 
 @app.route('/api/match/<match_type>')
 @login_required
