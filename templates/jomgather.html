@@ -1017,6 +1017,10 @@
                     <label for="eventTime">Time</label>
                     <input type="time" id="eventTime" name="eventTime">
                   </div>
+                  <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" name="location" placeholder="E.g. FCI Lounge" value="{{ request.args.get('location', '') }}">
+                  </div>
               </div>
                   
               <button type="submit" class="search-btn">Find Gatherings</button>

@@ -254,7 +254,8 @@ def jomgather():
         request.args.get('faculty'), 
         request.args.get('course'), 
         request.args.get('year'), 
-        request.args.get('interests')
+        request.args.get('interests'),
+        request.args.get('location')
     ])
     
     students = []
@@ -442,6 +443,7 @@ def jomgather():
         year_semester = request.args.get('yearSemester', '')
         event_date = request.args.get('eventDate', '')
         event_time = request.args.get('eventTime', '')
+        location = request.args.get('location', '')
         
         # Apply gathering type filter
         if gathering_type and gathering_type != 'other':
@@ -465,6 +467,10 @@ def jomgather():
         # Apply year/semester filter
         if year_semester:
             query = query.filter(Gathering.year_semester.ilike(f'%{year_semester}%'))
+            
+        # Apply location filter
+        if location:
+            query = query.filter(Gathering.location.ilike(f'%{location}%'))
             
         # Apply date filter
         if event_date:
