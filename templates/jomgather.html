@@ -651,10 +651,7 @@
             {% endfor %}
           </div>
         {% elif search_performed %}
-          <div class="no-results">
-            <h3>No matching students found</h3>
-            <p>Try adjusting your search filters or check back later as more students join!</p>
-          </div>
+          <div class="no-results"></div>
         {% endif %}
       </div>
     </div>
@@ -761,10 +758,7 @@
             {% endfor %}
           </div>
         {% elif search_performed %}
-          <div class="no-results">
-            <h3>No matching partners found</h3>
-            <p>Try adjusting your search filters or connect with more students!</p>
-          </div>
+          <div class="no-results"></div>
         {% else %}
           <div class="no-results"></div>
         {% endif %}
@@ -775,244 +769,44 @@
       <div id="create-gathering" class="tab-content {% if active_tab == 'create-gathering' %}active{% endif %}">
           <div class="event-form">
             <h3 class="filter-title">Create a New Gathering</h3>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="eventTitle">Gathering Title</label>
-                <input type="text" id="eventTitle" name="eventTitle" placeholder="E.g. Programming Study Group">
-              </div>
-              <div class="form-group">
-                <label for="eventType">Gathering Type</label>
-                <select id="eventType" name="eventType">
-                  <option value="study">Study Session</option>
-                  <option value="project">Project Collaboration</option>
-                  <option value="social">Social Hangout</option>
-                  <option value="sports">Sports Activity</option>
-                  <option value="sports">Gaming Hangout</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                  <label for="eventTitle">Faculty Focus</label>
+            <form action="{{ url_for('create_gathering') }}" method="POST">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="eventTitle">Gathering Title</label>
+                  <input type="text" id="eventTitle" name="eventTitle" placeholder="E.g. Programming Study Group">
+                </div>
+                <div class="form-group">
+                  <label for="eventType">Gathering Type</label>
                   <select id="eventType" name="eventType">
-                      <option value="study">Faculty of Multimedia</option>
-                      <option value="project">Faculty of Computing Informatics</option>
-                      <option value="social">Faculty of Management</option>
-                      <option value="sports">Faculty of Engineering</option>
-                      <option value="sports">Faculty of Applied Communication</option>
-                      <option value="sports">Faculty of Cinematic Arts</option>
-                      <option value="other">Other</option>
-                    </select>
-              </div>
-              <div class="form-group">
-                  <label for="eventTitle">Year & Semester</label>
-                  <input type="text" id="eventTitle" name="eventTitle" placeholder="E.g. Year 1 Sem 3">
-              </div>       
-          </div>  
-            <div class="form-row">
-              <div class="form-group">
-                <label for="eventDate">Date</label>
-                <input type="date" id="eventDate" name="eventDate">
-              </div>
-              <div class="form-group">
-                <label for="eventTime">Time</label>
-                <input type="time" id="eventTime" name="eventTime">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="eventLocation">Location</label>
-                <input type="text" id="eventLocation" name="eventLocation" placeholder="E.g. Library Study Room 3, FCI Building">
-              </div>
-              <div class="form-group">
-                <label for="maxAttendees">Maximum Participants</label>
-                <input type="number" id="maxAttendees" name="maxAttendees" min="1" max="50" placeholder="E.g. 10">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="eventDescription">Description</label>
-              <textarea id="eventDescription" name="eventDescription" placeholder="Describe your gathering, its purpose, and what participants should expect or bring..."></textarea>
-            </div>
-            <div class="form-group">
-              <label for="targetAudience">Target Audience (Optional)</label>
-              <input type="text" id="targetAudience" name="targetAudience" placeholder="E.g. Software Development students, 2nd year Advertising Design students">
-            </div>
-            <button class="create-btn">Create Gathering</button>
-          </div>
-        </div>
-    
-        <!-- My Gatherings Tab -->
-        <div id="my-gatherings" class="tab-content {% if active_tab == 'my-gatherings' %}active{% endif %}">
-          <!-- Hosting Gathering -->
-          <div class="gathering-card hosting">
-            <div class="gathering-header">
-              <div>
-                <h3 class="gathering-title">Web Development Project Group</h3>
-                <span class="gathering-status hosting">Hosting</span>
-              </div>
-              <div>
-                <p>Created on: August 20, 2025</p>
-              </div>
-            </div>
-            <div class="gathering-details">
-              <div class="detail-item">
-                <span class="detail-label">Faculty:</span>
-                <span>Faculty of Computing and Informatics</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Year & Semester:</span>
-                <span>Year 2 Sem 2</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Date:</span>
-                <span>August 25, 2025</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Time:</span>
-                <span>2:00 PM - 5:00 PM</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Location:</span>
-                <span>FCI Lounge</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Gathering Type:</span>
-                <span>Project Collaboration</span>
-              </div>
-              
-            </div>
-            <p class="gathering-description">Working on the semester project for Web Application Development. We'll be discussing the frontend implementation using React and planning the backend architecture. Please bring your laptops with the dev environment set up.</p>
-            <div class="attendees-list">
-              <h4 class="attendees-title">Participants (3/5):</h4>
-              <div class="attendees">
-                <div class="attendee">
-                  <img src="/api/placeholder/50/50" alt="profile">
-                  <span>You (Host)</span>
-                </div>
-                <div class="attendee">
-                  <img src="/api/placeholder/50/50" alt="profile">
-                  <span>Ahmad</span>
-                </div>
-                <div class="attendee">
-                  <img src="/api/placeholder/50/50" alt="profile">
-                  <span>Sarah</span>
+                    <option value="study">Study Session</option>
+                    <option value="project">Project Collaboration</option>
+                    <option value="social">Social Hangout</option>
+                    <option value="sports">Sports Activity</option>
+                    <option value="gaming">Gaming Hangout</option>
+                    <option value="other">Other</option>
+                  </select>
                 </div>
               </div>
-            </div>
-            <div class="gathering-actions">
-              <button class="action-btn primary-btn">Edit Details</button>
-              <button class="action-btn secondary-btn">Message All</button>
-              <button class="action-btn danger-btn">Cancel Gathering</button>
-            </div>
-          </div>
-    
-          <!-- Attending Gathering -->
-          <div class="gathering-card">
-            <div class="gathering-header">
-              <div>
-                <h3 class="gathering-title">AI Study Group</h3>
-                <span class="gathering-status">Attending</span>
-              </div>
-              <div>
-                <p>Hosted by: Wesley </p>
-              </div>
-            </div>
-            <div class="gathering-details">
-              <div class="detail-item">
-                <span class="detail-label">Faculty:</span>
-                <span>Other</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Year & Semester:</span>
-                <span>No specifications</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Date:</span>
-                <span>Septemer 23, 2025</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Time:</span>
-                <span>9:00 AM - 11:00 AM</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Location:</span>
-                <span>MMU Field</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Gathering Type:</span>
-                <span>Sports Activity</span>
-              </div>
-            </div>
-            <p class="gathering-description">Interested in playing football and also making friends in general? Come join us playing football and make new friends!</p>
-            <div class="attendees-list">
-              <h4 class="attendees-title">Participants (8/15):</h4>
-              <div class="attendees">
-                <div class="attendee">
-                  <img src="/api/placeholder/50/50" alt="profile">
-                  <span>Wesley (Host)</span>
-                </div>
-                <div class="attendee">
-                  <img src="/api/placeholder/50/50" alt="profile">
-                  <span>You</span>
-                </div>
-                <div class="attendee">
-                  <img src="/api/placeholder/50/50" alt="profile">
-                  <span>Raj</span>
-                </div>
-                <div class="attendee">
-                  <img src="/api/placeholder/50/50" alt="profile">
-                  <span>+5 others</span>
-                </div>
-              </div>
-            </div>
-            <div class="gathering-actions">
-              <button class="action-btn primary-btn">View Details</button>
-              <button class="action-btn secondary-btn">Message Host</button>
-              <button class="action-btn danger-btn">Leave Gathering</button>
-            </div>
-          </div>
-        </div>
-    
-            
-    
-      <div id="find-gatherings" class="tab-content {% if active_tab == 'find-gatherings' %}active{% endif %}">
-          <!-- Finding Gathering -->
-          <div class="filter-section">
-            <h3 class="filter-title">Find Gatherings By:</h3>
-            <div class="form-row">
-                <div class="filter-form">
-                    <div class="form-group">
-                      <label for="faculty">Gathering Type</label>
-                      <select id="faculty" name="faculty">
-                          <option value="study">Study Session</option>
-                          <option value="project">Project Collaboration</option>
-                          <option value="social">Social Hangout</option>
-                          <option value="sports">Sports Activity</option>
-                          <option value="sports">Gaming Hangout</option>
-                          <option value="other">Other</option>
+              <div class="form-row">
+                <div class="form-group">
+                    <label for="facultyFocus">Faculty Focus</label>
+                    <select id="facultyFocus" name="facultyFocus">
+                        <option value="Faculty of Multimedia">Faculty of Multimedia</option>
+                        <option value="Faculty of Computing Informatics">Faculty of Computing Informatics</option>
+                        <option value="Faculty of Management">Faculty of Management</option>
+                        <option value="Faculty of Engineering">Faculty of Engineering</option>
+                        <option value="Faculty of Applied Communication">Faculty of Applied Communication</option>
+                        <option value="Faculty of Cinematic Arts">Faculty of Cinematic Arts</option>
+                        <option value="Other">Other</option>
                       </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="course">Faculty Focus</label>
-                      <select id="course" name="course">
-                          <option value="study">Faculty of Multimedia</option>
-                          <option value="project">Faculty of Computing Informatics</option>
-                          <option value="social">Faculty of Management</option>
-                          <option value="sports">Faculty of Engineering</option>
-                          <option value="sports">Faculty of Applied Communication</option>
-                          <option value="sports">Faculty of Cinematic Arts</option>
-                          <option value="other">Other</option>
-                        
-                      </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="eventTitle">Year & Semester</label>
-                        <input type="text" id="eventTitle" name="eventTitle" placeholder="E.g. Year 1 Sem 3">
-                    </div>
                 </div>
-            </div>
-            <div class="form-row">
+                <div class="form-group">
+                    <label for="yearSemester">Year & Semester</label>
+                    <input type="text" id="yearSemester" name="yearSemester" placeholder="E.g. Year 1 Sem 3">
+                </div>       
+            </div>  
+              <div class="form-row">
                 <div class="form-group">
                   <label for="eventDate">Date</label>
                   <input type="date" id="eventDate" name="eventDate">
@@ -1021,79 +815,304 @@
                   <label for="eventTime">Time</label>
                   <input type="time" id="eventTime" name="eventTime">
                 </div>
+              </div>
+              <div class="form-row">
                 <div class="form-group">
-                    <label for="interests">Interests</label>
-                    <input type="text" id="interests" name="interests" placeholder="E.g. programming, sports, music">
+                  <label for="eventLocation">Location</label>
+                  <input type="text" id="eventLocation" name="eventLocation" placeholder="E.g. Library Study Room 3, FCI Building">
+                </div>
+                <div class="form-group">
+                  <label for="maxAttendees">Maximum Participants</label>
+                  <input type="number" id="maxAttendees" name="maxAttendees" min="1" max="50" placeholder="E.g. 10">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="eventDescription">Description</label>
+                <textarea id="eventDescription" name="eventDescription" placeholder="Describe your gathering, its purpose, and what participants should expect or bring..."></textarea>
+              </div>
+              <div class="form-group">
+                <label for="targetAudience">Target Audience (Optional)</label>
+                <input type="text" id="targetAudience" name="targetAudience" placeholder="E.g. Software Development students, 2nd year Advertising Design students">
+              </div>
+              <button type="submit" class="create-btn">Create Gathering</button>
+            </form>
+          </div>
+        </div>
+    
+        <!-- My Gatherings Tab -->
+        <div id="my-gatherings" class="tab-content {% if active_tab == 'my-gatherings' %}active{% endif %}">
+          {% if my_gatherings %}
+            {% for gathering_data in my_gatherings %}
+              {% set gathering_item = gathering_data.gathering %}
+              {% set is_host = gathering_data.is_host %}
+              {% set participants_count = gathering_data.participants_count %}
+              {% set creator = gathering_data.creator %}
+              
+              <div class="gathering-card {% if is_host %}hosting{% endif %}">
+                <div class="gathering-header">
+                  <div>
+                    <h3 class="gathering-title">{{ gathering_item.title }}</h3>
+                    <span class="gathering-status {% if is_host %}hosting{% endif %}">
+                      {% if is_host %}Hosting{% else %}Attending{% endif %}
+                    </span>
                   </div>
+                  <div>
+                    {% if is_host %}
+                      <p>Created on: {{ gathering_item.created_at.strftime('%B %d, %Y') }}</p>
+                    {% else %}
+                      <p>Hosted by: {{ creator.username }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="gathering-details">
+                  <div class="detail-item">
+                    <span class="detail-label">Faculty:</span>
+                    <span>{{ gathering_item.faculty }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Year & Semester:</span>
+                    <span>{{ gathering_item.year_semester }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Date:</span>
+                    <span>{{ gathering_item.date.strftime('%B %d, %Y') }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Time:</span>
+                    <span>{{ gathering_item.time.strftime('%I:%M %p') }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Location:</span>
+                    <span>{{ gathering_item.location }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Gathering Type:</span>
+                    <span>{{ gathering_item.gathering_type|title }}</span>
+                  </div>
+                </div>
+                <p class="gathering-description">{{ gathering_item.description }}</p>
+                <div class="attendees-list">
+                  <h4 class="attendees-title">Participants ({{ participants_count }}/{{ gathering_item.max_participants }}):</h4>
+                  <div class="attendees">
+                    <div class="attendee">
+                      {% if is_host %}
+                        {% if current_user.customisation and current_user.customisation.profile_picture %}
+                          <img src="{{ url_for('static', filename='uploads/' + current_user.customisation.profile_picture) }}" alt="Your profile">
+                        {% else %}
+                          <img src="/api/placeholder/50/50" alt="profile">
+                        {% endif %}
+                        <span>You (Host)</span>
+                      {% else %}
+                        {% if creator.customisation and creator.customisation.profile_picture %}
+                          <img src="{{ url_for('static', filename='uploads/' + creator.customisation.profile_picture) }}" alt="{{ creator.username }}">
+                        {% else %}
+                          <img src="/api/placeholder/50/50" alt="profile">
+                        {% endif %}
+                        <span>{{ creator.username }} (Host)</span>
+                      {% endif %}
+                    </div>
+                    
+                    {% for participant in gathering_data.participants %}
+                      {% if (is_host and participant.id != current_user.id) or (not is_host and participant.id != creator.id and participant.id != current_user.id) %}
+                        <div class="attendee">
+                          {% if participant.customisation and participant.customisation.profile_picture %}
+                            <img src="{{ url_for('static', filename='uploads/' + participant.customisation.profile_picture) }}" alt="{{ participant.username }}">
+                          {% else %}
+                            <img src="/api/placeholder/50/50" alt="profile">
+                          {% endif %}
+                          <span>{{ participant.username }}{% if participant.id == current_user.id %} (You){% endif %}</span>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                    
+                    {% if not is_host and current_user.id not in gathering_item.participants|map(attribute='id')|list %}
+                      <div class="attendee">
+                        {% if current_user.customisation and current_user.customisation.profile_picture %}
+                          <img src="{{ url_for('static', filename='uploads/' + current_user.customisation.profile_picture) }}" alt="Your profile">
+                        {% else %}
+                          <img src="/api/placeholder/50/50" alt="profile">
+                        {% endif %}
+                        <span>You</span>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="gathering-actions">
+                  {% if is_host %}
+                    <a href="{{ url_for('edit_gathering', gathering_id=gathering_item.id) }}" class="action-btn primary-btn">Edit Details</a>
+                    <a href="{{ url_for('message_gathering', gathering_id=gathering_item.id) }}" class="action-btn secondary-btn">Message All</a>
+                    <form action="{{ url_for('cancel_gathering', gathering_id=gathering_item.id) }}" method="POST" style="display: inline;">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button type="submit" class="action-btn danger-btn">Cancel Gathering</button>
+                    </form>
+                  {% else %}
+                    <a href="{{ url_for('edit_gathering', gathering_id=gathering_item.id) }}" class="action-btn primary-btn">View Details</a>
+                    <a href="{{ url_for('message_gathering', gathering_id=gathering_item.id) }}" class="action-btn secondary-btn">Message Host</a>
+                    <form action="{{ url_for('leave_gathering', gathering_id=gathering_item.id) }}" method="POST" style="display: inline;">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button type="submit" class="action-btn danger-btn">Leave Gathering</button>
+                    </form>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="no-results" style="text-align: center; padding: 40px 0;">
+              <h3>You haven't created or joined any gatherings yet.</h3>
+              <p style="margin-top: 15px;">
+                <a href="{{ url_for('jomgather', tab='create-gathering') }}" style="color: #0927af; text-decoration: underline;">Create a gathering</a> 
+                or 
+                <a href="{{ url_for('jomgather', tab='find-gatherings') }}" style="color: #0927af; text-decoration: underline;">find gatherings to join</a>.
+              </p>
             </div>
-                
-            <button class="search-btn">Find Students</button>
+          {% endif %}
+        </div>
+    
+            
+    
+      <div id="find-gatherings" class="tab-content {% if active_tab == 'find-gatherings' %}active{% endif %}">
+          <!-- Finding Gathering -->
+          <div class="filter-section">
+            <h3 class="filter-title">Find Gatherings By:</h3>
+            <form action="{{ url_for('jomgather') }}" method="GET">
+              <input type="hidden" name="tab" value="find-gatherings">
+              <div class="form-row">
+                  <div class="filter-form">
+                      <div class="form-group">
+                        <label for="faculty">Gathering Type</label>
+                        <select id="faculty" name="faculty">
+                            <option value="">All Types</option>
+                            <option value="study">Study Session</option>
+                            <option value="project">Project Collaboration</option>
+                            <option value="social">Social Hangout</option>
+                            <option value="sports">Sports Activity</option>
+                            <option value="gaming">Gaming Hangout</option>
+                            <option value="other">Other</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="course">Faculty Focus</label>
+                        <select id="course" name="course">
+                            <option value="">All Faculties</option>
+                            <option value="study">Faculty of Multimedia</option>
+                            <option value="project">Faculty of Computing Informatics</option>
+                            <option value="social">Faculty of Management</option>
+                            <option value="sports">Faculty of Engineering</option>
+                            <option value="gaming">Faculty of Applied Communication</option>
+                            <option value="other">Other</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                          <label for="eventTitle">Year & Semester</label>
+                          <input type="text" id="eventTitle" name="yearSemester" placeholder="E.g. Year 1 Sem 3">
+                      </div>
+                  </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-group">
+                    <label for="eventDate">Date</label>
+                    <input type="date" id="eventDate" name="eventDate">
+                  </div>
+                  <div class="form-group">
+                    <label for="eventTime">Time</label>
+                    <input type="time" id="eventTime" name="eventTime">
+                  </div>
+              </div>
+                  
+              <button type="submit" class="search-btn">Find Gatherings</button>
+            </form>
             </div>
             
           
-    
-          <!-- Hosting Gathering -->
-          <div class="gathering-card hosting">
-            <div class="gathering-header">
-              <div>
-                <h3 class="gathering-title">MLBB Rank Stack</h3>
-                <span class="gathering-status hosting">Hosting</span>
-              </div>
-              <div>
-                <p>Created by: Keith Chong</p>
-              </div>
-            </div>
-            <div class="gathering-details">
-              <div class="detail-item">
-                <span class="detail-label">Faculty:</span>
-                <span>Faculty of Computing and Informatics</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Year & Semester:</span>
-                <span>Year 2 Sem 1</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Date:</span>
-                <span>August 25, 2025</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Time:</span>
-                <span>2:00 PM - 5:00 PM</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Location:</span>
-                <span>FCI Lounge</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Gathering Type:</span>
-                <span>Gaming Hangout</span>
-              </div>
+          <!-- Display Gatherings -->
+          {% if all_gatherings %}
+            {% for gathering_data in all_gatherings %}
+              {% set gathering_item = gathering_data.gathering %}
+              {% set participants_count = gathering_data.participants_count %}
+              {% set creator = gathering_data.creator %}
               
-            </div>
-            <p class="gathering-description">Tired of noobs random teammates that is making you have no progress in rank up and also want to find some friends that plays mlbb? Join us to right here and we will rank up together :D.</p>
-            <div class="attendees-list">
-              <h4 class="attendees-title">Participants (3/5):</h4>
-              <div class="attendees">
-                <div class="attendee">
-                  <img src="/api/placeholder/50/50" alt="profile">
-                  <span>You (Host)</span>
+              <div class="gathering-card hosting">
+                <div class="gathering-header">
+                  <div>
+                    <h3 class="gathering-title">{{ gathering_item.title }}</h3>
+                    <span class="gathering-status hosting">Available</span>
+                  </div>
+                  <div>
+                    <p>Created by: {{ creator.username }}</p>
+                  </div>
                 </div>
-                <div class="attendee">
-                  <img src="/api/placeholder/50/50" alt="profile">
-                  <span>Ahmad</span>
+                <div class="gathering-details">
+                  <div class="detail-item">
+                    <span class="detail-label">Faculty:</span>
+                    <span>{{ gathering_item.faculty }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Year & Semester:</span>
+                    <span>{{ gathering_item.year_semester }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Date:</span>
+                    <span>{{ gathering_item.date.strftime('%B %d, %Y') }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Time:</span>
+                    <span>{{ gathering_item.time.strftime('%I:%M %p') }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Location:</span>
+                    <span>{{ gathering_item.location }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Gathering Type:</span>
+                    <span>{{ gathering_item.gathering_type|title }}</span>
+                  </div>
                 </div>
-                <div class="attendee">
-                  <img src="/api/placeholder/50/50" alt="profile">
-                  <span>Sarah</span>
+                <p class="gathering-description">{{ gathering_item.description }}</p>
+                <div class="attendees-list">
+                  <h4 class="attendees-title">Participants ({{ participants_count }}/{{ gathering_item.max_participants }}):</h4>
+                  <div class="attendees">
+                    <div class="attendee">
+                      {% if creator.customisation and creator.customisation.profile_picture %}
+                        <img src="{{ url_for('static', filename='uploads/' + creator.customisation.profile_picture) }}" alt="{{ creator.username }}">
+                      {% else %}
+                        <img src="/api/placeholder/50/50" alt="profile">
+                      {% endif %}
+                      <span>{{ creator.username }} (Host)</span>
+                    </div>
+                    
+                    {% for participant in gathering_data.participants %}
+                      {% if participant.id != creator.id %}
+                        <div class="attendee">
+                          {% if participant.customisation and participant.customisation.profile_picture %}
+                            <img src="{{ url_for('static', filename='uploads/' + participant.customisation.profile_picture) }}" alt="{{ participant.username }}">
+                          {% else %}
+                            <img src="/api/placeholder/50/50" alt="profile">
+                          {% endif %}
+                          <span>{{ participant.username }}</span>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="gathering-actions">
+                  <a href="{{ url_for('message_gathering', gathering_id=gathering_item.id) }}" class="action-btn primary-btn">View Details</a>
+                  <a href="{{ url_for('message_gathering', gathering_id=gathering_item.id) }}" class="action-btn secondary-btn">Message Host</a>
+                  <form action="{{ url_for('join_gathering', gathering_id=gathering_item.id) }}" method="POST" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="action-btn danger-btn">Join Gathering</button>
+                  </form>
                 </div>
               </div>
+            {% endfor %}
+          {% elif all_gatherings is defined %}
+            <div class="no-results" style="text-align: center; padding: 40px 0;">
+              <h3>No gatherings found.</h3>
+              <p style="margin-top: 15px;">
+                <a href="{{ url_for('jomgather', tab='create-gathering') }}" style="color: #0927af; text-decoration: underline;">Create a gathering</a> 
+                to get started.
+              </p>
             </div>
-            <div class="gathering-actions">
-              <button class="action-btn primary-btn">View Details</button>
-              <button class="action-btn secondary-btn">Message Host</button>
-              <button class="action-btn danger-btn">Join Gathering</button>
-            </div>
-          </div>
+          {% endif %}
       </div>
     
       <script>

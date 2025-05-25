@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gathering Chat - JomGather</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jomgather.css') }}">
+  <script src="{{ url_for('static', filename='js/sound.js') }}"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    .navbar {
+      background-color: #0927af;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    
+    .navbar__container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1300px;
+      padding: 0 50px;
+    }
+    
+    #navbar__logo {
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    
+    .navbar__menu {
+      display: flex;
+      align-items: center;
+      list-style: none;
+    }
+    
+    .navbar__item {
+      height: 80px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar__links {
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      padding: 0 1rem;
+      font-size: 2rem;
+      height: 100%;
+      transition: all 1s ease;
+    }
+    
+    .navbar__links:hover {
+      color: #ff0000
+    }
+    
+    .button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      padding: 10px 20px;
+      height: 100%;
+      width: 100%;
+      border: none;
+      outline: none;
+      border-radius: 4px;
+      background: #ff0000;
+      color: #ffffff;
+      transition: all 1s ease;
+    }
+    
+    .button:hover {
+      background: #aa0000;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .page-title h1 {
+      font-size: 2rem;
+      color: #0927af;
+      margin-bottom: 10px;
+    }
+
+    .chat-container {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      height: 70vh;
+    }
+
+    .chat-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid #e0e0e0;
+      background-color: #0927af;
+      color: white;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .chat-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 10px 15px;
+      border-radius: 18px;
+      margin-bottom: 10px;
+      word-wrap: break-word;
+      position: relative;
+    }
+
+    .message.sent {
+      align-self: flex-end;
+      background-color: #0927af;
+      color: white;
+      border-bottom-right-radius: 5px;
+      margin-left: auto;
+    }
+
+    .message.received {
+      align-self: flex-start;
+      background-color: #e5e5ea;
+      color: #333;
+      border-bottom-left-radius: 5px;
+      margin-right: auto;
+    }
+
+    .message .sender {
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .message .content {
+      margin-bottom: 5px;
+    }
+
+    .message .time {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.7);
+      text-align: right;
+    }
+
+    .message.received .time {
+      color: rgba(0, 0, 0, 0.5);
+    }
+
+    .message-row {
+      display: flex;
+      margin-bottom: 15px;
+      align-items: flex-end;
+    }
+
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 8px;
+      overflow: hidden;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .chat-input {
+      padding: 15px;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+    }
+
+    .chat-input form {
+      display: flex;
+      width: 100%;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px 15px;
+      border: 1px solid #ccc;
+      border-radius: 30px;
+      font-size: 1rem;
+    }
+
+    .chat-input button {
+      background: #0927af;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 10px 20px;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .chat-input button:hover {
+      background: #006eff;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 8px 16px;
+      background: #ffffff;
+      color: #0927af;
+      border: 2px solid #0927af;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: #cfcfcf;
+    }
+
+    .participants-list {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .participants-title {
+      font-size: 1.2rem;
+      color: #0927af;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 10px;
+    }
+
+    .participants {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .participant {
+      display: flex;
+      align-items: center;
+      background: #f5f5f5;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .participant img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar__container">
+        <a href="{{ url_for('index') }}" id="navbar__logo">JomGather</a>
+        <div class="navbar__toggle" id="mobile-menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+        <ul class="navbar__menu">
+            <li class="navbar__item">
+                <a href="{{ url_for('index') }}" class="navbar__links">Home</a>
+            </li>            
+            <li class="navbar__item">
+                <a href="{{ url_for('customise') }}" class="navbar__links">Customize Profile</a>
+            </li>
+            <li class="navbar__item">
+                <a href="{{ url_for('match') }}" class="navbar__links">Mix & Match</a>
+            </li>
+            <li class="navbar__item">
+                <a href="{{ url_for('view_connections') }}" class="navbar__links">My Connections</a>
+            </li>
+            <li class="navbar__btn">
+              <a href="{{ url_for('logout') }}" class="button">Logout</a>
+            </li>
+        </ul>
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages" style="max-width: 1200px; margin: 20px auto 0; padding: 0 20px;">
+        {% for category, message in messages %}
+          <div class="flash-message" style="padding: 12px 20px; border-radius: 4px; margin-bottom: 15px;
+                 {% if category == 'success' %}
+                   background-color: #dff0d8; color: #3c763d; border: 1px solid #d6e9c6;
+                 {% elif category == 'error' %}
+                   background-color: #f2dede; color: #a94442; border: 1px solid #ebccd1;
+                 {% else %}
+                   background-color: #d9edf7; color: #31708f; border: 1px solid #bce8f1;
+                 {% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="container">
+    <a href="{{ url_for('jomgather', tab='my-gatherings') }}" class="back-btn">← Back to Gatherings</a>
+    
+    <div class="page-title">
+      <h1>{{ gathering.title }} - Group Chat</h1>
+      <p>Chat with all participants of this gathering</p>
+    </div>
+
+    <div class="chat-container">
+      <div class="chat-header">
+        <h2>{{ gathering.title }} - Group Chat</h2>
+      </div>
+      
+      <div class="chat-messages">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="message-row">
+              {% if message.user_id != current_user.id %}
+                <div class="user-avatar">
+                  {% set message_user = message.user %}
+                  {% if message_user.customisation and message_user.customisation.profile_picture %}
+                    <img src="{{ url_for('static', filename='uploads/' + message_user.customisation.profile_picture) }}" alt="{{ message_user.username }}">
+                  {% else %}
+                    <img src="/api/placeholder/30/30" alt="profile">
+                  {% endif %}
+                </div>
+              {% endif %}
+              
+              <div class="message {% if message.user_id == current_user.id %}sent{% else %}received{% endif %}">
+                <div class="sender">
+                  {% if message.user_id != current_user.id %}
+                    {% set message_user = message.user %}
+                    {{ message_user.username }}
+                  {% else %}
+                    You
+                  {% endif %}
+                </div>
+                <div class="content">{{ message.content }}</div>
+                <div class="time">{{ (message.created_at.replace(tzinfo=None) + timedelta(hours=8)).strftime('%H:%M | %d %b %Y') }} (GMT+8)</div>
+              </div>
+              
+              {% if message.user_id == current_user.id %}
+                <div class="user-avatar" style="margin-left: 8px; margin-right: 0;">
+                  {% if current_user.customisation and current_user.customisation.profile_picture %}
+                    <img src="{{ url_for('static', filename='uploads/' + current_user.customisation.profile_picture) }}" alt="Your profile">
+                  {% else %}
+                    <img src="/api/placeholder/30/30" alt="Your profile">
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="message-row">
+            <div class="user-avatar">
+              {% if gathering.user.customisation and gathering.user.customisation.profile_picture %}
+                <img src="{{ url_for('static', filename='uploads/' + gathering.user.customisation.profile_picture) }}" alt="Host profile">
+              {% else %}
+                <img src="/api/placeholder/30/30" alt="Host profile">
+              {% endif %}
+            </div>
+            <div class="message received">
+              <div class="sender">{{ gathering.user.username }} (Host)</div>
+              <div class="content">Welcome to the group chat for {{ gathering.title }}!</div>
+              <div class="time">Just now</div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      
+      <div class="chat-input">
+        <form action="{{ url_for('message_gathering', gathering_id=gathering.id) }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="text" name="message" placeholder="Type a message..." required>
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="participants-list">
+      <h3 class="participants-title">Gathering Participants</h3>
+      <div class="participants">
+        {% for user in participants %}
+        <div class="participant">
+          {% if user.customisation and user.customisation.profile_picture %}
+            <img src="{{ url_for('static', filename='uploads/' + user.customisation.profile_picture) }}" alt="{{ user.username }}'s profile">
+          {% else %}
+            <img src="/api/placeholder/50/50" alt="profile">
+          {% endif %}
+          <span>{{ user.username }} {% if gathering.user_id == user.id %}(Host){% endif %}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+</body>
+</html> 

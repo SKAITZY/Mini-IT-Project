@@ -20,7 +20,7 @@ init_extensions(app)
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Import models after db is initialized
-from models import User, Customisation, Connection, Message
+from models import User, Customisation, Connection, Message, Gathering, GatheringParticipant, GatheringMessage
 
 # Add timedelta to Jinja globals
 app.jinja_env.globals.update(timedelta=timedelta)
@@ -247,6 +247,8 @@ def jomgather():
     
     students = []
     connected_partners = []
+    my_gatherings = []
+    all_gatherings = []
     
     # Only search for students if in find-partners tab to avoid duplicate display
     if current_user.is_authenticated and active_tab == 'find-partners':
@@ -326,13 +328,197 @@ def jomgather():
             # Execute query
             connected_partners = query.all()
     
+    # Fetch gatherings for the "My Gatherings" tab
+    elif current_user.is_authenticated and active_tab == 'my-gatherings':
+        # Get gatherings created by the user that are not canceled
+        created_gatherings = Gathering.query.filter_by(
+            user_id=current_user.id
+        ).filter(Gathering.status != 'canceled').all()
+        
+        # Get gatherings the user is participating in but didn't create
+        participant_gatherings_ids = db.session.query(GatheringParticipant.gathering_id)\
+            .filter(GatheringParticipant.user_id == current_user.id)\
+            .filter(GatheringParticipant.status == 'joined').all()
+        
+        participant_gatherings_ids = [g[0] for g in participant_gatherings_ids]
+        
+        # Exclude gatherings created by user to avoid duplicates, and exclude canceled gatherings
+        attending_gatherings = Gathering.query.filter(
+            Gathering.id.in_(participant_gatherings_ids),
+            Gathering.user_id != current_user.id,
+            Gathering.status != 'canceled'
+        ).all()
+        
+        # Combine the gatherings with a flag to indicate if user is host
+        for gathering in created_gatherings:
+            participants_count = GatheringParticipant.query.filter_by(
+                gathering_id=gathering.id, 
+                status='joined'
+            ).count()
+            
+            creator = User.query.get(gathering.user_id)
+            
+            # Get all participants for this gathering
+            participants_query = GatheringParticipant.query.filter_by(
+                gathering_id=gathering.id,
+                status='joined'
+            ).all()
+            
+            participants = []
+            for participant in participants_query:
+                participant_user = User.query.get(participant.user_id)
+                if participant_user:
+                    participants.append(participant_user)
+            
+            # Debug: Print participants
+            print(f"Gathering {gathering.id} - {gathering.title} participants:")
+            for p in participants:
+                print(f"  - User ID: {p.id}, Username: {p.username}")
+            
+            my_gatherings.append({
+                'gathering': gathering,
+                'is_host': True,
+                'participants_count': participants_count,
+                'creator': creator,
+                'participants': participants
+            })
+            
+        for gathering in attending_gatherings:
+            participants_count = GatheringParticipant.query.filter_by(
+                gathering_id=gathering.id, 
+                status='joined'
+            ).count()
+            
+            creator = User.query.get(gathering.user_id)
+            
+            # Get all participants for this gathering
+            participants_query = GatheringParticipant.query.filter_by(
+                gathering_id=gathering.id,
+                status='joined'
+            ).all()
+            
+            participants = []
+            for participant in participants_query:
+                participant_user = User.query.get(participant.user_id)
+                if participant_user:
+                    participants.append(participant_user)
+            
+            # Debug: Print participants
+            print(f"Gathering {gathering.id} - {gathering.title} participants:")
+            for p in participants:
+                print(f"  - User ID: {p.id}, Username: {p.username}")
+            
+            my_gatherings.append({
+                'gathering': gathering,
+                'is_host': False,
+                'participants_count': participants_count,
+                'creator': creator,
+                'participants': participants
+            })
+            
+        # Sort by date (most recent first)
+        my_gatherings.sort(key=lambda x: x['gathering'].date, reverse=False)
+    
+    # Fetch gatherings for the "Find Gatherings" tab
+    elif current_user.is_authenticated and active_tab == 'find-gatherings':
+        # Get all active gatherings
+        query = Gathering.query.filter(Gathering.status == 'active')
+        
+        # Apply basic filters if specified in the URL
+        gathering_type = request.args.get('faculty', '')  # Using faculty as gathering_type in original UI
+        faculty_filter = request.args.get('course', '')   # Using course as faculty in original UI
+        year_semester = request.args.get('yearSemester', '')
+        event_date = request.args.get('eventDate', '')
+        event_time = request.args.get('eventTime', '')
+        
+        # Apply gathering type filter
+        if gathering_type and gathering_type != 'other':
+            query = query.filter(Gathering.gathering_type == gathering_type)
+            
+        # Apply faculty filter
+        if faculty_filter and faculty_filter != 'other':
+            # Map from the form values to actual faculty names
+            faculty_mapping = {
+                'study': 'Faculty of Multimedia',
+                'project': 'Faculty of Computing Informatics',
+                'social': 'Faculty of Management',
+                'sports': 'Faculty of Engineering',
+                'gaming': 'Faculty of Applied Communication',
+                'other': 'Other'
+            }
+            
+            if faculty_filter in faculty_mapping:
+                query = query.filter(Gathering.faculty == faculty_mapping[faculty_filter])
+        
+        # Apply year/semester filter
+        if year_semester:
+            query = query.filter(Gathering.year_semester.ilike(f'%{year_semester}%'))
+            
+        # Apply date filter
+        if event_date:
+            try:
+                date_filter = datetime.strptime(event_date, '%Y-%m-%d').date()
+                query = query.filter(Gathering.date == date_filter)
+            except ValueError:
+                # If date format is invalid, ignore this filter
+                pass
+                
+        # Apply time filter
+        if event_time:
+            try:
+                time_filter = datetime.strptime(event_time, '%H:%M').time()
+                query = query.filter(Gathering.time == time_filter)
+            except ValueError:
+                # If time format is invalid, ignore this filter
+                pass
+            
+        # Execute query and prepare results
+        gatherings = query.all()
+        
+        for gathering in gatherings:
+            participants_count = GatheringParticipant.query.filter_by(
+                gathering_id=gathering.id, 
+                status='joined'
+            ).count()
+            
+            creator = User.query.get(gathering.user_id)
+            
+            # Get all participants for this gathering
+            participants_query = GatheringParticipant.query.filter_by(
+                gathering_id=gathering.id,
+                status='joined'
+            ).all()
+            
+            participants = []
+            for participant in participants_query:
+                participant_user = User.query.get(participant.user_id)
+                if participant_user:
+                    participants.append(participant_user)
+            
+            # Debug: Print participants
+            print(f"Gathering {gathering.id} - {gathering.title} participants:")
+            for p in participants:
+                print(f"  - User ID: {p.id}, Username: {p.username}")
+            
+            all_gatherings.append({
+                'gathering': gathering,
+                'participants_count': participants_count,
+                'creator': creator,
+                'participants': participants
+            })
+            
+        # Sort by date (soonest first)
+        all_gatherings.sort(key=lambda x: x['gathering'].date)
+    
     return render_template('jomgather.html', 
                            students=students,
                            connected_partners=connected_partners,
                            faculties=faculties,
                            courses=courses,
                            search_performed=search_performed,
-                           active_tab=active_tab)
+                           active_tab=active_tab,
+                           my_gatherings=my_gatherings,
+                           all_gatherings=all_gatherings)
 
 @app.route('/find_students', methods=['GET', 'POST'])
 @login_required
@@ -514,6 +700,119 @@ def send_message(connection_id):
     other_user_id = connection.connected_user_id if connection.user_id == current_user.id else connection.user_id
     return redirect(url_for('chat', user_id=other_user_id))
 
+@app.route('/create_gathering', methods=['POST'])
+@login_required
+def create_gathering():
+    try:
+        # Get form data and print for debugging
+        title = request.form.get('eventTitle')
+        gathering_type = request.form.get('eventType')
+        faculty = request.form.get('facultyFocus')
+        year_semester = request.form.get('yearSemester')
+        event_date = request.form.get('eventDate')
+        event_time = request.form.get('eventTime')
+        location = request.form.get('eventLocation')
+        max_attendees = request.form.get('maxAttendees')
+        description = request.form.get('eventDescription')
+        target_audience = request.form.get('targetAudience')
+        
+        # Log received form data for debugging
+        print(f"Form data received:")
+        print(f"Title: {title}")
+        print(f"Type: {gathering_type}")
+        print(f"Faculty: {faculty}")
+        print(f"Year/Semester: {year_semester}")
+        print(f"Date: {event_date}")
+        print(f"Time: {event_time}")
+        print(f"Location: {location}")
+        print(f"Max Participants: {max_attendees}")
+        print(f"Description: {description}")
+        print(f"Target Audience: {target_audience}")
+        
+        # Validate required fields
+        if not all([title, gathering_type, faculty, year_semester, event_date, event_time, location, max_attendees, description]):
+            missing_fields = []
+            if not title: missing_fields.append("Title")
+            if not gathering_type: missing_fields.append("Gathering Type")
+            if not faculty: missing_fields.append("Faculty")
+            if not year_semester: missing_fields.append("Year & Semester")
+            if not event_date: missing_fields.append("Date")
+            if not event_time: missing_fields.append("Time")
+            if not location: missing_fields.append("Location")
+            if not max_attendees: missing_fields.append("Maximum Participants")
+            if not description: missing_fields.append("Description")
+            
+            print(f"Missing required fields: {', '.join(missing_fields)}")
+            flash(f"Please fill in all required fields: {', '.join(missing_fields)}", 'error')
+            return redirect(url_for('jomgather', tab='create-gathering'))
+        
+        # Parse date and time
+        try:
+            date = datetime.strptime(event_date, '%Y-%m-%d').date()
+            time = datetime.strptime(event_time, '%H:%M').time()
+        except ValueError as e:
+            print(f"Date/time parsing error: {str(e)}")
+            flash('Invalid date or time format', 'error')
+            return redirect(url_for('jomgather', tab='create-gathering'))
+        
+        # Parse max participants
+        try:
+            max_participants = int(max_attendees)
+            if max_participants <= 0:
+                raise ValueError("Maximum participants must be greater than 0")
+        except ValueError as e:
+            print(f"Max participants parsing error: {str(e)}")
+            flash('Maximum participants must be a positive number', 'error')
+            return redirect(url_for('jomgather', tab='create-gathering'))
+
+        # Create new gathering
+        new_gathering = Gathering(
+            user_id=current_user.id,
+            title=title,
+            gathering_type=gathering_type,
+            faculty=faculty,
+            year_semester=year_semester,
+            date=date,
+            time=time,
+            location=location,
+            max_participants=max_participants,
+            description=description,
+            target_audience=target_audience,
+            status='active'
+        )
+
+        # Add to database
+        db.session.add(new_gathering)
+        db.session.commit()
+
+        # Add creator as first participant
+        participant = GatheringParticipant.query.filter_by(
+            gathering_id=new_gathering.id,
+            user_id=current_user.id,
+            status='joined'
+        ).first()
+        
+        if not participant:
+            participant = GatheringParticipant(
+                gathering_id=new_gathering.id,
+                user_id=current_user.id,
+                status='joined'
+            )
+            db.session.add(participant)
+            db.session.commit()
+
+        flash('Gathering created successfully!', 'success')
+        return redirect(url_for('jomgather', tab='my-gatherings'))
+
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Error creating gathering: {str(e)}")
+        print(f"Detailed error: {error_details}")
+        db.session.rollback()
+        flash(f'Error creating gathering: {str(e)}', 'error')
+        return redirect(url_for('jomgather', tab='create-gathering'))
+
 # Error handlers
 @app.errorhandler(404)
 def not_found_error(error):
@@ -535,24 +834,24 @@ def update_password():
         if not data:
             return jsonify({'success': False, 'error': 'No data provided'}), 400
 
-        # 使用正确的字段名 (student_id)
+        # Use the correct field name (student_id)
         student_id = data.get('student_id')
         new_password = data.get('new_password')
 
-        # 验证字段
+        # Validate fields
         if not all([student_id, new_password]):
             return jsonify({'success': False, 'error': 'Missing student ID or new password'}), 400
 
-        # 查找用户
+        # Find user
         user = User.query.filter_by(student_id=student_id).first()
         if not user:
             return jsonify({'success': False, 'error': 'Student ID not found'}), 404
 
-        # 更新密码
+        # Update password
         user.password_hash = generate_password_hash(new_password)
         db.session.commit()
 
-        # 记录成功日志
+        # Log success
         app.logger.info(f"Password updated for student_id: {student_id}")
         
         return jsonify({
@@ -562,7 +861,7 @@ def update_password():
 
     except Exception as e:
         db.session.rollback()
-        # 记录详细错误信息
+        # Log detailed error
         app.logger.error(f"Password update failed for {student_id}: {str(e)}", exc_info=True)
         return jsonify({
             'success': False,
@@ -577,24 +876,24 @@ def match():
 @login_required
 def match_users(match_type):
     try:
-        # 获取筛选条件
+        # Get filtering criteria
         faculty = request.args.get('faculty')
         year = request.args.get('year')
         
-        # 基础查询
+        # Basic query
         query = User.query.filter(
             User.id != current_user.id,
             User.is_active == True
         ).join(Customisation)
         
-        # 应用筛选
+        # Apply filters
         if faculty:
             query = query.filter(Customisation.faculty == faculty)
         if year:
             query = query.filter(Customisation.year_of_study == int(year))
         
         if match_type == 'random':
-            # 随机匹配
+            # Random match
             available_users = query.all()
             if not available_users:
                 return jsonify({'success': False, 'error': 'no match user'})
@@ -606,7 +905,7 @@ def match_users(match_type):
             })
             
         elif match_type == 'smart':
-            # 智能匹配（基于共同兴趣）
+            # Smart match (based on common interests)
             current_interests = set()
             if current_user.customisation and current_user.customisation.interests:
                 current_interests = set(current_user.customisation.interests.split(','))
@@ -619,11 +918,11 @@ def match_users(match_type):
                 if user.customisation and user.customisation.interests:
                     user_interests = set(user.customisation.interests.split(','))
                 
-                # 计算匹配分数
+                # Calculate match score
                 common_interests = current_interests & user_interests
                 score = len(common_interests)
                 
-                # 相同院系加分
+                # Extra points for same faculty
                 if (current_user.customisation and user.customisation and 
                     current_user.customisation.faculty == user.customisation.faculty):
                     score += 2
@@ -646,8 +945,9 @@ def match_users(match_type):
         app.logger.error(f"Match error: {str(e)}")
         return jsonify({'success': False, 'error': 'server error'}), 500
 
+
 def format_user(user):
-    """格式化用户数据"""
+    """format user data"""
     return {
         'id': user.id,
         'username': user.username,
@@ -665,6 +965,238 @@ def handle_api_errors(e):
             'error': str(e.description) if hasattr(e, 'description') else 'An error occurred'
         }), e.code
     return e
+
+@app.route('/join_gathering/<int:gathering_id>', methods=['POST'])
+@login_required
+def join_gathering(gathering_id):
+    try:
+        # Check if the gathering exists
+        gathering = Gathering.query.get_or_404(gathering_id)
+        
+        # Check if the gathering is still active
+        if gathering.status != 'active':
+            flash('This gathering is no longer active', 'error')
+            return redirect(url_for('jomgather', tab='find-gatherings'))
+        
+        # Check if the user is already a participant
+        existing_participant = GatheringParticipant.query.filter_by(
+            gathering_id=gathering_id,
+            user_id=current_user.id
+        ).first()
+        
+        if existing_participant:
+            flash('You are already a participant in this gathering', 'info')
+            return redirect(url_for('jomgather', tab='my-gatherings'))
+            
+        # Check if the gathering is full
+        participants_count = GatheringParticipant.query.filter_by(
+            gathering_id=gathering_id,
+            status='joined'
+        ).count()
+        
+        if participants_count >= gathering.max_participants:
+            flash('This gathering is already full', 'error')
+            return redirect(url_for('jomgather', tab='find-gatherings'))
+            
+        # Add the user as a participant
+        new_participant = GatheringParticipant(
+            gathering_id=gathering_id,
+            user_id=current_user.id,
+            status='joined'
+        )
+        
+        db.session.add(new_participant)
+        db.session.commit()
+        
+        flash('You have successfully joined the gathering!', 'success')
+        return redirect(url_for('jomgather', tab='my-gatherings'))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error joining gathering: {str(e)}', 'error')
+        return redirect(url_for('jomgather', tab='find-gatherings'))
+
+@app.route('/edit_gathering/<int:gathering_id>', methods=['GET', 'POST'])
+@login_required
+def edit_gathering(gathering_id):
+    gathering = Gathering.query.get_or_404(gathering_id)
+    
+    # Check if the current user is the creator of this gathering
+    if gathering.user_id != current_user.id:
+        flash('You can only edit gatherings you created', 'error')
+        return redirect(url_for('jomgather', tab='my-gatherings'))
+    
+    if request.method == 'POST':
+        try:
+            # Update gathering details
+            gathering.title = request.form.get('eventTitle')
+            gathering.gathering_type = request.form.get('eventType')
+            gathering.faculty = request.form.get('facultyFocus')
+            gathering.year_semester = request.form.get('yearSemester')
+            
+            event_date = request.form.get('eventDate')
+            event_time = request.form.get('eventTime')
+            
+            # Parse date and time
+            if event_date:
+                gathering.date = datetime.strptime(event_date, '%Y-%m-%d').date()
+            if event_time:
+                gathering.time = datetime.strptime(event_time, '%H:%M').time()
+                
+            gathering.location = request.form.get('eventLocation')
+            
+            max_attendees = request.form.get('maxAttendees')
+            if max_attendees and max_attendees.isdigit():
+                max_participants = int(max_attendees)
+                # Check if new max is less than current participants
+                current_participants = GatheringParticipant.query.filter_by(
+                    gathering_id=gathering_id, 
+                    status='joined'
+                ).count()
+                
+                if max_participants < current_participants:
+                    flash(f'Cannot reduce maximum participants below current count ({current_participants})', 'error')
+                    return redirect(url_for('edit_gathering', gathering_id=gathering_id))
+                    
+                gathering.max_participants = max_participants
+                
+            gathering.description = request.form.get('eventDescription')
+            gathering.target_audience = request.form.get('targetAudience')
+            
+            db.session.commit()
+            flash('Gathering updated successfully!', 'success')
+            return redirect(url_for('jomgather', tab='my-gatherings'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating gathering: {str(e)}', 'error')
+    
+    # Pre-fill the form with current gathering data
+    return render_template('edit_gathering.html', gathering=gathering)
+
+@app.route('/cancel_gathering/<int:gathering_id>', methods=['POST'])
+@login_required
+def cancel_gathering(gathering_id):
+    gathering = Gathering.query.get_or_404(gathering_id)
+    
+    # Check if the current user is the creator of this gathering
+    if gathering.user_id != current_user.id:
+        flash('You can only cancel gatherings you created', 'error')
+        return redirect(url_for('jomgather', tab='my-gatherings'))
+    
+    try:
+        # Update the status to canceled
+        gathering.status = 'canceled'
+        db.session.commit()
+        flash('Gathering has been canceled', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error canceling gathering: {str(e)}', 'error')
+        
+    return redirect(url_for('jomgather', tab='my-gatherings'))
+
+@app.route('/leave_gathering/<int:gathering_id>', methods=['POST'])
+@login_required
+def leave_gathering(gathering_id):
+    # Check if the user is a participant
+    participant = GatheringParticipant.query.filter_by(
+        gathering_id=gathering_id,
+        user_id=current_user.id
+    ).first()
+    
+    if not participant:
+        flash('You are not a participant in this gathering', 'error')
+        return redirect(url_for('jomgather', tab='my-gatherings'))
+    
+    # Check if the user is the creator
+    gathering = Gathering.query.get(gathering_id)
+    if gathering.user_id == current_user.id:
+        flash('As the creator, you cannot leave your own gathering. You can cancel it instead.', 'error')
+        return redirect(url_for('jomgather', tab='my-gatherings'))
+    
+    try:
+        # Remove the participant
+        db.session.delete(participant)
+        db.session.commit()
+        flash('You have left the gathering', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error leaving gathering: {str(e)}', 'error')
+        
+    return redirect(url_for('jomgather', tab='my-gatherings'))
+
+@app.route('/message_gathering/<int:gathering_id>', methods=['GET', 'POST'])
+@login_required
+def message_gathering(gathering_id):
+    # Check if the gathering exists
+    gathering = Gathering.query.get_or_404(gathering_id)
+    
+    # Check if user is a participant or creator
+    is_participant = False
+    
+    # Check if user created the gathering
+    if gathering.user_id == current_user.id:
+        is_participant = True
+    else:
+        # Check if user is a participant
+        participant = GatheringParticipant.query.filter_by(
+            gathering_id=gathering_id,
+            user_id=current_user.id
+        ).first()
+        
+        if participant:
+            is_participant = True
+    
+    if not is_participant:
+        flash('You must be a participant to message this gathering', 'error')
+        return redirect(url_for('jomgather', tab='my-gatherings'))
+    
+    # Handle POST request for sending a message
+    if request.method == 'POST':
+        message_content = request.form.get('message')
+        if message_content and message_content.strip():
+            # Create a new message
+            new_message = GatheringMessage(
+                gathering_id=gathering_id,
+                user_id=current_user.id,
+                content=message_content.strip()
+            )
+            db.session.add(new_message)
+            db.session.commit()
+            
+            flash('Message sent!', 'success')
+        
+        # Redirect to avoid form resubmission
+        return redirect(url_for('message_gathering', gathering_id=gathering_id))
+    
+    # Get all participants for this gathering
+    participants = GatheringParticipant.query.filter_by(
+        gathering_id=gathering_id,
+        status='joined'
+    ).all()
+    
+    participant_users = []
+    for p in participants:
+        user = User.query.get(p.user_id)
+        if user:
+            participant_users.append(user)
+    
+    # Also add the gathering creator if not already in the list
+    creator = User.query.get(gathering.user_id)
+    if creator and creator not in participant_users:
+        participant_users.append(creator)
+    
+    # Get all messages for this gathering
+    messages = GatheringMessage.query.filter_by(
+        gathering_id=gathering_id
+    ).order_by(GatheringMessage.created_at).all()
+    
+    # For now, render a simple chat interface for the gathering
+    return render_template('gathering_chat.html', 
+                          gathering=gathering, 
+                          participants=participant_users,
+                          messages=messages,
+                          current_user=current_user)
 
 # Run the app if this file is executed
 if __name__ == '__main__':
