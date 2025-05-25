@@ -73,12 +73,13 @@ def customise():
         year_of_study = request.form.get('year_of_study')
         profile_picture = request.files.get('profile_picture')
         name = request.form.get('name')  # Get the name field
+        email = request.form.get('email')  # Get the email field
         
         # Debug information
         print(f"Received POST data: bio={bio[:20] if bio else 'None'}..., interests={interests[:50] if interests else 'None'}...")
         print(f"Faculty: {faculty}, Course: {course}, Year: {year_of_study}")
         print(f"Profile picture: {profile_picture.filename if profile_picture else 'None'}")
-        print(f"Name: {name}")
+        print(f"Name: {name}, Email: {email}")
         
         # Process profile picture if uploaded
         if profile_picture and profile_picture.filename:
@@ -113,6 +114,17 @@ def customise():
         # Update username if name field is provided
         if name and name.strip():
             current_user.username = name.strip()
+        
+        # Update email if email field is provided and valid
+        if email and email.strip():
+            # Check if the email is already in use by another user
+            existing_user = User.query.filter(User.email == email.strip(), User.id != current_user.id).first()
+            if existing_user:
+                flash('Email already in use by another account', 'error')
+            elif validate_email(email.strip()):
+                current_user.email = email.strip()
+            else:
+                flash('Invalid email format', 'error')
         
         # Convert year_of_study to integer if it has a value
         if year_of_study:
