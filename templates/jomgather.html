@@ -625,7 +625,6 @@
                     {% if student.customisation.year_of_study %}
                       • {{ student.customisation.year_of_study }}{% if student.customisation.year_of_study == 1 %}st{% elif student.customisation.year_of_study == 2 %}nd{% elif student.customisation.year_of_study == 3 %}rd{% else %}th{% endif %} Year
                     {% endif %}
-                  </div>
                   
                   {% if student.customisation.interests %}
                     <div class="student-interests">
@@ -981,9 +980,9 @@
               <div class="form-row">
                   <div class="filter-form">
                       <div class="form-group">
-                        <label for="faculty">Gathering Type</label>
-                        <select id="faculty" name="faculty">
-                            <option value="all">All Types</option>
+                        <label for="gatheringType">Gathering Type</label>
+                        <select id="gatheringType" name="gatheringType">
+                            <option value="All Types">All Types</option>
                             <option value="study">Study Session</option>
                             <option value="project">Project Collaboration</option>
                             <option value="social">Social Hangout</option>
@@ -994,9 +993,9 @@
                         </select>
                       </div>
                       <div class="form-group">
-                        <label for="course">Faculty Focus</label>
-                        <select id="course" name="course">
-                            <option value="All">All Faculties</option>
+                        <label for="facultyFocus">Faculty Focus</label>
+                        <select id="facultyFocus" name="facultyFocus">
+                            <option value="All Faculties">All Faculties</option>
                             <option value="Faculty of Multimedia">Faculty of Multimedia</option>
                             <option value="Faculty of Computing Informatics">Faculty of Computing Informatics</option>
                             <option value="Faculty of Management">Faculty of Management</option>
@@ -1006,8 +1005,8 @@
                         </select>
                       </div>
                       <div class="form-group">
-                          <label for="eventTitle">Year & Semester</label>
-                          <input type="text" id="eventTitle" name="yearSemester" placeholder="E.g. Year 1 Sem 3">
+                          <label for="yearSemester">Year & Semester</label>
+                          <input type="text" id="yearSemester" name="yearSemester" placeholder="E.g. Year 1 Sem 3">
                       </div>                   
                   </div>
               </div>

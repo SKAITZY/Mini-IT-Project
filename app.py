@@ -437,62 +437,55 @@ def jomgather():
         # Get all active gatherings
         query = Gathering.query.filter(Gathering.status == 'active')
         
-        # Apply basic filters if specified in the URL
-        gathering_type = request.args.get('faculty', '')  # Using faculty as gathering_type in original UI
-        faculty_filter = request.args.get('course', '')   # Using course as faculty in original UI
-        year_semester = request.args.get('yearSemester', '')
-        event_date = request.args.get('eventDate', '')
-        event_time = request.args.get('eventTime', '')
-        location = request.args.get('eventLocation', '')
+        # Get filter parameters with proper names
+        gathering_type = request.args.get('gatheringType')  # Changed from 'faculty'
+        faculty = request.args.get('facultyFocus')         # Changed from 'course'
+        year_semester = request.args.get('yearSemester')
+        event_date = request.args.get('eventDate')
+        event_time = request.args.get('eventTime')
+        location = request.args.get('eventLocation')
+        
+        print(f"Debug - Filters received: Type={gathering_type}, Faculty={faculty}, Year={year_semester}")
         
         # Apply gathering type filter
-        if gathering_type and gathering_type != 'other':
+        if gathering_type and gathering_type != 'All Types':
             query = query.filter(Gathering.gathering_type == gathering_type)
             
         # Apply faculty filter
-        if faculty_filter and faculty_filter != 'other':
-            # Map from the form values to actual faculty names
-            faculty_mapping = {
-                'study': 'Faculty of Multimedia',
-                'project': 'Faculty of Computing Informatics',
-                'social': 'Faculty of Management',
-                'sports': 'Faculty of Engineering',
-                'gaming': 'Faculty of Applied Communication',
-                'other': 'Other'
-            }
-            
-            if faculty_filter in faculty_mapping:
-                query = query.filter(Gathering.faculty == faculty_mapping[faculty_filter])
+        if faculty and faculty != 'All Faculties':
+            query = query.filter(Gathering.faculty == faculty)
         
         # Apply year/semester filter
-        if year_semester:
+        if year_semester and year_semester.strip():
             query = query.filter(Gathering.year_semester.ilike(f'%{year_semester}%'))
-
-            
+        
         # Apply location filter
-        if location:
+        if location and location.strip():
             query = query.filter(Gathering.location.ilike(f'%{location}%'))
-            
+        
         # Apply date filter
         if event_date:
             try:
                 date_filter = datetime.strptime(event_date, '%Y-%m-%d').date()
                 query = query.filter(Gathering.date == date_filter)
-            except ValueError:
-                # If date format is invalid, ignore this filter
+                print(f"Debug - Applying date filter: {date_filter}")
+            except ValueError as e:
+                print(f"Debug - Date parsing error: {str(e)}")
                 pass
-                
+        
         # Apply time filter
         if event_time:
             try:
                 time_filter = datetime.strptime(event_time, '%H:%M').time()
                 query = query.filter(Gathering.time == time_filter)
-            except ValueError:
-                # If time format is invalid, ignore this filter
+                print(f"Debug - Applying time filter: {time_filter}")
+            except ValueError as e:
+                print(f"Debug - Time parsing error: {str(e)}")
                 pass
-            
-        # Execute query and prepare results
+        
+        # Execute query and get results
         gatherings = query.all()
+        print(f"Debug - Found {len(gatherings)} gatherings")
         
         for gathering in gatherings:
             participants_count = GatheringParticipant.query.filter_by(
