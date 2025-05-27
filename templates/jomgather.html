@@ -275,7 +275,8 @@
 
     .interest-tag {
       display: inline-block;
-      background: #dadada;
+      background: #0927af;
+      color: #ffffff;
       padding: 5px 10px;
       border-radius: 20px;
       font-size: 0.8rem;
@@ -689,7 +690,6 @@
                     <option value="2">2nd Year</option>
                     <option value="3">3rd Year</option>
                     <option value="4">4th Year</option>
-                    <option value="5">5th Year</option>
                   </select>
                 </div>
                 <div class="form-group">
@@ -784,6 +784,7 @@
                     <option value="social">Social Hangout</option>
                     <option value="sports">Sports Activity</option>
                     <option value="gaming">Gaming Hangout</option>
+                    <option value="eating">Eating out</option>
                     <option value="other">Other</option>
                   </select>
                 </div>
@@ -792,13 +793,14 @@
                 <div class="form-group">
                     <label for="facultyFocus">Faculty Focus</label>
                     <select id="facultyFocus" name="facultyFocus">
+                      <option value="All">All</option>
                         <option value="Faculty of Multimedia">Faculty of Multimedia</option>
                         <option value="Faculty of Computing Informatics">Faculty of Computing Informatics</option>
                         <option value="Faculty of Management">Faculty of Management</option>
                         <option value="Faculty of Engineering">Faculty of Engineering</option>
                         <option value="Faculty of Applied Communication">Faculty of Applied Communication</option>
                         <option value="Faculty of Cinematic Arts">Faculty of Cinematic Arts</option>
-                        <option value="Other">Other</option>
+                        
                       </select>
                 </div>
                 <div class="form-group">
@@ -981,25 +983,26 @@
                       <div class="form-group">
                         <label for="faculty">Gathering Type</label>
                         <select id="faculty" name="faculty">
-                            <option value="">All Types</option>
+                            <option value="all">All Types</option>
                             <option value="study">Study Session</option>
                             <option value="project">Project Collaboration</option>
                             <option value="social">Social Hangout</option>
                             <option value="sports">Sports Activity</option>
                             <option value="gaming">Gaming Hangout</option>
+                            <option value="eating">Eating out</option>
                             <option value="other">Other</option>
                         </select>
                       </div>
                       <div class="form-group">
                         <label for="course">Faculty Focus</label>
                         <select id="course" name="course">
-                            <option value="">All Faculties</option>
-                            <option value="study">Faculty of Multimedia</option>
-                            <option value="project">Faculty of Computing Informatics</option>
-                            <option value="social">Faculty of Management</option>
-                            <option value="sports">Faculty of Engineering</option>
-                            <option value="gaming">Faculty of Applied Communication</option>
-                            <option value="other">Faculty of Cinematic Arts</option>
+                            <option value="All">All Faculties</option>
+                            <option value="Faculty of Multimedia">Faculty of Multimedia</option>
+                            <option value="Faculty of Computing Informatics">Faculty of Computing Informatics</option>
+                            <option value="Faculty of Management">Faculty of Management</option>
+                            <option value="Faculty of Engineering">Faculty of Engineering</option>
+                            <option value="Faculty of Applied Communication">Faculty of Applied Communication</option>
+                            <option value="Faculty of Cinematic Arts">Faculty of Cinematic Arts</option>
                         </select>
                       </div>
                       <div class="form-group">
@@ -1018,17 +1021,11 @@
                     <input type="time" id="eventTime" name="eventTime">
                   </div>
                   <div class="form-group">
-<<<<<<< HEAD
                           <label for="eventLocation">Location</label>
                           <input type="text" id="eventLocation" name="eventLocation" placeholder="E.g. Library Study Room 3, FCI Building"value="{{ request.args.get('eventLocation', '') }}">
                       </div>
                   </div>
                   <button type="submit" class="search-btn">Find Gatherings</button>
-=======
-                    <label for="location">Location</label>
-                    <input type="text" id="location" name="location" placeholder="E.g. FCI Lounge" value="{{ request.args.get('location', '') }}">
-                  </div>
->>>>>>> c639f2871d860ebbbc102f89b7a82db2d36e9cd6
               </div>
                   
               
@@ -1107,8 +1104,7 @@
                   </div>
                 </div>
                 <div class="gathering-actions">
-                  <a href="{{ url_for('message_gathering', gathering_id=gathering_item.id) }}" class="action-btn primary-btn">View Details</a>
-                  <a href="{{ url_for('message_gathering', gathering_id=gathering_item.id) }}" class="action-btn secondary-btn">Message Host</a>
+                  <a href="{{ url_for('message_gathering', gathering_id=gathering_item.id) }}" class="action-btn secondary-btn">Message All</a>
                   <form action="{{ url_for('join_gathering', gathering_id=gathering_item.id) }}" method="POST" style="display: inline;">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="action-btn danger-btn">Join Gathering</button>
