@@ -163,3 +163,15 @@ class GatheringParticipant(db.Model):
     
     gathering = db.relationship('Gathering', backref='participants')
     user = db.relationship('User', backref='gathering_participations')
+
+class GatheringMessage(db.Model):
+    __tablename__ = 'gathering_message'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    gathering_id = db.Column(db.Integer, db.ForeignKey('gathering.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    
+    gathering = db.relationship('Gathering', backref='messages')
+    user = db.relationship('User', backref='gathering_messages')
