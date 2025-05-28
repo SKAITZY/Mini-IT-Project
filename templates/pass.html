@@ -41,13 +41,24 @@
 <script>
   document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-
+    
     const userId = document.getElementById('userId').value.trim();
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     const statusMsg = document.getElementById('statusMsg');
 
-    // 密码验证逻辑
+    // 检查2FA状态
+    const checkRes = await fetch(`/api/check-2fa/${userId}`);
+    const checkData = await checkRes.json();
+
+    if (checkData.require_2fa && !checkData.verified) {
+        // 需要2FA验证
+        sessionStorage.setItem('pending_student_id', userId);
+        window.location.href = `/2fa?source=reset`;
+        return;
+    }
+
+    // 其余密码验证和提交逻辑...
     const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
     if (!passwordRegex.test(newPassword)) {
         statusMsg.style.color = 'red';
@@ -66,10 +77,10 @@
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}'  // 添加CSRF保护
+                'X-CSRFToken': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
-                student_id: userId,  // 确保与后端一致
+                student_id: userId,
                 new_password: newPassword
             })
         });

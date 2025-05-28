@@ -8,10 +8,16 @@ import re
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import random
+import pyotp  # 确保你已经安装 pyotp: pip install pyotp
+from flask_migrate import Migrate
+from models import User, Customisation, Connection, Message  # 你已有
+
+
 
 # Create a Flask app instance (only once)
 app = Flask(__name__)
 app.config.from_object(Config)
+migrate = Migrate(app, db)  # ✅ 加这行
 
 # Initialize extensions
 init_extensions(app)
@@ -158,9 +164,14 @@ def login():
         user = User.query.filter_by(student_id=student_id).first()
         
         if user and check_password_hash(user.password_hash, password):
-            login_user(user)
-            user.update_last_login()
-            return redirect(url_for('customise'))
+            session['user_id'] = user.id
+            if user.is_2fa_enabled:
+                return redirect(url_for('two_factor_auth', source='login'))
+            else:
+                login_user(user)
+                return redirect(url_for('customise'))
+
+        
         else:
             flash('Invalid student ID or password', 'error')
             return redirect(url_for('login'))
@@ -218,8 +229,9 @@ def register():
             db.session.add(new_customisation)
             
             db.session.commit()
-            flash('Registration successful! Please login.', 'success')
-            return redirect(url_for('login'))
+            session['user_id'] = new_user.id
+            return redirect(url_for('two_factor_auth', source='register'))
+
         except Exception as e:
             db.session.rollback()
             flash(f'An error occurred during registration: {str(e)}. Please try again.', 'error')
@@ -443,11 +455,7 @@ def jomgather():
         year_semester = request.args.get('yearSemester', '')
         event_date = request.args.get('eventDate', '')
         event_time = request.args.get('eventTime', '')
-<<<<<<< HEAD
-        event_location = request.args.get('eventLocation', '')  
-=======
         location = request.args.get('location', '')
->>>>>>> c639f2871d860ebbbc102f89b7a82db2d36e9cd6
         
         # Apply gathering type filter
         if gathering_type and gathering_type != 'other':
@@ -876,6 +884,8 @@ def update_password():
         # Update password
         user.password_hash = generate_password_hash(new_password)
         db.session.commit()
+    
+
 
         # Log success
         app.logger.info(f"Password updated for student_id: {student_id}")
@@ -1232,13 +1242,110 @@ def message_gathering(gathering_id):
                           messages=messages,
                           current_user=current_user)
 
+
+@app.route('/2fa', methods=['GET', 'POST'], endpoint='two_factor_auth')
+def two_factor_auth():
+    source = request.args.get('source')  # 'register' | 'login' | 'reset'
+
+    # 对于 reset，用户尚未 login，所以使用 2fa_user_id 临时存储
+    if source == 'reset':
+        user_id = session.get('2fa_user_id')
+    else:
+        user_id = session.get('user_id')
+
+    if not user_id:
+        flash("Session expired or invalid access.", "error")
+        return redirect(url_for('register'))
+
+    user = User.query.get(user_id)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for('register'))
+
+    if request.method == 'POST':
+        if source == 'register':
+            enable_2fa = request.form.get('enable_2fa') == 'yes'
+            if enable_2fa:
+                if not user.two_fa_secret:
+                    user.two_fa_secret = pyotp.random_base32()
+                user.is_2fa_enabled = True
+                db.session.commit()
+                flash("2FA enabled and QR code bound.", 'success')
+            else:
+                user.is_2fa_enabled = False
+                db.session.commit()
+                flash("2FA skipped.", "info")
+            
+            login_user(user)  # 登录用户
+            return redirect(url_for('customise'))  # 重定向到个人资料页面
+
+
+        elif source in ['login', 'reset']:
+            otp = request.form.get('otp')
+            if user.two_fa_secret and pyotp.TOTP(user.two_fa_secret).verify(otp):
+                if source == 'login':
+                    login_user(user)
+                    return redirect(url_for('customise'))
+                elif source == 'reset':
+                    session['2fa_verified_for'] = user.student_id
+                    flash("2FA verification successful. You may now reset your password.", "success")
+                    return redirect(url_for('pass_page'))
+            else:
+                flash("Invalid OTP. Please try again.", 'error')
+
+    # 生成 QR 码（仅用于注册或首次绑定）
+    qr_url = None
+    if source == 'register' or (source == 'customise' and not user.is_2fa_enabled):
+        if not user.two_fa_secret:
+            user.two_fa_secret = pyotp.random_base32()
+            db.session.commit()
+        otp_uri = pyotp.totp.TOTP(user.two_fa_secret).provisioning_uri(
+            name=user.email or user.username,
+            issuer_name="JomGather"
+        )
+        qr_url = f'https://api.qrserver.com/v1/create-qr-code/?data={otp_uri}&size=200x200'
+
+    return render_template('2fa.html', source=source, qr_url=qr_url, user=user)
+
 # Run the app if this file is executed
 if __name__ == '__main__':
+    
     with app.app_context():
         # Check if tables need to be created
         db.create_all()
+
+        from models import User
+        for user in User.query.all():
+            if user.is_2fa_enabled is None:
+                print(f"Fixing user: {user.username}")
+                user.is_2fa_enabled = False
+        db.session.commit()
+        print("✔ All users patched: null is_2fa_enabled → False")
+
         print("Database tables created or confirmed to exist.")
         print(f"Using database: {app.config['SQLALCHEMY_DATABASE_URI']}")
         # List the tables that were created
         print(f"Tables created: {', '.join(db.metadata.tables.keys())}")
     app.run(debug=True)
+
+
+@app.route('/api/check-2fa/<student_id>')
+def check_2fa_status(student_id):
+    user = User.query.filter_by(student_id=student_id).first()
+    if not user:
+        return jsonify({'require_2fa': False})
+
+    is_verified = session.get('2fa_verified_for') == student_id
+    return jsonify({'require_2fa': user.is_2fa_enabled, 'verified': is_verified})
+
+from flask.cli import with_appcontext
+import click
+
+@click.command(name='create_tables')
+@with_appcontext
+def create_tables():
+    db.create_all()
+
+app.cli.add_command(create_tables)
+
+print(app.url_map)
