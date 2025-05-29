@@ -47,25 +47,7 @@
     const confirmPassword = document.getElementById('confirmPassword').value;
     const statusMsg = document.getElementById('statusMsg');
 
-    // 检查2FA状态
-    const checkRes = await fetch(`/api/check-2fa/${userId}`);
-    const checkData = await checkRes.json();
-
-    if (checkData.require_2fa && !checkData.verified) {
-        // 需要2FA验证
-        sessionStorage.setItem('pending_student_id', userId);
-        window.location.href = `/2fa?source=reset`;
-        return;
-    }
-
-    // 其余密码验证和提交逻辑...
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
-    if (!passwordRegex.test(newPassword)) {
-        statusMsg.style.color = 'red';
-        statusMsg.textContent = "Password must be at least 8 characters long, include uppercase, lowercase, a number, and a special character.";
-        return;
-    }
-
+    // 基本验证
     if (newPassword !== confirmPassword) {
         statusMsg.style.color = 'red';
         statusMsg.textContent = "Passwords do not match.";
@@ -86,6 +68,13 @@
         });
 
         const data = await response.json();
+
+        if (data.require_2fa) {
+            // 需要2FA验证
+            sessionStorage.setItem('pending_student_id', userId);
+            window.location.href = `/2fa?source=reset`;
+            return;
+        }
 
         if (!response.ok) {
             throw new Error(data.error || "Failed to update password");

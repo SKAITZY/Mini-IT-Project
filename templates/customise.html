@@ -533,6 +533,18 @@
           <button type="submit" class="save-btn" onclick="updateInterestsField()">Save Profile</button>
         </div>
       </form>
+
+      <form method="POST" action="{{ url_for('toggle_2fa') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if user.is_2fa_enabled %}
+          <button type="submit" name="action" value="disable">Disable 2FA</button>
+        {% else %}
+          <button type="submit" name="action" value="enable">Enable 2FA</button>
+        {% endif %}
+      </form>
+
+
+
     </div>
   </section>
 

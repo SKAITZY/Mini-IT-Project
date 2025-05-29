@@ -164,12 +164,8 @@ def login():
         user = User.query.filter_by(student_id=student_id).first()
         
         if user and check_password_hash(user.password_hash, password):
-            session['user_id'] = user.id
-            if user.is_2fa_enabled:
-                return redirect(url_for('two_factor_auth', source='login'))
-            else:
-                login_user(user)
-                return redirect(url_for('customise'))
+            login_user(user)
+            return redirect(url_for('customise'))
 
         
         else:
@@ -229,8 +225,9 @@ def register():
             db.session.add(new_customisation)
             
             db.session.commit()
-            session['user_id'] = new_user.id
-            return redirect(url_for('two_factor_auth', source='register'))
+            flash('Registration successful! Please login.', 'success')
+            return redirect(url_for('login'))
+
 
         except Exception as e:
             db.session.rollback()
@@ -868,28 +865,43 @@ def update_password():
         if not data:
             return jsonify({'success': False, 'error': 'No data provided'}), 400
 
-        # Use the correct field name (student_id)
         student_id = data.get('student_id')
         new_password = data.get('new_password')
 
-        # Validate fields
         if not all([student_id, new_password]):
             return jsonify({'success': False, 'error': 'Missing student ID or new password'}), 400
 
-        # Find user
         user = User.query.filter_by(student_id=student_id).first()
         if not user:
             return jsonify({'success': False, 'error': 'Student ID not found'}), 404
 
-        # Update password
+        # 检查2FA状态
+        if user.is_2fa_enabled:
+            if session.get('2fa_verified_for') != student_id:
+                session['2fa_user_id'] = user.id
+                return jsonify({
+                    'success': False, 
+                    'require_2fa': True,
+                    'message': '2FA verification required'
+                })
+
+        # 验证密码强度
+        if not validate_password(new_password):
+            return jsonify({
+                'success': False,
+                'error': 'Password must be at least 8 characters long and contain uppercase, lowercase, and numbers'
+            }), 400
+
+        # 更新密码
         user.password_hash = generate_password_hash(new_password)
         db.session.commit()
-    
 
+        # 清除2FA验证状态
+        if '2fa_verified_for' in session:
+            session.pop('2fa_verified_for')
+        if '2fa_user_id' in session:
+            session.pop('2fa_user_id')
 
-        # Log success
-        app.logger.info(f"Password updated for student_id: {student_id}")
-        
         return jsonify({
             'success': True,
             'message': 'Password updated successfully!'
@@ -897,7 +909,6 @@ def update_password():
 
     except Exception as e:
         db.session.rollback()
-        # Log detailed error
         app.logger.error(f"Password update failed for {student_id}: {str(e)}", exc_info=True)
         return jsonify({
             'success': False,
@@ -1243,16 +1254,11 @@ def message_gathering(gathering_id):
                           current_user=current_user)
 
 
-@app.route('/2fa', methods=['GET', 'POST'], endpoint='two_factor_auth')
+@app.route('/2fa', methods=['GET', 'POST'])
 def two_factor_auth():
-    source = request.args.get('source')  # 'register' | 'login' | 'reset'
-
-    # 对于 reset，用户尚未 login，所以使用 2fa_user_id 临时存储
-    if source == 'reset':
-        user_id = session.get('2fa_user_id')
-    else:
-        user_id = session.get('user_id')
-
+    source = request.args.get('source')  # 'customise', 'reset'
+    user_id = session.get('2fa_user_id') if source == 'reset' else session.get('user_id')
+    
     if not user_id:
         flash("Session expired or invalid access.", "error")
         return redirect(url_for('register'))
@@ -1262,44 +1268,31 @@ def two_factor_auth():
         flash("User not found.", "error")
         return redirect(url_for('register'))
 
-    if request.method == 'POST':
-        if source == 'register':
-            enable_2fa = request.form.get('enable_2fa') == 'yes'
-            if enable_2fa:
-                if not user.two_fa_secret:
-                    user.two_fa_secret = pyotp.random_base32()
-                user.is_2fa_enabled = True
-                db.session.commit()
-                flash("2FA enabled and QR code bound.", 'success')
-            else:
-                user.is_2fa_enabled = False
-                db.session.commit()
-                flash("2FA skipped.", "info")
-            
-            login_user(user)  # 登录用户
-            return redirect(url_for('customise'))  # 重定向到个人资料页面
+    if request.method == 'POST' and source == 'reset':
+        otp = request.form.get('otp', '').strip()
+        
+        # 更健壮的OTP验证
+        if not otp or len(otp) != 6 or not otp.isdigit():
+            flash("Invalid OTP format. Must be 6 digits.", "error")
+            return redirect(request.url)
+        
+        # 验证OTP
+        totp = pyotp.TOTP(user.two_fa_secret)
+        if totp.verify(otp, valid_window=1):  # 添加valid_window以处理时间偏差
+            session['2fa_verified_for'] = user.student_id
+            flash("2FA verification successful. You may now reset your password.", "success")
+            return redirect(url_for('pass_page'))
+        else:
+            flash("Incorrect OTP. Please try again.", "error")
+            return redirect(request.url)
 
-
-        elif source in ['login', 'reset']:
-            otp = request.form.get('otp')
-            if user.two_fa_secret and pyotp.TOTP(user.two_fa_secret).verify(otp):
-                if source == 'login':
-                    login_user(user)
-                    return redirect(url_for('customise'))
-                elif source == 'reset':
-                    session['2fa_verified_for'] = user.student_id
-                    flash("2FA verification successful. You may now reset your password.", "success")
-                    return redirect(url_for('pass_page'))
-            else:
-                flash("Invalid OTP. Please try again.", 'error')
-
-    # 生成 QR 码（仅用于注册或首次绑定）
+    # ✅ GET 请求生成 QR（仅当未启用）
     qr_url = None
-    if source == 'register' or (source == 'customise' and not user.is_2fa_enabled):
+    if source in ['customise'] and not user.is_2fa_enabled:
         if not user.two_fa_secret:
             user.two_fa_secret = pyotp.random_base32()
             db.session.commit()
-        otp_uri = pyotp.totp.TOTP(user.two_fa_secret).provisioning_uri(
+        otp_uri = pyotp.TOTP(user.two_fa_secret).provisioning_uri(
             name=user.email or user.username,
             issuer_name="JomGather"
         )
@@ -1307,9 +1300,26 @@ def two_factor_auth():
 
     return render_template('2fa.html', source=source, qr_url=qr_url, user=user)
 
+#print(pyotp.TOTP(user.is_2fa_enabled).now())
+
+
+@app.route('/toggle-2fa', methods=['POST'])
+@login_required
+def toggle_2fa():
+    action = request.form.get('action')
+    user = current_user
+
+    if action == 'enable':
+        session['user_id'] = user.id
+        return redirect(url_for('two_factor_auth', source='customise'))
+    elif action == 'disable':
+        user.is_2fa_enabled = False
+        db.session.commit()
+        flash("2FA disabled. Your secret is preserved for future use.", "info")
+    return redirect(url_for('customise'))
+
 # Run the app if this file is executed
 if __name__ == '__main__':
-    
     with app.app_context():
         # Check if tables need to be created
         db.create_all()
@@ -1348,4 +1358,6 @@ def create_tables():
 
 app.cli.add_command(create_tables)
 
-print(app.url_map)
+# This should be the last thing in the file
+# This should be the last thing in the file
+#print(app.url_map)

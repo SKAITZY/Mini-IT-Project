@@ -20,7 +20,7 @@
 <body>
   <div class="container">
     <h2>
-      {% if source == 'register' %}
+      {% if source == 'customise' %}
         Enable Two-Factor Authentication (2FA)
       {% elif source == 'reset' %}
         Verify Your Identity (2FA)
@@ -39,43 +39,31 @@
       {% endif %}
     {% endwith %}
 
-    {% if source == 'register' %}
-      <form method="POST">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <p>Would you like to enable 2FA for extra security? You can use Google Authenticator or any TOTP app.</p>
-        {% if qr_url %}
-          <div class="qr">
-            <p>Scan this QR code:</p>
-            <img src="{{ qr_url }}" alt="QR Code for 2FA">
-          </div>
-        {% endif %}
-        <div class="form-group">
-          <button type="submit" name="enable_2fa" value="yes" class="btn btn-primary">Yes, Enable 2FA</button>
-          <button type="submit" name="enable_2fa" value="no" class="btn btn-secondary">No, Skip</button>
-        </div>
-      </form>
-
-    {% elif source == 'reset' %}
+    {% if source == 'reset' %}
       <form method="POST">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <p>Please enter the OTP from your 2FA app to continue resetting your password.</p>
         <div class="form-group">
           <label for="otp">6-digit OTP:</label>
-          <input type="text" name="otp" id="otp" pattern="\\d{6}" required>
+          <input type="text" name="otp" id="otp" pattern="\d{6}" title="Please enter exactly 6 digits" required>
         </div>
         <button type="submit" class="btn btn-primary">Verify</button>
       </form>
 
-    {% else %}
+    {% elif source == 'customise' and qr_url %}
+      <p>Scan this QR code with your authenticator app to enable 2FA:</p>
+      <div class="qr">
+        <img src="{{ qr_url }}" alt="QR Code for 2FA">
+      </div>
       <form method="POST">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <p>Enter your 2FA OTP to proceed.</p>
-        <div class="form-group">
-          <label for="otp">OTP:</label>
-          <input type="text" name="otp" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" name="enable_2fa" value="yes" class="btn btn-primary">
+          I’ve scanned the QR – Enable 2FA
+        </button>
       </form>
+
+    {% else %}
+      <p>Nothing to show.</p>
     {% endif %}
   </div>
 </body>
