@@ -42,56 +42,36 @@
   document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const userId = document.getElementById('userId').value.trim();
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const statusMsg = document.getElementById('statusMsg');
-
-    // 基本验证
-    if (newPassword !== confirmPassword) {
-        statusMsg.style.color = 'red';
-        statusMsg.textContent = "Passwords do not match.";
-        return;
-    }
+    const formData = {
+        student_id: document.getElementById('userId').value.trim(),
+        new_password: document.getElementById('newPassword').value,
+    };
 
     try {
         const response = await fetch('/update-password', {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({
-                student_id: userId,
-                new_password: newPassword
-            })
+            body: JSON.stringify(formData)
         });
 
         const data = await response.json();
-
+        
         if (data.require_2fa) {
-            // 需要2FA验证
-            sessionStorage.setItem('pending_student_id', userId);
+            // Store in sessionStorage temporarily
+            sessionStorage.setItem('pendingStudentId', formData.student_id);
             window.location.href = `/2fa?source=reset`;
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error(data.error || "Failed to update password");
-        }
-
-        if (data.success) {
-            statusMsg.style.color = 'green';
-            statusMsg.textContent = data.message || "Password changed successfully! Redirecting to login...";
-            setTimeout(() => { window.location.href = "/login"; }, 2000);
+        } else if (data.success) {
+            // Handle non-2FA success
+            window.location.href = "/customise";
         } else {
-            statusMsg.style.color = 'red';
-            statusMsg.textContent = data.error || "Failed to update password.";
+            alert(data.error || "Password update failed");
         }
-    } catch (err) {
-        statusMsg.style.color = 'red';
-        statusMsg.textContent = err.message || "An error occurred. Please try again.";
-        console.error("Password update error:", err);
+    } catch (error) {
+        console.error('Error:', error);
+        alert("Network error occurred");
     }
 });
 </script>
