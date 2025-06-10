@@ -1018,22 +1018,16 @@
                     <input type="time" id="eventTime" name="eventTime">
                   </div>
                   <div class="form-group">
-<<<<<<< HEAD
                           <label for="eventLocation">Location</label>
                           <input type="text" id="eventLocation" name="eventLocation" placeholder="E.g. Library Study Room 3, FCI Building"value="{{ request.args.get('eventLocation', '') }}">
                       </div>
                   </div>
                   <button type="submit" class="search-btn">Find Gatherings</button>
-=======
-                    <label for="location">Location</label>
-                    <input type="text" id="location" name="location" placeholder="E.g. FCI Lounge" value="{{ request.args.get('location', '') }}">
-                  </div>
->>>>>>> c639f2871d860ebbbc102f89b7a82db2d36e9cd6
               </div>
                   
               
             </form>
-            </div>
+            
             
           
           <!-- Display Gatherings -->
@@ -1116,12 +1110,12 @@
                 </div>
               </div>
             {% endfor %}
-          {% elif all_gatherings is defined %}
-            <div class="no-results" style="text-align: center; padding: 40px 0;">
-              <h3>No gatherings found.</h3>
-              <p style="margin-top: 15px;">
-                <a href="{{ url_for('jomgather', tab='create-gathering') }}" style="color: #0927af; text-decoration: underline;">Create a gathering</a> 
-                to get started.
+          {% else %}
+              <div class="no-results" style="text-align: center; padding: 40px 0;">
+                  <h3>No gatherings found.</h3>
+                  <p style="margin-top: 15px;">
+                      <a href="{{ url_for('jomgather', tab='create-gathering') }}" style="color: #0927af; text-decoration: underline;">Create a gathering</a> 
+                      to get started.
               </p>
             </div>
           {% endif %}

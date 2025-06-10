@@ -45,7 +45,7 @@
         <p>Would you like to enable 2FA for extra security? You can use Google Authenticator or any TOTP app.</p>
         {% if qr_url %}
           <div class="qr">
-            <p>Scan this QR code:</p>
+            <p>Scan this QR code before enabling 2FA, or else no OTP for you:</p>
             <img src="{{ qr_url }}" alt="QR Code for 2FA">
           </div>
         {% endif %}
