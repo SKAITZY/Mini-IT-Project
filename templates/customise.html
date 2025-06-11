@@ -5,423 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JomGather - Customize Profile</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    body {
-      background-color: #f5f5f5;
-      color: #333;
-    }
-    
-    .navbar {
-      background-color: #0927af;
-      height: 80px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-    }
-    
-    .navbar__container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      max-width: 1300px;
-      padding: 0 50px;
-    }
-    
-    #navbar__logo {
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      text-decoration: none;
-      font-size: 2rem;
-      font-weight: bold;
-    }
-    
-    .navbar__menu {
-      display: flex;
-      align-items: center;
-      list-style: none;
-    }
-    
-    .navbar__item {
-      height: 80px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .navbar__links {
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      padding: 0 1rem;
-      height: 100%;
-      transition: all 0.3s ease;
-    }
-    
-    .navbar__links:hover {
-      color: #ff0000;
-    }
-    
-    .button {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-decoration: none;
-      padding: 10px 20px;
-      height: 100%;
-      width: 100%;
-      border: none;
-      outline: none;
-      border-radius: 4px;
-      background: #ff0000;
-      color: #fff;
-      transition: all 0.3s ease;
-    }
-    
-    .button:hover {
-      background: #ff5100;
-    }
-    
-    .profile-section {
-      max-width: 1000px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    
-    .profile-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    
-    .profile-header h1 {
-      color: #0a192f;
-      margin-bottom: 10px;
-    }
-    
-    .profile-header p {
-      color: #666;
-    }
-    
-    .profile-form {
-      display: grid;
-      gap: 30px;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-      color: #0a192f;
-    }
-    
-    .form-group input[type="text"],
-    .form-group input[type="email"],
-    .form-group textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-    
-    .form-group textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-    
-    .profile-photo {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    
-    .photo-container {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: #eee;
-      margin: 0 auto 15px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .photo-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .photo-placeholder {
-      font-size: 50px;
-      color: #aaa;
-    }
-    
-    .upload-btn {
-      background: #ff0000;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .upload-btn:hover {
-      background: #ff5100;
-    }
-    
-    .save-section {
-      text-align: center;
-      margin-top: 30px;
-    }
-    
-    .save-btn {
-      background: #ff0000;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 15px 30px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .save-btn:hover {
-      background: #ff5100;
-    }
-    
-    .two-columns {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    
-    /* Delete account styling */
-    .delete-account-section {
-      margin-top: 50px;
-      padding-top: 30px;
-      border-top: 1px solid #ddd;
-      text-align: center;
-    }
-    
-    .delete-account-section h3 {
-      color: #333;
-      margin-bottom: 10px;
-    }
-    
-    .warning-text {
-      color: #d9534f;
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
-    
-    .delete-btn {
-      background: #d9534f;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 12px 24px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .delete-btn:hover {
-      background: #c9302c;
-    }
-    
-    /* Modal styling */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.7);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .modal-content {
-      background-color: white;
-      padding: 30px;
-      border-radius: 8px;
-      max-width: 500px;
-      width: 90%;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-    
-    .modal-content h2 {
-      color: #d9534f;
-      margin-bottom: 15px;
-    }
-    
-    .modal-content p {
-      margin-bottom: 15px;
-      line-height: 1.5;
-    }
-    
-    .confirm-input {
-      width: 100%;
-      padding: 12px;
-      margin: 15px 0;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-    
-    .modal-buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-    }
-    
-    .cancel-btn {
-      background: #f8f9fa;
-      color: #333;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      padding: 10px 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .cancel-btn:hover {
-      background: #e2e6ea;
-    }
-    
-    .confirm-delete-btn {
-      background: #d9534f;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .confirm-delete-btn:hover {
-      background: #c9302c;
-    }
-    
-    /* Interest buttons and tags styling */
-    .interest-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    
-    .interest-btn {
-      background: #f5f5f5;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      padding: 8px 15px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .interest-btn.active {
-      background: #0927af;
-      color: white;
-      border-color: #0927af;
-    }
-    
-    .category-heading {
-      font-weight: bold;
-      margin: 15px 0 10px;
-      color: #0a192f;
-    }
-    
-    .custom-interest {
-      display: flex;
-      gap: 10px;
-      margin: 20px 0;
-    }
-    
-    .custom-interest input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-    
-    .add-btn {
-      background: #0927af;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 0 15px;
-      cursor: pointer;
-    }
-    
-    .selected-interests {
-      margin: 20px 0;
-    }
-    
-    .interest-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    
-    .interest-tag {
-      background: #0927af;
-      color: white;
-      border-radius: 20px;
-      padding: 5px 10px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    
-    .remove-tag {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    @media screen and (max-width: 768px) {
-      .two-columns {
-        grid-template-columns: 1fr;
-      }
-      
-      .navbar__container {
-        padding: 0 20px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/customise.css') }}"> 
 </head>
+
 <body>
   <nav class="navbar">
     <div class="navbar__container">
@@ -643,6 +229,10 @@
           <button type="submit" class="save-btn" onclick="updateInterestsField()">Save Profile</button>
         </div>
         
+        <div class="account-setup-title">
+          <span>Account Setup</span>
+        </div>
+
         <div class="delete-account-section">
           <h3>Delete Account</h3>
           <p class="warning-text">Warning: This action cannot be undone. All your data, including profile, connections, messages, and gatherings will be permanently deleted.</p>
@@ -650,17 +240,21 @@
         </div>
       </form>
 
-      <form method="POST" action="{{ url_for('toggle_2fa') }}" style="margin-top: 20px;">
+      <div class="2fa-section" style="margin-top: 20px; text-align: center;">
+        <h3>Two-Factor Authentication</h3>
+        <p style="color:#d9534f">Add an extra layer of security to your account</p>
+        <button
+          type="button"
+          id="2fa-btn"
+          class="enable-2fa-btn{% if user.is_2fa_enabled %} disable{% endif %}"
+          onclick="open2FAModal()">
+          {{ 'Disable 2FA' if user.is_2fa_enabled else 'Enable 2FA' }}
+        </button>
+      </div>
+
+      <form id="2fa-form" method="POST" action="{{ url_for('toggle_2fa') }}" style="display: none;">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        {% if user.is_2fa_enabled %}
-          <button type="submit" name="action" value="disable" class="btn btn-danger">
-            Disable 2FA
-          </button>
-        {% else %}
-          <button type="submit" name="action" value="enable" class="btn btn-primary">
-            Enable 2FA
-          </button>
-        {% endif %}
+        <input type="hidden" name="action" id="2fa-action" value="">
       </form>
 
 
@@ -907,7 +501,75 @@
         alert('The student ID you entered does not match your account. Please try again.');
       }
     }
+
+    // 2FA Modal Functions
+    function open2FAModal() {
+      const modal = document.getElementById('2fa-modal');
+      const enableContent = document.getElementById('2fa-enable-content');
+      const disableContent = document.getElementById('2fa-disable-content');
+      {% if user.is_2fa_enabled %}
+        enableContent.style.display = 'none';
+        disableContent.style.display = 'block';
+      {% else %}
+        enableContent.style.display = 'block';
+        disableContent.style.display = 'none';
+      {% endif %}
+      modal.style.display = 'flex';
+    }
+
+    function close2FAModal() {
+      document.getElementById('2fa-modal').style.display = 'none';
+    }
+
+    function enable2FA() {
+      // Set the action and submit the form
+      document.getElementById('2fa-action').value = 'enable';
+      document.getElementById('2fa-form').submit();
+    }
+
+    function disable2FA() {
+      // Set the action and submit the form
+      document.getElementById('2fa-action').value = 'disable';
+      document.getElementById('2fa-form').submit();
+    }
+
+    // Add form submit event listener for profile form
+    document.querySelector('form[action="{{ url_for('customise') }}"]').addEventListener('submit', function(e) {
+      // Prevent the default form submission
+      e.preventDefault();
+      
+      // Make sure interests are updated before submission
+      updateInterestsField();
+      
+      console.log("Form is being submitted with interests:", document.getElementById('interests').value);
+      
+      // Continue with the form submission
+      this.submit();
+    });
   </script>
+
+  <!-- 2FA Confirmation Modal -->
+    <div id="2fa-modal" class="modal">
+      <div class="modal-content">
+        <h2>Two-Factor Authentication</h2>
+        <div id="2fa-enable-content" style="display: none;">
+          <p>For enhanced security, you'll need to scan a QR code with an authenticator app to enable 2FA.</p>
+          <p>After scanning, you'll need to enter a code from the app to complete setup.</p>
+          <div class="modal-buttons">
+            <button class="cancel-btn" onclick="close2FAModal()">Cancel</button>
+            <button class="confirm-delete-btn" onclick="enable2FA()">Continue to Setup</button>
+          </div>
+        </div>
+        <div id="2fa-disable-content" style="display: none;">
+          <p>Are you sure you want to disable Two-Factor Authentication?</p>
+          <p>This will reduce the security of your account.</p>
+          <div class="modal-buttons">
+            <button class="cancel-btn" onclick="close2FAModal()">Cancel</button>
+            <button class="confirm-delete-btn" onclick="disable2FA()">Disable 2FA</button>
+          </div>
+        </div>
+      </div>
+    </div>
   
   <script src="{{ url_for('static', filename='js/common.js') }}"></script>
   <script src="{{ url_for('static', filename='js/sound.js') }}"></script>
