@@ -13,6 +13,8 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
     last_login = db.Column(db.DateTime)
+    is_2fa_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    two_fa_secret = db.Column(db.String(32), nullable=True)
     
     def __init__(self, student_id, username, email, password):
         self.student_id = student_id

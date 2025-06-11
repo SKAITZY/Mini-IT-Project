@@ -946,8 +946,8 @@
                       <button type="submit" class="action-btn danger-btn">Cancel Gathering</button>
                     </form>
                   {% else %}
-                    <a href="{{ url_for('edit_gathering', gathering_id=gathering_item.id) }}" class="action-btn primary-btn">View Details</a>
-                    <a href="{{ url_for('message_gathering', gathering_id=gathering_item.id) }}" class="action-btn secondary-btn">Message Host</a>
+                    <a href="{{ url_for('edit_gathering', gathering_id=gathering_item.id) }}" class="action-btn primary-btn">Edit Details</a>
+                    <a href="{{ url_for('message_gathering', gathering_id=gathering_item.id) }}" class="action-btn secondary-btn">Message All</a>
                     <form action="{{ url_for('leave_gathering', gathering_id=gathering_item.id) }}" method="POST" style="display: inline;">
                       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                       <button type="submit" class="action-btn danger-btn">Leave Gathering</button>
@@ -999,13 +999,13 @@
                             <option value="social">Faculty of Management</option>
                             <option value="sports">Faculty of Engineering</option>
                             <option value="gaming">Faculty of Applied Communication</option>
-                            <option value="other">Other</option>
+                            <option value="other">Faculty of Cinematic Arts</option>
                         </select>
                       </div>
                       <div class="form-group">
                           <label for="eventTitle">Year & Semester</label>
                           <input type="text" id="eventTitle" name="yearSemester" placeholder="E.g. Year 1 Sem 3">
-                      </div>
+                      </div>                   
                   </div>
               </div>
               <div class="form-row">
@@ -1018,12 +1018,20 @@
                     <input type="time" id="eventTime" name="eventTime">
                   </div>
                   <div class="form-group">
+<<<<<<< HEAD
+                          <label for="eventLocation">Location</label>
+                          <input type="text" id="eventLocation" name="eventLocation" placeholder="E.g. Library Study Room 3, FCI Building"value="{{ request.args.get('eventLocation', '') }}">
+                      </div>
+                  </div>
+                  <button type="submit" class="search-btn">Find Gatherings</button>
+=======
                     <label for="location">Location</label>
                     <input type="text" id="location" name="location" placeholder="E.g. FCI Lounge" value="{{ request.args.get('location', '') }}">
                   </div>
+>>>>>>> c639f2871d860ebbbc102f89b7a82db2d36e9cd6
               </div>
                   
-              <button type="submit" class="search-btn">Find Gatherings</button>
+              
             </form>
             </div>
             

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Two-Factor Authentication</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2em; background-color: #f4f4f4; }
+    .container { background: white; max-width: 600px; margin: 0 auto; padding: 2em; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .qr { text-align: center; margin-top: 20px; }
+    .qr img { width: 200px; height: 200px; }
+    .btn { padding: 0.6em 1.5em; margin: 0.5em; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-primary { background-color: #007bff; color: white; }
+    .btn-secondary { background-color: #6c757d; color: white; }
+    .form-group { margin: 1em 0; }
+    label { display: block; margin-bottom: 0.5em; font-weight: bold; }
+    input[type="text"] { width: 100%; padding: 0.5em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>
+      {% if source == 'register' %}
+        Enable Two-Factor Authentication (2FA)
+      {% elif source == 'reset' %}
+        Verify Your Identity (2FA)
+      {% else %}
+        Two-Factor Authentication
+      {% endif %}
+    </h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% if source == 'register' %}
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <p>Would you like to enable 2FA for extra security? You can use Google Authenticator or any TOTP app.</p>
+        {% if qr_url %}
+          <div class="qr">
+            <p>Scan this QR code:</p>
+            <img src="{{ qr_url }}" alt="QR Code for 2FA">
+          </div>
+        {% endif %}
+        <div class="form-group">
+          <button type="submit" name="enable_2fa" value="yes" class="btn btn-primary">Yes, Enable 2FA</button>
+          <button type="submit" name="enable_2fa" value="no" class="btn btn-secondary">No, Skip</button>
+        </div>
+      </form>
+
+    {% elif source == 'reset' %}
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <p>Please enter the OTP from your 2FA app to continue resetting your password.</p>
+        <div class="form-group">
+          <label for="otp">6-digit OTP:</label>
+          <input type="text" name="otp" id="otp" pattern="\\d{6}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Verify</button>
+      </form>
+
+    {% else %}
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <p>Enter your 2FA OTP to proceed.</p>
+        <div class="form-group">
+          <label for="otp">OTP:</label>
+          <input type="text" name="otp" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    {% endif %}
+  </div>
+</body>
+</html>
