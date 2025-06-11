@@ -1027,7 +1027,7 @@
                   
               
             </form>
-            </div>
+            
             
           
           <!-- Display Gatherings -->
@@ -1110,12 +1110,12 @@
                 </div>
               </div>
             {% endfor %}
-          {% elif all_gatherings is defined %}
-            <div class="no-results" style="text-align: center; padding: 40px 0;">
-              <h3>No gatherings found.</h3>
-              <p style="margin-top: 15px;">
-                <a href="{{ url_for('jomgather', tab='create-gathering') }}" style="color: #0927af; text-decoration: underline;">Create a gathering</a> 
-                to get started.
+          {% else %}
+              <div class="no-results" style="text-align: center; padding: 40px 0;">
+                  <h3>No gatherings found.</h3>
+                  <p style="margin-top: 15px;">
+                      <a href="{{ url_for('jomgather', tab='create-gathering') }}" style="color: #0927af; text-decoration: underline;">Create a gathering</a> 
+                      to get started.
               </p>
             </div>
           {% endif %}

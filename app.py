@@ -452,7 +452,7 @@ def jomgather():
         year_semester = request.args.get('yearSemester', '')
         event_date = request.args.get('eventDate', '')
         event_time = request.args.get('eventTime', '')
-        location = request.args.get('location', '')
+        location = request.args.get('eventLocation', '')
         
         # Apply gathering type filter
         if gathering_type and gathering_type != 'other':
@@ -476,10 +476,6 @@ def jomgather():
         # Apply year/semester filter
         if year_semester:
             query = query.filter(Gathering.year_semester.ilike(f'%{year_semester}%'))
-
-        # Apply location filter
-        if event_location:
-            query = query.filter(Gathering.location.ilike(f'%{event_location}%'))
             
         # Apply location filter
         if location:
@@ -755,7 +751,7 @@ def create_gathering():
         print(f"Year/Semester: {year_semester}")
         print(f"Date: {event_date}")
         print(f"Time: {event_time}")
-        print(f"Location: {location}")
+        print(f"eventLocation: {location}")
         print(f"Max Participants: {max_attendees}")
         print(f"Description: {description}")
         print(f"Target Audience: {target_audience}")
@@ -769,7 +765,7 @@ def create_gathering():
             if not year_semester: missing_fields.append("Year & Semester")
             if not event_date: missing_fields.append("Date")
             if not event_time: missing_fields.append("Time")
-            if not location: missing_fields.append("Location")
+            if not location: missing_fields.append("eventLocation")
             if not max_attendees: missing_fields.append("Maximum Participants")
             if not description: missing_fields.append("Description")
             
@@ -1382,8 +1378,6 @@ def check_2fa_status(student_id):
     is_verified = session.get('2fa_verified_for') == student_id
     return jsonify({'require_2fa': user.is_2fa_enabled, 'verified': is_verified})
 
-from flask.cli import with_appcontext
-import click
 
 @click.command(name='create_tables')
 @with_appcontext
