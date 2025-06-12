@@ -957,6 +957,7 @@ def update_password():
         }), 500
 
 @app.route('/match')
+@login_required
 def match():
     # Get all faculties for filter dropdowns
     faculties = db.session.query(Customisation.faculty).filter(Customisation.faculty.isnot(None)).distinct().all()
