@@ -95,12 +95,15 @@ class Connection(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     connected_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     status = db.Column(db.String(20), default='pending')  # pending, accepted, rejected
+    initiator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
     
     # Relationships
     user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('connections_made', lazy='dynamic'))
     connected_user = db.relationship('User', foreign_keys=[connected_user_id], backref=db.backref('connections_received', lazy='dynamic'))
+    initiator = db.relationship('User', foreign_keys=[initiator_id])
     
     def to_dict(self):
         return {

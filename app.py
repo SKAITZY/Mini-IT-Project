@@ -11,6 +11,9 @@ import random
 import pyotp  # 确保你已经安装 pyotp: pip install pyotp
 from flask_migrate import Migrate
 from models import User, Customisation, Connection, Message  # 你已有
+import click
+from flask.cli import with_appcontext
+
 
 
 
@@ -616,7 +619,10 @@ def connect_with_user(user_id):
     ).first()
     
     if existing_connection:
-        flash('You already have a connection with this user', 'info')
+        return jsonify({
+            'success': False,
+            'error': 'You already have a connection with this user'
+        })
     else:
         # Create a new connection
         new_connection = Connection(
@@ -627,13 +633,16 @@ def connect_with_user(user_id):
         db.session.add(new_connection)
         try:
             db.session.commit()
-            flash('Connection request sent!', 'success')
+            return jsonify({
+                'success': True,
+                'message': 'Connection request sent!'
+            })
         except Exception as e:
             db.session.rollback()
-            flash(f'An error occurred: {str(e)}', 'error')
-    
-    # Redirect back to where the request came from
-    return redirect(request.referrer or url_for('jomgather'))
+            return jsonify({
+                'success': False,
+                'error': f'An error occurred: {str(e)}'
+            }), 500
 
 @app.route('/connections', endpoint='view_connections')
 @login_required
@@ -959,17 +968,15 @@ def update_password():
 @app.route('/match')
 @login_required
 def match():
-    # Get all faculties for filter dropdowns
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))  # Silent redirect
+    
     faculties = db.session.query(Customisation.faculty).filter(Customisation.faculty.isnot(None)).distinct().all()
-    faculties = [faculty[0] for faculty in faculties if faculty[0]]
-    return render_template('match.html', faculties=faculties)
+    return render_template('match.html', faculties=[f[0] for f in faculties if f[0]])
 
 @app.route('/api/match/<match_type>')
 @login_required
 def match_users(match_type):
-    # Your existing match logic...
-    
-    # Rest of your existing match logic...
     try:
         # Get filtering criteria
         faculty = request.args.get('faculty')
@@ -988,10 +995,12 @@ def match_users(match_type):
             query = query.filter(Customisation.year_of_study == int(year))
         
         if match_type == 'random':
-            # Random match
             available_users = query.all()
             if not available_users:
-                return jsonify({'success': False, 'error': 'no match user'})
+                return jsonify({
+                    'success': False,
+                    'error': 'No users match your filters'
+                })
             
             matched_user = random.choice(available_users)
             return jsonify({
@@ -1026,20 +1035,29 @@ def match_users(match_type):
                     highest_score = score
                     best_match = user
             
-            if best_match:
+            if best_match and highest_score > 0:  # Only return if we have at least 1 common interest
                 result = format_user(best_match)
                 result['common_interests'] = list(common_interests)
                 return jsonify({'success': True, 'user': result})
-            else:
-                return jsonify({'success': False, 'error': 'no suitable match found'}), 404
-                
+            
+            # No suitable match found
+            return jsonify({
+                'success': False,
+                'error': 'No users with matching interests found'
+            })
+            
         else:
-            return jsonify({'success': False, 'error': 'invalid match type'}), 400
+            return jsonify({
+                'success': False,
+                'error': 'Invalid match type'
+            }), 400
             
     except Exception as e:
         app.logger.error(f"Match error: {str(e)}")
-        return jsonify({'success': False, 'error': 'server error'}), 500
-
+        return jsonify({
+            'success': False,
+            'error': 'Server error'
+        }), 500
 
 def format_user(user):
     """format user data"""
@@ -1471,3 +1489,6 @@ def pre_check_2fa():
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+    
+    # test sftp
+

@@ -62,10 +62,12 @@
     <h2 class="section-title">Why Choose JomGather?</h2>
     <div class="features-container">
       <div class="feature-card">
-        <div class="feature-icon">👥</div>
-        <h3 class="feature-title">Match Your Interests</h3>
-        <p class="feature-desc">Connect with students who share your passions, hobbies, and academic interests.</p>
-        <a href="{{ url_for('match') }}">Click Here</a>
+          <div class="feature-icon">👥</div>
+          <h3 class="feature-title">Match Your Interests</h3>
+          <p class="feature-desc">Connect with students who share your passions.</p>
+          <a href="{{ url_for('match' if current_user.is_authenticated else 'login') }}">
+              Click Here
+          </a>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🎯</div>
