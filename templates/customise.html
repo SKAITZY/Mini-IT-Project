@@ -6,6 +6,461 @@
   <title>JomGather - Customize Profile</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/customise.css') }}"> 
+  <style>
+       * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    
+
+    
+    .profile-section {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .profile-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .profile-header h1 {
+      color: #0a192f;
+      margin-bottom: 10px;
+    }
+    
+    .profile-header p {
+      color: #666;
+    }
+    
+    .profile-form {
+      display: grid;
+      gap: 30px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #0a192f;
+    }
+    
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .profile-photo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .photo-container {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: #eee;
+      margin: 0 auto 15px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .photo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .photo-placeholder {
+      font-size: 50px;
+      color: #aaa;
+    }
+    
+    .upload-btn {
+      background: #ff0000;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .upload-btn:hover {
+      background: #ff5100;
+    }
+    
+    .save-section {
+      text-align: center;
+      margin-top: 30px;
+    }
+    
+    .save-btn {
+      background: #ff0000;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 15px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .save-btn:hover {
+      background: #ff5100;
+    }
+    
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    /* Delete account styling */
+    .delete-account-section {
+      margin-top: 50px;
+      padding-top: 30px;
+      border-top: 1px solid #ddd;
+      text-align: center;
+    }
+    
+    .delete-account-section h3 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .warning-text {
+      color: #d9534f;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    
+    .delete-btn {
+      background: #d9534f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 12px 24px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .delete-btn:hover {
+      background: #c9302c;
+    }
+    
+    /* Modal styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    .modal-content h2 {
+      color: #d9534f;
+      margin-bottom: 15px;
+    }
+    
+    .modal-content p {
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    
+    .confirm-input {
+      width: 100%;
+      padding: 12px;
+      margin: 15px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    
+    .cancel-btn {
+      background: #f8f9fa;
+      color: #333;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .cancel-btn:hover {
+      background: #e2e6ea;
+    }
+    
+    .confirm-delete-btn {
+      background: #d9534f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .confirm-delete-btn:hover {
+      background: #c9302c;
+    }
+    
+    /* Interest buttons and tags styling */
+    .interest-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .interest-btn {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 8px 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .interest-btn.active {
+      background: #0927af;
+      color: white;
+      border-color: #0927af;
+    }
+    
+    .category-heading {
+      font-weight: bold;
+      margin: 15px 0 10px;
+      color: #0a192f;
+    }
+    
+    .custom-interest {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .custom-interest input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    .add-btn {
+      background: #0927af;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 0 15px;
+      cursor: pointer;
+    }
+    
+    .selected-interests {
+      margin: 20px 0;
+    }
+    
+    .interest-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .interest-tag {
+      background: #0927af;
+      color: white;
+      border-radius: 20px;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .remove-tag {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    @media screen and (max-width: 768px) {
+      .two-columns {
+        grid-template-columns: 1fr;
+      }
+      .profile-section {
+        margin: 20px auto;
+        padding: 15px;
+      }
+      .photo-container {
+        width: 120px;
+        height: 120px;
+      }
+      .modal-content {
+        width: 95%;
+        padding: 20px;
+      }
+      .modal-buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .cancel-btn,
+      .confirm-delete-btn {
+        width: 100%;
+      }
+    }
+
+    /* 2FA button styling */
+    .enable-2fa-btn {
+      background: #35b637;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      display: inline-block !important;
+      margin: 15px auto;
+      padding: 12px 25px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .enable-2fa-btn:not(.disable) {
+      background: #35b637;
+      color: white;
+    }
+    .enable-2fa-btn.disable {
+      background: #d9534f;
+      color: white;
+    }
+
+    /* Modal content adjustments */
+    .modal-content {
+      background-color: white;
+      padding: 40px 30px; /* Increase top/bottom padding */
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .modal-content h2 {
+      color: #d9534f;
+      margin-bottom: 25px; /* Increase bottom margin */
+      margin-top: 10px;    /* Add top margin if needed */
+    }
+    .modal-content p {
+      margin-bottom: 18px;
+      margin-top: 10px;
+      line-height: 1.7;
+    }
+
+    .account-setup-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #0a192f;
+      margin: 40px 0; /* Increased vertical margin */
+      text-align: center;
+      position: relative;
+    }
+    .account-setup-title::before,
+    .account-setup-title::after {
+      content: "";
+      display: inline-block;
+      width: 30%;
+      height: 1px;
+      background-color: #ddd;
+      position: absolute;
+      top: 50%;
+    }
+    .account-setup-title::before {
+      left: 0;
+    }
+    .account-setup-title::after {
+      right: 0;
+    }
+    .account-setup-title span {
+      padding: 0 15px;
+      position: relative;
+      background: white; /* Match your background color */
+    }
+
+    /* 2FA section styling - use a valid class name */
+    .twofa-section {
+      display: block !important;
+      margin-top: 20px;
+      text-align: center;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+    .twofa-section h3 {
+      margin-bottom: 15px;
+      color: #0a192f;
+    }
+    .twofa-section p {
+      margin-bottom: 25px;
+      color: #666;
+    }
+  </style>
 </head>
 
 <body>
@@ -275,58 +730,53 @@
     </div>
   </div>
 
+  <!-- Remove this entire block from customise.html -->
   <script>
-    // Function to update the hidden interests field before form submission
-    function updateInterestsField() {
-      console.log("Updating interests field...");
-      const selectedTags = document.querySelectorAll('.interest-tag');
-      const interests = Array.from(selectedTags).map(tag => tag.getAttribute('data-interest')).join(',');
-      document.getElementById('interests').value = interests;
-      console.log("Interests to be saved:", interests);
+    // Mobile menu toggle
+    const menu = document.querySelector('#mobile-menu');
+    const menuLinks = document.querySelector('.navbar__menu');
+
+    if (menu) {
+      menu.addEventListener('click', function() {
+        menu.classList.toggle('is-active');
+        menuLinks.classList.toggle('active');
+       });
     }
-    
-    // Toggle interest selection
-    function toggleInterest(button) {
-      button.classList.toggle('active');
-      
-      const interestText = button.innerText;
-      const selectedTags = document.getElementById('selected-tags');
-      
-      // Check if already selected
-      const existingTag = document.querySelector(`.interest-tag[data-interest="${interestText}"]`);
-      
-      if (button.classList.contains('active') && !existingTag) {
-        // Add tag to selected interests
-        const tag = document.createElement('div');
-        tag.className = 'interest-tag';
-        tag.setAttribute('data-interest', interestText);
-        tag.innerHTML = `
-          ${interestText}
-          <button class="remove-tag" onclick="removeInterest(this.parentElement, '${interestText}')">×</button>
-        `;
-        selectedTags.appendChild(tag);
-      } else if (!button.classList.contains('active') && existingTag) {
-        // Remove tag from selected interests
-        existingTag.remove();
+
+            // Mobile menu toggle
+        const menu = document.querySelector('#mobile-menu');
+        const menuLinks = document.querySelector('.navbar__menu');
+
+        if (menu) {
+          menu.addEventListener('click', function() {
+            menu.classList.toggle('is-active');
+            menuLinks.classList.toggle('active');
+          });
+        }
+  </script>
+
+  <script>
+      // Function to update the hidden interests field before form submission
+      function updateInterestsField() {
+        console.log("Updating interests field...");
+        const selectedTags = document.querySelectorAll('.interest-tag');
+        const interests = Array.from(selectedTags).map(tag => tag.getAttribute('data-interest')).join(',');
+        document.getElementById('interests').value = interests;
+        console.log("Interests to be saved:", interests);
       }
       
-      // Update the hidden interests field immediately
-      updateInterestsField();
-    }
-    
-    // Add custom interest
-    function addCustomInterest() {
-      const customInput = document.getElementById('custom-interest');
-      const interestText = customInput.value.trim();
-      
-      if (interestText) {
+      // Toggle interest selection
+      function toggleInterest(button) {
+        button.classList.toggle('active');
+        
+        const interestText = button.innerText;
         const selectedTags = document.getElementById('selected-tags');
         
-        // Check if already added
+        // Check if already selected
         const existingTag = document.querySelector(`.interest-tag[data-interest="${interestText}"]`);
         
-        if (!existingTag) {
-          // Create new interest tag
+        if (button.classList.contains('active') && !existingTag) {
+          // Add tag to selected interests
           const tag = document.createElement('div');
           tag.className = 'interest-tag';
           tag.setAttribute('data-interest', interestText);
@@ -335,92 +785,126 @@
             <button class="remove-tag" onclick="removeInterest(this.parentElement, '${interestText}')">×</button>
           `;
           selectedTags.appendChild(tag);
+        } else if (!button.classList.contains('active') && existingTag) {
+          // Remove tag from selected interests
+          existingTag.remove();
+        }
+        
+        // Update the hidden interests field immediately
+        updateInterestsField();
+      }
+      
+      // Add custom interest
+      function addCustomInterest() {
+        const customInput = document.getElementById('custom-interest');
+        const interestText = customInput.value.trim();
+        
+        if (interestText) {
+          const selectedTags = document.getElementById('selected-tags');
           
-          // Clear input
-          customInput.value = '';
+          // Check if already added
+          const existingTag = document.querySelector(`.interest-tag[data-interest="${interestText}"]`);
           
-          // Update the hidden interests field
-          updateInterestsField();
+          if (!existingTag) {
+            // Create new interest tag
+            const tag = document.createElement('div');
+            tag.className = 'interest-tag';
+            tag.setAttribute('data-interest', interestText);
+            tag.innerHTML = `
+              ${interestText}
+              <button class="remove-tag" onclick="removeInterest(this.parentElement, '${interestText}')">×</button>
+            `;
+            selectedTags.appendChild(tag);
+            
+            // Clear input
+            customInput.value = '';
+            
+            // Update the hidden interests field
+            updateInterestsField();
+          }
         }
       }
-    }
-    
-    // Remove interest from selected tags
-    function removeInterest(tagElement, interestText) {
-      // Remove tag element
-      tagElement.remove();
       
-      // Deselect the corresponding button if it exists
-      const button = Array.from(document.querySelectorAll('.interest-btn'))
-        .find(btn => btn.innerText === interestText);
+      // Remove interest from selected tags
+      function removeInterest(tagElement, interestText) {
+        // Remove tag element
+        tagElement.remove();
         
-      if (button) {
-        button.classList.remove('active');
+        // Deselect the corresponding button if it exists
+        const button = Array.from(document.querySelectorAll('.interest-btn'))
+          .find(btn => btn.innerText === interestText);
+          
+        if (button) {
+          button.classList.remove('active');
+        }
+        
+        // Update the hidden interests field immediately
+        updateInterestsField();
       }
       
-      // Update the hidden interests field immediately
-      updateInterestsField();
-    }
-    
-    // Handle Enter key in custom interest input
-    document.getElementById('custom-interest').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        addCustomInterest();
-      }
-    });
-    
-    // Mobile menu toggle
-    const menu = document.querySelector('#mobile-menu');
-    const menuLinks = document.querySelector('.navbar__menu');
-    
-    if (menu) {
-      menu.addEventListener('click', function() {
-        menu.classList.toggle('is-active');
-        menuLinks.classList.toggle('active');
+      // Handle Enter key in custom interest input
+      document.getElementById('custom-interest').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addCustomInterest();
+        }
       });
-    }
 
-    // Preview uploaded image
-    document.getElementById('photo-upload').addEventListener('change', function(e) {
-      if (e.target.files && e.target.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = document.querySelector('.photo-container img') || document.createElement('img');
-          img.src = e.target.result;
-          img.alt = 'Profile Picture';
-          const container = document.querySelector('.photo-container');
-          container.innerHTML = '';
-          container.appendChild(img);
+      // Preview uploaded image
+      document.getElementById('photo-upload').addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const img = document.querySelector('.photo-container img') || document.createElement('img');
+            img.src = e.target.result;
+            img.alt = 'Profile Picture';
+            const container = document.querySelector('.photo-container');
+            container.innerHTML = '';
+            container.appendChild(img);
+          }
+          reader.readAsDataURL(e.target.files[0]);
         }
-        reader.readAsDataURL(e.target.files[0]);
-      }
-    });
+      });
 
-    // Initialize selected interests from user data
-    window.addEventListener('load', function() {
-      const interests = document.getElementById('interests').value;
-      console.log("Loaded interests:", interests);
-      
-      if (interests && interests.trim()) {
-        const interestList = interests.split(',').map(i => i.trim()).filter(i => i); // Filter out empty strings
-        console.log("Interest list:", interestList);
+      // Initialize selected interests from user data
+      window.addEventListener('load', function() {
+        const interests = document.getElementById('interests').value;
+        console.log("Loaded interests:", interests);
         
-        interestList.forEach(interest => {
-          // Find matching button if any
-          const button = Array.from(document.querySelectorAll('.interest-btn'))
-            .find(btn => btn.innerText === interest);
+        if (interests && interests.trim()) {
+          const interestList = interests.split(',').map(i => i.trim()).filter(i => i); // Filter out empty strings
+          console.log("Interest list:", interestList);
           
-          if (button) {
-            // If there's a matching button, activate it (but don't call toggleInterest to avoid duplication)
-            button.classList.add('active');
-            console.log("Activating existing interest:", interest);
+          interestList.forEach(interest => {
+            // Find matching button if any
+            const button = Array.from(document.querySelectorAll('.interest-btn'))
+              .find(btn => btn.innerText === interest);
             
-            // Manually create the tag for the interest
-            const selectedTags = document.getElementById('selected-tags');
-            const existingTag = document.querySelector(`.interest-tag[data-interest="${interest}"]`);
-            
-            if (!existingTag) {
+            if (button) {
+              // If there's a matching button, activate it (but don't call toggleInterest to avoid duplication)
+              button.classList.add('active');
+              console.log("Activating existing interest:", interest);
+              
+              // Manually create the tag for the interest
+              const selectedTags = document.getElementById('selected-tags');
+              const existingTag = document.querySelector(`.interest-tag[data-interest="${interest}"]`);
+              
+              if (!existingTag) {
+                const tag = document.createElement('div');
+                tag.className = 'interest-tag';
+                tag.setAttribute('data-interest', interest);
+                tag.innerHTML = `
+                  ${interest}
+                  <button class="remove-tag" onclick="removeInterest(this.parentElement, '${interest}')">×</button>
+                `;
+                selectedTags.appendChild(tag);
+              }
+            } else {
+              // If no matching button, create as custom interest
+              console.log("Adding custom interest:", interest);
+              const selectedTags = document.getElementById('selected-tags');
+              
+              // Create new interest tag
               const tag = document.createElement('div');
               tag.className = 'interest-tag';
               tag.setAttribute('data-interest', interest);
@@ -430,122 +914,107 @@
               `;
               selectedTags.appendChild(tag);
             }
-          } else {
-            // If no matching button, create as custom interest
-            console.log("Adding custom interest:", interest);
-            const selectedTags = document.getElementById('selected-tags');
-            
-            // Create new interest tag
-            const tag = document.createElement('div');
-            tag.className = 'interest-tag';
-            tag.setAttribute('data-interest', interest);
-            tag.innerHTML = `
-              ${interest}
-              <button class="remove-tag" onclick="removeInterest(this.parentElement, '${interest}')">×</button>
-            `;
-            selectedTags.appendChild(tag);
-          }
-        });
+          });
+          
+          // Make sure the interests field is updated after initialization
+          updateInterestsField();
+        }
+      });
+
+      // Add form submit event listener
+      document.querySelector('form').addEventListener('submit', function(e) {
+        // Prevent the default form submission
+        e.preventDefault();
         
-        // Make sure the interests field is updated after initialization
+        // Make sure interests are updated before submission
         updateInterestsField();
-      }
-    });
-
-    // Add form submit event listener
-    document.querySelector('form').addEventListener('submit', function(e) {
-      // Prevent the default form submission
-      e.preventDefault();
-      
-      // Make sure interests are updated before submission
-      updateInterestsField();
-      
-      console.log("Form is being submitted with interests:", document.getElementById('interests').value);
-      
-      // Continue with the form submission
-      this.submit();
-    });
-
-    // Delete account functions
-    function confirmDelete() {
-      document.getElementById('delete-modal').style.display = 'flex';
-    }
-    
-    function closeDeleteModal() {
-      document.getElementById('delete-modal').style.display = 'none';
-      document.getElementById('confirm-student-id').value = '';
-    }
-    
-    function deleteAccount() {
-      const studentId = document.getElementById('confirm-student-id').value;
-      const actualStudentId = "{{ user.student_id }}";
-      
-      if (studentId === actualStudentId) {
-        // Create and submit a form to the delete-account endpoint
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = "{{ url_for('delete_account') }}";
         
-        // Add CSRF token if using Flask-WTF
-        {% if csrf_token %}
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = 'csrf_token';
-        csrfToken.value = "{{ csrf_token() }}";
-        form.appendChild(csrfToken);
+        console.log("Form is being submitted with interests:", document.getElementById('interests').value);
+        
+        // Continue with the form submission
+        this.submit();
+      });
+
+      // Delete account functions
+      function confirmDelete() {
+        document.getElementById('delete-modal').style.display = 'flex';
+      }
+      
+      function closeDeleteModal() {
+        document.getElementById('delete-modal').style.display = 'none';
+        document.getElementById('confirm-student-id').value = '';
+      }
+      
+      function deleteAccount() {
+        const studentId = document.getElementById('confirm-student-id').value;
+        const actualStudentId = "{{ user.student_id }}";
+        
+        if (studentId === actualStudentId) {
+          // Create and submit a form to the delete-account endpoint
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = "{{ url_for('delete_account') }}";
+          
+          // Add CSRF token if using Flask-WTF
+          {% if csrf_token %}
+          const csrfToken = document.createElement('input');
+          csrfToken.type = 'hidden';
+          csrfToken.name = 'csrf_token';
+          csrfToken.value = "{{ csrf_token() }}";
+          form.appendChild(csrfToken);
+          {% endif %}
+          
+          document.body.appendChild(form);
+          form.submit();
+        } else {
+          alert('The student ID you entered does not match your account. Please try again.');
+        }
+      }
+
+      // 2FA Modal Functions
+      function open2FAModal() {
+        const modal = document.getElementById('2fa-modal');
+        const enableContent = document.getElementById('2fa-enable-content');
+        const disableContent = document.getElementById('2fa-disable-content');
+        {% if user.is_2fa_enabled %}
+          enableContent.style.display = 'none';
+          disableContent.style.display = 'block';
+        {% else %}
+          enableContent.style.display = 'block';
+          disableContent.style.display = 'none';
         {% endif %}
-        
-        document.body.appendChild(form);
-        form.submit();
-      } else {
-        alert('The student ID you entered does not match your account. Please try again.');
+        modal.style.display = 'flex';
       }
-    }
 
-    // 2FA Modal Functions
-    function open2FAModal() {
-      const modal = document.getElementById('2fa-modal');
-      const enableContent = document.getElementById('2fa-enable-content');
-      const disableContent = document.getElementById('2fa-disable-content');
-      {% if user.is_2fa_enabled %}
-        enableContent.style.display = 'none';
-        disableContent.style.display = 'block';
-      {% else %}
-        enableContent.style.display = 'block';
-        disableContent.style.display = 'none';
-      {% endif %}
-      modal.style.display = 'flex';
-    }
+      function close2FAModal() {
+        document.getElementById('2fa-modal').style.display = 'none';
+      }
 
-    function close2FAModal() {
-      document.getElementById('2fa-modal').style.display = 'none';
-    }
+      function enable2FA() {
+        // Set the action and submit the form
+        document.getElementById('2fa-action').value = 'enable';
+        document.getElementById('2fa-form').submit();
+      }
 
-    function enable2FA() {
-      // Set the action and submit the form
-      document.getElementById('2fa-action').value = 'enable';
-      document.getElementById('2fa-form').submit();
-    }
+      function disable2FA() {
+        // Set the action and submit the form
+        document.getElementById('2fa-action').value = 'disable';
+        document.getElementById('2fa-form').submit();
+      }
 
-    function disable2FA() {
-      // Set the action and submit the form
-      document.getElementById('2fa-action').value = 'disable';
-      document.getElementById('2fa-form').submit();
-    }
-
-    // Add form submit event listener for profile form
-    document.querySelector('form[action="{{ url_for('customise') }}"]').addEventListener('submit', function(e) {
-      // Prevent the default form submission
-      e.preventDefault();
-      
-      // Make sure interests are updated before submission
-      updateInterestsField();
-      
-      console.log("Form is being submitted with interests:", document.getElementById('interests').value);
-      
-      // Continue with the form submission
-      this.submit();
-    });
+      // Add form submit event listener for profile form
+      document.querySelector('form[action="{{ url_for('customise') }}"]').addEventListener('submit', function(e) {
+        // Prevent the default form submission
+        e.preventDefault();
+        
+        // Make sure interests are updated before submission
+        updateInterestsField();
+        
+        console.log("Form is being submitted with interests:", document.getElementById('interests').value);
+        
+        // Continue with the form submission
+        this.submit();
+      });
   </script>
 
   <!-- 2FA Confirmation Modal -->

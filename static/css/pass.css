@@ -89,10 +89,7 @@ input[type="text"], input[type="password"] {
 }
 
 /* 确保导航栏不会覆盖返回按钮 */
-.navbar {
-  position: relative;
-  z-index: 999;
-}
+
 
 /* 移动端适配 */
 @media (max-width: 768px) {
@@ -104,5 +101,18 @@ input[type="text"], input[type="password"] {
   .back-button {
     padding: 6px 12px;
     font-size: 14px;
+  }
+}
+
+/* Add to pass.css */
+@media screen and (max-width: 768px) {
+  .form-container {
+    margin: 40px auto;
+    padding: 20px;
+  }
+
+  .back-button-container {
+    top: 15px;
+    left: 15px;
   }
 }

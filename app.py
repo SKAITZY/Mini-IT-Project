@@ -5,14 +5,14 @@ from extensions import db, login_manager, csrf, init_extensions
 from config import Config
 import os
 import re
+import click
+from flask.cli import with_appcontext
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import random
 import pyotp  # 确保你已经安装 pyotp: pip install pyotp
 from flask_migrate import Migrate
-from models import User, Customisation, Connection, Message  # 你已有
-import click
-from flask.cli import with_appcontext
+from models import User, Customisation, Connection, Message
 
 
 
@@ -995,12 +995,10 @@ def match_users(match_type):
             query = query.filter(Customisation.year_of_study == int(year))
         
         if match_type == 'random':
+            # Random match
             available_users = query.all()
             if not available_users:
-                return jsonify({
-                    'success': False,
-                    'error': 'No users match your filters'
-                })
+                return jsonify({'success': False, 'error': 'no match user'})
             
             matched_user = random.choice(available_users)
             return jsonify({
@@ -1035,29 +1033,20 @@ def match_users(match_type):
                     highest_score = score
                     best_match = user
             
-            if best_match and highest_score > 0:  # Only return if we have at least 1 common interest
+            if best_match:
                 result = format_user(best_match)
                 result['common_interests'] = list(common_interests)
                 return jsonify({'success': True, 'user': result})
-            
-            # No suitable match found
-            return jsonify({
-                'success': False,
-                'error': 'No users with matching interests found'
-            })
-            
+            else:
+                return jsonify({'success': False, 'error': 'no suitable match found'}), 404
+                
         else:
-            return jsonify({
-                'success': False,
-                'error': 'Invalid match type'
-            }), 400
+            return jsonify({'success': False, 'error': 'invalid match type'}), 400
             
     except Exception as e:
         app.logger.error(f"Match error: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': 'Server error'
-        }), 500
+        return jsonify({'success': False, 'error': 'server error'}), 500
+
 
 def format_user(user):
     """format user data"""

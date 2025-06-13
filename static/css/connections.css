@@ -1,0 +1,344 @@
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    .navbar__menu {
+      display: flex;
+      align-items: center;
+      list-style: none;
+    }
+    
+    .navbar__item {
+      height: 80px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar__links {
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      padding: 0 1rem;
+      height: 100%;
+      transition: all 0.3s ease;
+    }
+    
+    .navbar__links:hover {
+      color: #ff0000;
+    }
+    
+    .button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      padding: 10px 20px;
+      height: 100%;
+      width: 100%;
+      border: none;
+      outline: none;
+      border-radius: 4px;
+      background: #ff0000;
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+    
+    .button:hover {
+      background: #ff5100;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .page-header h1 {
+      color: #0927af;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    
+    .page-header p {
+      color: #666;
+    }
+    
+    .connections-wrapper {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+    
+    @media (min-width: 768px) {
+      .connections-wrapper {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      }
+    }
+    
+    .connection-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    
+    .connection-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .connection-header {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .connection-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #eee;
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    
+    .connection-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .connection-user-info {
+      flex: 1;
+    }
+    
+    .connection-username {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #0927af;
+      margin-bottom: 4px;
+    }
+    
+    .connection-faculty {
+      color: #ff0000;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    
+    .connection-course {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .connection-status {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+    
+    .status-pending {
+      background-color: #ffd700;
+      color: #333;
+    }
+    
+    .status-accepted {
+      background-color: #4caf50;
+      color: white;
+    }
+    
+    .status-rejected {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    .connection-body {
+      padding: 15px;
+    }
+    
+    .connection-interests {
+      margin-bottom: 15px;
+    }
+    
+    .connection-interests-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+    
+    .interest-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    
+    .interest-tag {
+      background-color: #f0f0f0;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+    
+    .connection-actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .connection-btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      flex: 1;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .chat-btn {
+      background-color: #0927af;
+      color: white;
+    }
+    
+    .chat-btn:hover {
+      background-color: #071c80;
+    }
+    
+    .accept-btn {
+      background-color: #4caf50;
+      color: white;
+    }
+    
+    .accept-btn:hover {
+      background-color: #3d8b40;
+    }
+    
+    .reject-btn {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    .reject-btn:hover {
+      background-color: #d32f2f;
+    }
+    
+    .no-connections {
+      text-align: center;
+      padding: 40px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .no-connections h3 {
+      margin-bottom: 15px;
+      color: #666;
+    }
+    
+    .no-connections p {
+      margin-bottom: 20px;
+      color: #888;
+    }
+    
+    .find-students-btn {
+      background-color: #0927af;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 4px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.3s ease;
+    }
+    
+    .find-students-btn:hover {
+      background-color: #071c80;
+    }
+    
+    .connections-count {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .flash-messages {
+      max-width: 1200px;
+      margin: 20px auto 0;
+      padding: 0 20px;
+    }
+
+    .flash-message {
+      padding: 12px 20px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+
+    .flash-success {
+      background-color: #dff0d8;
+      color: #3c763d;
+      border: 1px solid #d6e9c6;
+    }
+
+    .flash-error {
+      background-color: #f2dede;
+      color: #a94442;
+      border: 1px solid #ebccd1;
+    }
+
+    .flash-info {
+      background-color: #d9edf7;
+      color: #31708f;
+      border: 1px solid #bce8f1;
+    }
+
+    /* Add to connections.css */
+@media screen and (max-width: 768px) {
+  .container {
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
+  .connections-wrapper {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .connection-card {
+    width: 100%;
+  }
+
+  .connection-avatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  .connection-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .connection-btn {
+    width: 100%;
+  }
+}

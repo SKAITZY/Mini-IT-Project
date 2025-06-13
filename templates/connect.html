@@ -8,30 +8,39 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
 </head>
 <body>
-  <nav class="navbar">
-    <div class="navbar__container">
-      <a href="{{ url_for('index') }}" id="navbar__logo">JomGather</a>
-      <div class="navbar__toggle" id="mobile-menu">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </div>
-      <ul class="navbar__menu">
-        <li class="navbar__item">
-          <a href="{{ url_for('index') }}" class="navbar__links">Home</a>
-        </li>
-        <li class="navbar__item">
-          <a href="{{ url_for('customise') }}" class="navbar__links">Customize Profile</a>
-        </li>
-        <li class="navbar__item">
-          <a href="{{ url_for('jomgather') }}" class="navbar__links">Jom Gather</a>
-        </li>
-        <li class="navbar__btn">
-          <a href="{{ url_for('register') }}" class="button">Sign Up/Log In</a>
-        </li>
-      </ul>
+<nav class="navbar" aria-label="Main navigation">
+  <div class="navbar__container">
+    <a href="{{ url_for('index') }}" id="navbar__logo" aria-label="JomGather Home">JomGather</a>
+    <div class="navbar__toggle" id="mobile-menu">
+      <span class="bar" aria-hidden="true"></span>
+      <span class="bar" aria-hidden="true"></span>
+      <span class="bar" aria-hidden="true"></span>
     </div>
-  </nav>
+    <ul class="navbar__menu" role="menubar">
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('index') }}" class="navbar__links {% if request.endpoint == 'index' %}active{% endif %}" role="menuitem">Home</a>
+      </li>
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('customise') }}" class="navbar__links {% if request.endpoint == 'customise' %}active{% endif %}" role="menuitem">Customize Profile</a>
+      </li>
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('jomgather') }}" class="navbar__links {% if request.endpoint == 'jomgather' %}active{% endif %}" role="menuitem">Jom Gather</a>
+      </li>
+      {% if current_user.is_authenticated %}
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('view_connections') }}" class="navbar__links {% if request.endpoint == 'view_connections' %}active{% endif %}" role="menuitem">My Connections</a>
+      </li>
+      <li class="navbar__btn" role="none">
+        <a href="{{ url_for('logout') }}" class="button" role="menuitem">Logout</a>
+      </li>
+      {% else %}
+      <li class="navbar__btn" role="none">
+        <a href="{{ url_for('register') }}" class="button" role="menuitem">Sign Up/Log In</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
 
   <div class="chat-container">
     <div class="sidebar">
@@ -61,5 +70,17 @@
       <!-- Chat messages will be dynamically added here -->
     </div>
   </div>
+  <script>
+    // Mobile menu toggle
+    const menu = document.querySelector('#mobile-menu');
+    const menuLinks = document.querySelector('.navbar__menu');
+
+    if (menu) {
+      menu.addEventListener('click', function() {
+        menu.classList.toggle('is-active');
+        menuLinks.classList.toggle('active');
+      });
+    }
+  </script>>
 </body>
 </html>

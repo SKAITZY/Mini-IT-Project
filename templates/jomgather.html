@@ -7,513 +7,42 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/jomgather.css') }}">
   <script src="{{ url_for('static', filename='js/sound.js') }}"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-  
-    
-    body {
-      background-color: #f5f5f5;
-      color: #333;
-    }
-    
-    .navbar {
-      background-color: #0927af;
-      height: 80px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-    }
-    
-    .navbar__container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      max-width: 1300px;
-      padding: 0 50px;
-    }
-    
-    #navbar__logo {
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      text-decoration: none;
-      font-size: 2rem;
-      font-weight: bold;
-    }
-    
-    .navbar__menu {
-      display: flex;
-      align-items: center;
-      list-style: none;
-    }
-    
-    .navbar__item {
-      height: 80px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .navbar__links {
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      padding: 0 1rem;
-      font-size: 2rem;
-      height: 100%;
-      transition: all 1s ease;
-    }
-    
-    .navbar__links:hover {
-      color: #ff0000
-    }
-    
-    .button {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-decoration: none;
-      padding: 10px 20px;
-      height: 100%;
-      width: 100%;
-      border: none;
-      outline: none;
-      border-radius: 4px;
-      background: #ff0000;
-      color: #ffffff;
-      transition: all 1s ease;
-    }
-    
-    .button:hover {
-      background: #aa0000;
-    }
-
-    .page-title {
-      background: linear-gradient(rgba(255, 0, 0, 0.856), rgba(42, 177, 255, 0.829));
-      color:#ffffff;
-      padding: 40px 20px;
-      text-align: center;
-    }
-
-    .page-title h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-    }
-
-    .page-title p {
-      font-size: 1.2rem;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-
-    .tabs {
-      display: flex;
-      border-bottom: 1px solid #e0e0e0;
-      margin-bottom: 30px;
-    }
-
-    .tab {
-      padding: 12px 24px;
-      cursor: pointer;
-      border: none;
-      background: none;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--dark-gray);
-      border-bottom: 3px solid transparent;
-      transition: all 1s ease;
-    }
-
-    .tab.active {
-      color: #ff0000;
-      border-bottom: 3px solid #ff0000;
-
-    }
-
-    .tab:hover:not(.active) {
-      color: #0927af;
-      border-bottom: 3px solid #0927af;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Find Partners Section */
-    .filter-section {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
-    }
-
-    .filter-title {
-      color: #0927af;
-      margin-bottom: 15px;
-      font-size: 1.2rem;
-    }
-
-    .filter-form {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      color: #333;
-      font-weight: 500;
-    }
-
-    .form-group select,
-    .form-group input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #5d5d5d;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-
-    .search-btn {
-      background: #0927af;
-      color: #ffffff;
-      border: none;
-      border-radius: 4px;
-      padding: 12px 24px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 1s ease;
-      margin-top: 15px;
-    }
-
-    .search-btn:hover {
-      background: #097aaf;
-    }
-
-    /* Results Section */
-    .results-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 25px;
-    }
-
-    .student-card {
-      background: #ffffff;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
-    }
-
-    .student-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-    }
-
-    .student-image {
-      height: 200px;
-      width: 100%;
-      background: #dadada;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .student-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .student-info {
-      padding: 20px;
-    }
-
-    .student-name {
-      font-size: 1.2rem;
-      color: #0927af;
-      margin-bottom: 5px;
-    }
-
-    .student-faculty {
-      color: #ff0000;
-      font-weight: 500;
-      margin-bottom: 10px;
-    }
-
-    .student-interests {
-      margin: 10px 0;
-    }
-
-    .interest-tag {
-      display: inline-block;
-      background: #dadada;
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      margin: 0 5px 5px 0;
-    }
-
-    .student-bio {
-      font-size: 0.9rem;
-      color: #333;
-      line-height: 1.5;
-      margin: 10px 0;
-    }
-
-    .connect-btn {
-      background: #ff0000;
-      color: #ffffff;
-      border: none;
-      border-radius: 4px;
-      padding: 8px 16px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 1s ease;
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    .connect-btn:hover {
-      background: #c41019;
-    }
-
-    /* Create Gathering Section */
-    .event-form {
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-
-    .event-form textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #000000;
-      border-radius: 4px;
-      font-size: 1rem;
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    .create-btn {
-      background: #0927af;
-      color: #ffffff;
-      border: none;
-      border-radius: 4px;
-      padding: 12px 24px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 20px;
-    }
-
-    .create-btn:hover {
-      background: #006eff;
-    }
-
-    /* My Gatherings Section */
-    .gathering-card {
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      padding: 20px;
-      margin-bottom: 20px;
-      border-left: 5px solid #0927af;
-    }
-
-    .gathering-card.hosting {
-      border-left-color: #ff0000;
-    }
-
-    .gathering-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 15px;
-    }
-
-    .gathering-title {
-      font-size: 1.3rem;
-      color: #0927af;
-      margin-bottom: 5px;
-    }
-
-    .gathering-status {
-      background: #0927af;
-      color: #ffffff;
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-    }
-
-    .gathering-status.hosting {
-      background: #ff0000;
-    }
-
-    .gathering-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-
-    .detail-item {
-      display: flex;
-      align-items: center;
-    }
-
-    .detail-label {
-      font-weight: 600;
-      margin-right: 10px;
-      color: #333;
-    }
-
-    .gathering-description {
-      margin: 15px 0;
-      color: #333;
-      line-height: 1.5;
-    }
-
-    .gathering-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .action-btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 1s ease;
-    }
-
-    .primary-btn {
-      background: #0927af;
-      color: #ffffff;
-    }
-
-    .primary-btn:hover {
-      background: #006eff;
-    }
-
-    .secondary-btn {
-      background: #ffffff;
-      color: #0927af;
-      border: 2px solid #0927af;
-    }
-
-    .secondary-btn:hover {
-      background: #cfcfcf;
-    }
-
-    .danger-btn {
-      background: #ff0000;
-      color: #ffffff;
-    }
-
-    .danger-btn:hover {
-      background: #c41019;
-    }
-
-    .attendees-list {
-      margin-top: 15px;
-    }
-
-    .attendees-title {
-      font-size: 1rem;
-      color: #0927af;
-      margin-bottom: 10px;
-    }
-
-    .attendees {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .attendee {
-      display: flex;
-      align-items: center;
-      background: #cfcfcf;
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-    }
-
-    .attendee img {
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
-      margin-right: 5px;
-    }
-  </style>
 </head>
+
 <body>
-  <nav class="navbar">
-    <div class="navbar__container">
-        <a href="{{ url_for('index') }}" id="navbar__logo">JomGather</a>
-        <div class="navbar__toggle" id="mobile-menu">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-        </div>
-        <ul class="navbar__menu">
-            <li class="navbar__item">
-                <a href="{{ url_for('index') }}" class="navbar__links">Home</a>
-            </li>            
-            <li class="navbar__item">
-                <a href="{{ url_for('customise') }}" class="navbar__links">Customize Profile</a>
-            </li>
-            <li class="navbar__item">
-                <a href="{{ url_for('match') }}" class="navbar__links">Mix & Match</a>
-            </li>
-            <li class="navbar__item">
-                <a href="{{ url_for('view_connections') }}" class="navbar__links">My Connections</a>
-            </li>
-            <li class="navbar__btn">
-              <a href="{{ url_for('logout') }}" class="button">Logout</a>
-            </li>
-        </ul>
+<nav class="navbar" aria-label="Main navigation">
+  <div class="navbar__container">
+    <a href="{{ url_for('index') }}" id="navbar__logo" aria-label="JomGather Home">JomGather</a>
+    <div class="navbar__toggle" id="mobile-menu">
+      <span class="bar" aria-hidden="true"></span>
+      <span class="bar" aria-hidden="true"></span>
+      <span class="bar" aria-hidden="true"></span>
     </div>
-  </nav>
+    <ul class="navbar__menu" role="menubar">
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('index') }}" class="navbar__links {% if request.endpoint == 'index' %}active{% endif %}" role="menuitem">Home</a>
+      </li>
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('customise') }}" class="navbar__links {% if request.endpoint == 'customise' %}active{% endif %}" role="menuitem">Customize Profile</a>
+      </li>
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('jomgather') }}" class="navbar__links {% if request.endpoint == 'jomgather' %}active{% endif %}" role="menuitem">Jom Gather</a>
+      </li>
+      {% if current_user.is_authenticated %}
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('view_connections') }}" class="navbar__links {% if request.endpoint == 'view_connections' %}active{% endif %}" role="menuitem">My Connections</a>
+      </li>
+      <li class="navbar__btn" role="none">
+        <a href="{{ url_for('logout') }}" class="button" role="menuitem">Logout</a>
+      </li>
+      {% else %}
+      <li class="navbar__btn" role="none">
+        <a href="{{ url_for('register') }}" class="button" role="menuitem">Sign Up/Log In</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -536,9 +65,16 @@
 
   <div class="page-title">
     <h1>Jom Gather</h1>
-    <p>Connect with fellow MMU students for study sessions, hangouts, and events</p>
+    <p>Find your perfect study partners, project collaborators, and campus friends at MMU!</p>
+    <div class="smart-match-cta">
+      <p>Not sure who to connect with? Let our <strong>Smart Matching</strong> do the work for you!</p>
+      <a href="{{ url_for('match') }}" class="cta-button">
+        <span class="icon">✨</span> Try Mix & Match Now
+        <span class="icon">→</span>
+      </a>
+    </div>
   </div>
-
+  
   <div class="container">
     <div class="tabs">
       <button class="tab {% if active_tab == 'find-partners' %}active{% endif %}" onclick="showTab('find-partners')" data-tab-id="find-partners">Find Partners</button>
@@ -1161,17 +697,6 @@
             tabInput.value = tabId;
           });
         }
-
-        // Mobile menu toggle
-        const menu = document.querySelector('#mobile-menu');
-        const menuLinks = document.querySelector('.navbar__menu');
-        
-        if (menu) {
-          menu.addEventListener('click', function() {
-            menu.classList.toggle('is-active');
-            menuLinks.classList.toggle('active');
-          });
-        }
         
         // Add tab input to all forms initially
         document.addEventListener('DOMContentLoaded', function() {
@@ -1194,6 +719,17 @@
 
         // Call the updateStudentCards function when the page loads
         window.onload = updateStudentCards;
+
+        // Mobile menu toggle
+        const menu = document.querySelector('#mobile-menu');
+        const menuLinks = document.querySelector('.navbar__menu');
+
+        if (menu) {
+          menu.addEventListener('click', function() {
+            menu.classList.toggle('is-active');
+            menuLinks.classList.toggle('active');
+          });
+        }
       </script>
     
       <script src="{{ url_for('static', filename='js/common.js') }}"></script>

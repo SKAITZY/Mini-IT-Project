@@ -10,87 +10,9 @@ body {
   color: #333;
 }
 
-.navbar {
-  background-color: #0927af;
-  height: 80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 999;
-}
 
-.navbar__container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  max-width: 1300px;
-  padding: 0 50px;
-}
 
-#navbar__logo {
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 2rem;
-  font-weight: bold;
-}
 
-.navbar__menu {
-  display: flex;
-  align-items: center;
-  list-style: none;
-}
-
-.navbar__item {
-  height: 80px;
-  display: flex;
-  align-items: center;
-}
-
-.navbar__links {
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  padding: 0 1.5rem;
-  height: 100%;
-  transition: all 0.3s ease;
-  font-size: 1.7rem;
-  font-weight: 500;
-}
-
-.navbar__links:hover {
-  color: #ff0000;
-  transform: scale(1.05);
-}
-
-.button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-decoration: none;
-  padding: 10px 20px;
-  height: 100%;
-  width: 100%;
-  border: none;
-  outline: none;
-  border-radius: 4px;
-  background: #ff0000;
-  color: #fff;
-  transition: all 0.3s ease;
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-
-.button:hover {
-  background: #ff6a00;
-}
 
 
 .hero {
@@ -231,4 +153,41 @@ footer {
   text-align: center;
   padding: 20px;
   font-size: 1.2rem;
+}
+
+/* Add to index.css */
+@media screen and (max-width: 768px) {
+  .hero {
+    height: auto;
+    padding: 60px 20px;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero h2 {
+    font-size: 1.5rem;
+  }
+
+  .hero-btns {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .features {
+    padding: 40px 15px;
+  }
+
+  .feature-card {
+    width: 100%;
+  }
+
+  .cta {
+    padding: 50px 20px;
+  }
+
+  .cta h2 {
+    font-size: 2rem;
+  }
 }
