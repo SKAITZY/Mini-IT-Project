@@ -19,23 +19,35 @@
             <span class="bar"></span>
             <span class="bar"></span>
         </div>
-        <ul class="navbar__menu">
-            <li class="navbar__item">
-                <a href="{{ url_for('index') }}" class="navbar__links">Home</a>
-            </li>            
-            <li class="navbar__item">
-                <a href="{{ url_for('customise') }}" class="navbar__links">Customize Profile</a>
-            </li>
-            <li class="navbar__item">
-                <a href="{{ url_for('match') }}" class="navbar__links">Mix & Match</a>
-            </li>
-            <li class="navbar__item">
-                                 <a href="{{ url_for('view_connections') }}" class="navbar__links">My Connections</a>
-            </li>
-            <li class="navbar__btn">
-              <a href="{{ url_for('logout') }}" class="button">Logout</a>
-            </li>
-        </ul>
+      <ul class="navbar__menu">
+        <li class="navbar__item">
+          <a href="{{ url_for('index') }}" class="navbar__links {% if request.endpoint == 'index' %}active{% endif %}">Home</a>
+        </li>
+        <li class="navbar__item">
+          <a href="{{ url_for('customise') }}" class="navbar__links {% if request.endpoint == 'customise' %}active{% endif %}">Customize Profile</a>
+        </li>
+        <li class="navbar__item">
+          <a href="{{ url_for('jomgather') }}" class="navbar__links {% if request.endpoint == 'jomgather' %}active{% endif %}">Jom Gather</a>
+        </li>
+
+        {% if current_user.is_authenticated %}
+          <!-- Show these only AFTER login -->
+          <li class="navbar__item">
+            <a href="{{ url_for('view_connections') }}" class="navbar__links {% if request.endpoint == 'view_connections' %}active{% endif %}">My Connections</a>
+          </li>
+          <li class="navbar__item">
+            <a href="{{ url_for('view_guidelines') }}" class="navbar__links {% if request.endpoint == 'view_guidelines' %}active{% endif %}">Guidelines</a>
+          </li>
+          <li class="navbar__btn">
+            <a href="{{ url_for('logout') }}" class="button">Logout</a>
+          </li>
+        {% else %}
+          <!-- Show only Sign Up/Log In BEFORE login -->
+          <li class="navbar__btn">
+            <a href="{{ url_for('register') }}" class="button">Sign Up/Log In</a>
+          </li>
+        {% endif %}
+      </ul>
     </div>
   </nav>
 

@@ -1,318 +1,368 @@
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    body {
-      background-color: #f5f5f5;
-      color: #333;
-    }
-    
-    .navbar__menu {
-      display: flex;
-      align-items: center;
-      list-style: none;
-    }
-    
-    .navbar__item {
-      height: 80px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .navbar__links {
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      padding: 0 1rem;
-      height: 100%;
-      transition: all 0.3s ease;
-    }
-    
-    .navbar__links:hover {
-      color: #ff0000;
-    }
-    
-    .button {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-decoration: none;
-      padding: 10px 20px;
-      height: 100%;
-      width: 100%;
-      border: none;
-      outline: none;
-      border-radius: 4px;
-      background: #ff0000;
-      color: #fff;
-      transition: all 0.3s ease;
-    }
-    
-    .button:hover {
-      background: #ff5100;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-    
-    .page-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    
-    .page-header h1 {
-      color: #0927af;
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
-    
-    .page-header p {
-      color: #666;
-    }
-    
-    .connections-wrapper {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 30px;
-    }
-    
-    @media (min-width: 768px) {
-      .connections-wrapper {
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      }
-    }
-    
-    .connection-card {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      transition: transform 0.3s ease;
-    }
-    
-    .connection-card:hover {
-      transform: translateY(-5px);
-    }
-    
-    .connection-header {
-      display: flex;
-      align-items: center;
-      padding: 15px;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .connection-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background-color: #eee;
-      margin-right: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-    
-    .connection-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .connection-user-info {
-      flex: 1;
-    }
-    
-    .connection-username {
-      font-weight: bold;
-      font-size: 1.1rem;
-      color: #0927af;
-      margin-bottom: 4px;
-    }
-    
-    .connection-faculty {
-      color: #ff0000;
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-    }
-    
-    .connection-course {
-      color: #666;
-      font-size: 0.9rem;
-    }
-    
-    .connection-status {
-      font-size: 0.8rem;
-      padding: 4px 8px;
-      border-radius: 20px;
-      display: inline-block;
-      margin-top: 8px;
-    }
-    
-    .status-pending {
-      background-color: #ffd700;
-      color: #333;
-    }
-    
-    .status-accepted {
-      background-color: #4caf50;
-      color: white;
-    }
-    
-    .status-rejected {
-      background-color: #f44336;
-      color: white;
-    }
-    
-    .connection-body {
-      padding: 15px;
-    }
-    
-    .connection-interests {
-      margin-bottom: 15px;
-    }
-    
-    .connection-interests-title {
-      font-weight: bold;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-    }
-    
-    .interest-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    
-    .interest-tag {
-      background-color: #f0f0f0;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-    }
-    
-    .connection-actions {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
-    
-    .connection-btn {
-      padding: 8px 16px;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-      font-size: 0.9rem;
-      flex: 1;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-    }
-    
-    .chat-btn {
-      background-color: #0927af;
-      color: white;
-    }
-    
-    .chat-btn:hover {
-      background-color: #071c80;
-    }
-    
-    .accept-btn {
-      background-color: #4caf50;
-      color: white;
-    }
-    
-    .accept-btn:hover {
-      background-color: #3d8b40;
-    }
-    
-    .reject-btn {
-      background-color: #f44336;
-      color: white;
-    }
-    
-    .reject-btn:hover {
-      background-color: #d32f2f;
-    }
-    
-    .no-connections {
-      text-align: center;
-      padding: 40px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    .no-connections h3 {
-      margin-bottom: 15px;
-      color: #666;
-    }
-    
-    .no-connections p {
-      margin-bottom: 20px;
-      color: #888;
-    }
-    
-    .find-students-btn {
-      background-color: #0927af;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 4px;
-      text-decoration: none;
-      display: inline-block;
-      transition: background-color 0.3s ease;
-    }
-    
-    .find-students-btn:hover {
-      background-color: #071c80;
-    }
-    
-    .connections-count {
-      font-size: 1.1rem;
-      color: #666;
-      margin-bottom: 20px;
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-    .flash-messages {
-      max-width: 1200px;
-      margin: 20px auto 0;
-      padding: 0 20px;
-    }
+body {
+  background-color: #f5f5f5;
+  color: #333;
+}
 
-    .flash-message {
-      padding: 12px 20px;
-      border-radius: 4px;
-      margin-bottom: 15px;
-    }
+.navbar__menu {
+  display: flex;
+  align-items: center;
+  list-style: none;
+}
 
-    .flash-success {
-      background-color: #dff0d8;
-      color: #3c763d;
-      border: 1px solid #d6e9c6;
-    }
+.navbar__item {
+  height: 80px;
+  display: flex;
+  align-items: center;
+}
 
-    .flash-error {
-      background-color: #f2dede;
-      color: #a94442;
-      border: 1px solid #ebccd1;
-    }
+.navbar__links {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 0 1rem;
+  height: 100%;
+  transition: all 0.3s ease;
+}
 
-    .flash-info {
-      background-color: #d9edf7;
-      color: #31708f;
-      border: 1px solid #bce8f1;
-    }
+.navbar__links:hover {
+  color: #ff0000;
+}
 
-    /* Add to connections.css */
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  padding: 10px 20px;
+  height: 100%;
+  width: 100%;
+  border: none;
+  outline: none;
+  border-radius: 4px;
+  background: #ff0000;
+  color: #fff;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.button:hover {
+  background: #ff5100;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 81, 0, 0.2);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  color: #0927af;
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.page-header p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.connections-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+
+@media (min-width: 768px) {
+  .connections-wrapper {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
+.connection-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #eaeaea;
+}
+
+.connection-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  border-color: #0927af;
+}
+
+.connection-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.connection-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.connection-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.connection-user-info {
+  flex: 1;
+}
+
+.connection-username {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #0927af;
+  margin-bottom: 5px;
+}
+
+.connection-faculty {
+  color: #ff0000;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.connection-course {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.connection-status {
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-top: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.status-pending {
+  background-color: #ffa500;
+  color: white;
+}
+
+.status-accepted {
+  background-color: #4caf50;
+  color: white;
+  box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+}
+
+.status-rejected {
+  background-color: #f44336;
+  color: white;
+}
+
+.connection-body {
+  padding: 20px;
+}
+
+.connection-interests {
+  margin-bottom: 20px;
+}
+
+.connection-interests-title {
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.interest-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.interest-tag {
+  background-color: rgba(9, 39, 175, 0.1);
+  color: #0927af;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.interest-tag:hover {
+  background-color: rgba(9, 39, 175, 0.2);
+  transform: translateY(-2px);
+}
+
+.connection-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.connection-btn {
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex: 1;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.chat-btn {
+  background: #0927af;
+  color: white;
+}
+
+.chat-btn:hover {
+  background: #071c80;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(9, 39, 175, 0.2);
+}
+
+.accept-btn {
+  background: #4caf50;
+  color: white;
+}
+
+.accept-btn:hover {
+  background: #3d8b40;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+}
+
+.reject-btn {
+  background: #f44336;
+  color: white;
+}
+
+.reject-btn:hover {
+  background: #d32f2f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(244, 67, 54, 0.2);
+}
+
+.awaiting-btn {
+  background: #ffa500;
+  color: white;
+  cursor: not-allowed;
+}
+
+.awaiting-btn:hover {
+  background: #e69500;
+}
+
+.no-connections {
+  text-align: center;
+  padding: 60px 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.no-connections h3 {
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 1.3rem;
+}
+
+.no-connections p {
+  margin-bottom: 25px;
+  color: #666;
+  font-size: 1rem;
+}
+
+.find-students-btn {
+  background: linear-gradient(135deg, #0927af 0%, #ff0000 100%);
+  color: white;
+  padding: 12px 30px;
+  border-radius: 50px;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(9, 39, 175, 0.2);
+}
+
+.find-students-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(9, 39, 175, 0.3);
+  background: linear-gradient(135deg, #071c80 0%, #cc0000 100%);
+}
+
+.connections-count {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 20px;
+  text-align: center;
+  padding: 12px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+}
+
+.flash-messages {
+  max-width: 1200px;
+  margin: 20px auto 0;
+  padding: 0 20px;
+}
+
+.flash-message {
+  padding: 12px 20px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.flash-success {
+  background-color: #dff0d8;
+  color: #3c763d;
+  border: 1px solid #d6e9c6;
+}
+
+.flash-error {
+  background-color: #f2dede;
+  color: #a94442;
+  border: 1px solid #ebccd1;
+}
+
+.flash-info {
+  background-color: #d9edf7;
+  color: #31708f;
+  border: 1px solid #bce8f1;
+}
+
 @media screen and (max-width: 768px) {
   .container {
     margin: 20px auto;
@@ -340,5 +390,13 @@
 
   .connection-btn {
     width: 100%;
+  }
+  
+  .connection-header {
+    padding: 15px;
+  }
+  
+  .connection-body {
+    padding: 15px;
   }
 }
