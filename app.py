@@ -656,42 +656,9 @@ def connect_with_user(user_id):
                 flash(f'An error occurred: {str(e)}', 'error')
                 return redirect(url_for('jomgather'))
 
-@app.route('/connections', endpoint='view_connections')
-@login_required
-def view_connections():
-    # Get all connections where the current user is involved
-    connections_made = Connection.query.filter_by(user_id=current_user.id).all()
-    connections_received = Connection.query.filter_by(connected_user_id=current_user.id).all()
-    
-    # Get the users involved in these connections
-    connected_users = []
-    
-    for conn in connections_made:
-        user = User.query.get(conn.connected_user_id)
-        if user:
-            connected_users.append({
-                'connection_id': conn.id,
-                'user': user,
-                'status': conn.status,
-                'initiator': True,
-                'created_at': conn.created_at
-            })
-            
-    for conn in connections_received:
-        user = User.query.get(conn.user_id)
-        if user:
-            connected_users.append({
-                'connection_id': conn.id,
-                'user': user,
-                'status': conn.status,
-                'initiator': False,
-                'created_at': conn.created_at
-            })
-    
-    # Sort by most recent
-    connected_users.sort(key=lambda x: x['created_at'], reverse=True)
-    
-    return render_template('connections.html', connections=connected_users)
+@app.route('/guidelines', endpoint='view_guidelines')
+def view_guidelines():
+    return render_template('guidelines.html')
 
 @app.route('/connection/<int:connection_id>/accept', methods=['POST'])
 @login_required

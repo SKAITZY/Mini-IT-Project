@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Guidelines - JomGather</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" />
+  <style>
+    .guidelines-container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    .guidelines-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .guidelines-header h1 {
+      color: #2c3e50;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .guidelines-header p {
+      color: #7f8c8d;
+      font-size: 1.2rem;
+    }
+    
+    .guideline-section {
+      background: #fff;
+      border-radius: 10px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .guideline-section h2 {
+      color: #e74c3c;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .guideline-section h3 {
+      color: #34495e;
+      font-size: 1.3rem;
+      margin: 1.5rem 0 0.8rem 0;
+    }
+    
+    .guideline-step {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+    
+    .guideline-step::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    
+    .tip-box {
+      background: #ecf0f1;
+      border-left: 4px solid #3498db;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 5px;
+    }
+    
+    .tip-box strong {
+      color: #2980b9;
+    }
+    
+    .feature-highlight {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin: 1rem 0;
+    }
+    
+    .icon {
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar" aria-label="Main navigation">
+  <div class="navbar__container">
+    <a href="{{ url_for('index') }}" id="navbar__logo" aria-label="JomGather Home">JomGather</a>
+    <div class="navbar__toggle" id="mobile-menu">
+      <span class="bar" aria-hidden="true"></span>
+      <span class="bar" aria-hidden="true"></span>
+      <span class="bar" aria-hidden="true"></span>
+    </div>
+    <ul class="navbar__menu" role="menubar">
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('index') }}" class="navbar__links {% if request.endpoint == 'index' %}active{% endif %}" role="menuitem">Home</a>
+      </li>
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('customise') }}" class="navbar__links {% if request.endpoint == 'customise' %}active{% endif %}" role="menuitem">Customize Profile</a>
+      </li>
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('jomgather') }}" class="navbar__links {% if request.endpoint == 'jomgather' %}active{% endif %}" role="menuitem">Jom Gather</a>
+      </li>
+      {% if current_user.is_authenticated %}
+      <li class="navbar__item" role="none">
+        <a href="{{ url_for('view_guidelines') }}" class="navbar__links {% if request.endpoint == 'view_guidelines' %}active{% endif %}" role="menuitem">Guidelines</a>
+      </li>
+      <li class="navbar__btn" role="none">
+        <a href="{{ url_for('logout') }}" class="button" role="menuitem">Logout</a>
+      </li>
+      {% else %}
+      <li class="navbar__btn" role="none">
+        <a href="{{ url_for('register') }}" class="button" role="menuitem">Sign Up/Log In</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+
+<div class="guidelines-container">
+  <div class="guidelines-header">
+    <h1>User Guidelines</h1>
+    <p>Learn how to make the most of JomGather and connect with fellow MMU students!</p>
+  </div>
+
+  <div class="guideline-section">
+    <h2><span class="icon">🚀</span> Getting Started</h2>
+    <h3>1. Create Your Account</h3>
+    <div class="guideline-step">Click "Sign Up/Log In" from the homepage</div>
+    <div class="guideline-step">Fill in your MMU student details (Student ID, Name, Email)</div>
+    <div class="guideline-step">Create a secure password and verify your email</div>
+    
+    <h3>2. Complete Your Profile</h3>
+    <div class="guideline-step">Navigate to "Customize Profile" in the top menu</div>
+    <div class="guideline-step">Upload a profile picture and add your interests</div>
+    <div class="guideline-step">Select your faculty, year, and semester</div>
+    <div class="guideline-step">Write a brief bio to introduce yourself</div>
+    
+    <div class="tip-box">
+      <strong>💡 Tip:</strong> A complete profile helps you find better matches and makes others more likely to connect with you!
+    </div>
+  </div>
+
+  <div class="guideline-section">
+    <h2><span class="icon">👥</span> Finding & Connecting with Students</h2>
+    <h3>Using the Match System</h3>
+    <div class="guideline-step">Go to "Jom Gather" from the main menu</div>
+    <div class="guideline-step">Use the "Match Your Interests" feature to find compatible students</div>
+    <div class="guideline-step">Browse through profiles and click "Connect" on interesting matches</div>
+    <div class="guideline-step">Send a personalized connection request</div>
+    
+    <h3>Finding Study Partners</h3>
+    <div class="guideline-step">Use the search filters to find students in your faculty/year</div>
+    <div class="guideline-step">Look for students with similar academic interests</div>
+    <div class="guideline-step">Check their availability and study preferences</div>
+    
+    <div class="feature-highlight">
+      <strong>🎯 Pro Feature:</strong> Use the "Find Hangout Partners" section to discover students who share your hobbies and interests outside of academics!
+    </div>
+  </div>
+
+  <div class="guideline-section">
+    <h2><span class="icon">🎉</span> Creating & Joining Gatherings</h2>
+    <h3>Creating Your Own Gathering</h3>
+    <div class="guideline-step">Go to "Jom Gather" and click "Create Gathering"</div>
+    <div class="guideline-step">Choose gathering type (Study Session, Social Event, Sports, etc.)</div>
+    <div class="guideline-step">Set date, time, location, and maximum participants</div>
+    <div class="guideline-step">Write a clear description of what to expect</div>
+    <div class="guideline-step">Specify your target audience (faculty, year level, interests)</div>
+    
+    <h3>Joining Existing Gatherings</h3>
+    <div class="guideline-step">Browse available gatherings in the "Discover Events" section</div>
+    <div class="guideline-step">Read the description and requirements carefully</div>
+    <div class="guideline-step">Click "Join" if you're interested and meet the criteria</div>
+    <div class="guideline-step">Wait for the organizer's approval</div>
+    
+    <div class="tip-box">
+      <strong>💡 Tip:</strong> Be respectful of gathering requirements and show up on time if you commit to attending!
+    </div>
+  </div>
+
+  <div class="guideline-section">
+    <h2><span class="icon">💬</span> Communication & Chat</h2>
+    <h3>Messaging Connected Students</h3>
+    <div class="guideline-step">Once a connection is accepted, you can start chatting</div>
+    <div class="guideline-step">Access chats through your accepted connections</div>
+    <div class="guideline-step">Be friendly and respectful in all communications</div>
+    <div class="guideline-step">Share your contact details only when comfortable</div>
+    
+    <h3>Gathering Group Chats</h3>
+    <div class="guideline-step">Join gathering-specific group chats to coordinate with other participants</div>
+    <div class="guideline-step">Use group chat to share updates, ask questions, or get to know other members</div>
+    <div class="guideline-step">Keep conversations relevant to the gathering purpose</div>
+  </div>
+
+  <div class="guideline-section">
+    <h2><span class="icon">🔒</span> Safety & Best Practices</h2>
+    <h3>Profile Safety</h3>
+    <div class="guideline-step">Only share information you're comfortable with being public</div>
+    <div class="guideline-step">Use your real name and student ID for authenticity</div>
+    <div class="guideline-step">Report any suspicious or inappropriate behavior</div>
+    
+    <h3>Meeting in Person</h3>
+    <div class="guideline-step">Always meet new connections in public, well-lit areas</div>
+    <div class="guideline-step">Inform a friend about your plans when meeting someone new</div>
+    <div class="guideline-step">Trust your instincts - if something feels wrong, prioritize your safety</div>
+    
+    <div class="tip-box">
+      <strong>🛡️ Safety First:</strong> JomGather is designed to be a safe space for MMU students. Help us maintain this by being respectful and reporting any concerns.
+    </div>
+  </div>
+
+  <div class="guideline-section">
+    <h2><span class="icon">⚙️</span> Managing Your Experience</h2>
+    <h3>Privacy Settings</h3>
+    <div class="guideline-step">Review and update your profile visibility preferences</div>
+    <div class="guideline-step">Control who can send you connection requests</div>
+    <div class="guideline-step">Manage your notification settings</div>
+    
+    <h3>Account Management</h3>
+    <div class="guideline-step">Regularly update your interests and availability</div>
+    <div class="guideline-step">Keep your contact information current</div>
+    <div class="guideline-step">Remove or block users who make you uncomfortable</div>
+    
+    <div class="feature-highlight">
+      <strong>🎨 Customization:</strong> Make your profile stand out by regularly updating your interests, adding new photos, and keeping your bio fresh!
+    </div>
+  </div>
+
+  <div class="guideline-section">
+    <h2><span class="icon">🤝</span> Community Guidelines</h2>
+    <div class="guideline-step">Be respectful and inclusive in all interactions</div>
+    <div class="guideline-step">Keep conversations appropriate and friendly</div>
+    <div class="guideline-step">Honor your commitments to gatherings and study sessions</div>
+    <div class="guideline-step">Help create a welcoming environment for all MMU students</div>
+    <div class="guideline-step">Report any violations of community standards</div>
+    
+    <div class="tip-box">
+      <strong>🌟 Remember:</strong> JomGather is all about building positive connections and creating meaningful experiences. Be the kind of person you'd want to connect with!
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2025 MMU JomGather - Where MMU Students Connect</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+</body>
+</html> 
