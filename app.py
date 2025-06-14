@@ -589,8 +589,6 @@ def jomgather():
             
         # Sort by date (soonest first)
         all_gatherings.sort(key=lambda x: x['gathering'].date)
-
-    all_connected = all(current_user.is_connected_to(student) for student in students) if students else False
     
     return render_template('jomgather.html', 
                            students=students,
@@ -600,8 +598,7 @@ def jomgather():
                            search_performed=search_performed,
                            active_tab=active_tab,
                            my_gatherings=my_gatherings,
-                           all_gatherings=all_gatherings,
-                           all_connected=all_connected)
+                           all_gatherings=all_gatherings)
 
 @app.route('/find_students', methods=['GET', 'POST'])
 @login_required
