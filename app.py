@@ -660,6 +660,43 @@ def connect_with_user(user_id):
 def view_guidelines():
     return render_template('guidelines.html')
 
+@app.route('/connections', endpoint='view_connections')
+@login_required
+def view_connections():
+    # Get all connections where the current user is involved
+    connections_made = Connection.query.filter_by(user_id=current_user.id).all()
+    connections_received = Connection.query.filter_by(connected_user_id=current_user.id).all()
+    
+    # Get the users involved in these connections
+    connected_users = []
+    
+    for conn in connections_made:
+        user = User.query.get(conn.connected_user_id)
+        if user:
+            connected_users.append({
+                'connection_id': conn.id,
+                'user': user,
+                'status': conn.status,
+                'initiator': True,
+                'created_at': conn.created_at
+            })
+            
+    for conn in connections_received:
+        user = User.query.get(conn.user_id)
+        if user:
+            connected_users.append({
+                'connection_id': conn.id,
+                'user': user,
+                'status': conn.status,
+                'initiator': False,
+                'created_at': conn.created_at
+            })
+    
+    # Sort by most recent
+    connected_users.sort(key=lambda x: x['created_at'], reverse=True)
+    
+    return render_template('connections.html', connections=connected_users)
+
 @app.route('/connection/<int:connection_id>/accept', methods=['POST'])
 @login_required
 def accept_connection(connection_id):
@@ -668,7 +705,7 @@ def accept_connection(connection_id):
     # Ensure the current user is the one receiving the request
     if connection.connected_user_id != current_user.id:
         flash('You are not authorized to accept this connection', 'error')
-        return redirect(url_for('view_guidelines'))
+        return redirect(url_for('view_connections'))
     
     connection.status = 'accepted'
     db.session.commit()
@@ -685,13 +722,13 @@ def reject_connection(connection_id):
     # Ensure the current user is the one receiving the request
     if connection.connected_user_id != current_user.id:
         flash('You are not authorized to reject this connection', 'error')
-        return redirect(url_for('view_guidelines'))
+        return redirect(url_for('view_connections'))
     
     # Instead of marking as rejected, delete the connection
     db.session.delete(connection)
     db.session.commit()
     flash('Connection request rejected', 'success')
-    return redirect(url_for('view_guidelines'))
+    return redirect(url_for('view_connections'))
 
 @app.route('/chat/<int:user_id>')
 @login_required
@@ -707,7 +744,7 @@ def chat(user_id):
     
     if not connection or connection.status != 'accepted':
         flash('You must be connected with this user to chat', 'error')
-        return redirect(url_for('view_guidelines'))
+        return redirect(url_for('view_connections'))
     
     # Get all messages in this connection
     messages = Message.query.filter_by(connection_id=connection.id).order_by(Message.created_at).all()
@@ -794,14 +831,14 @@ def send_message(connection_id):
         if is_ajax:
             return {'error': 'You are not authorized to send messages in this chat'}, 403
         flash('You are not authorized to send messages in this chat', 'error')
-        return redirect(url_for('view_guidelines'))
+        return redirect(url_for('view_connections'))
     
     # Ensure the connection is accepted
     if connection.status != 'accepted':
         if is_ajax:
             return {'error': 'This connection has not been accepted yet'}, 400
         flash('This connection has not been accepted yet', 'error')
-        return redirect(url_for('view_guidelines'))
+        return redirect(url_for('view_connections'))
     
     # Get the message content
     content = request.form.get('message', '').strip()
