@@ -178,10 +178,17 @@
                     </div>
                   {% endif %}
                   
-                  <form action="{{ url_for('connect_with_user', user_id=student.id) }}" method="POST">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="connect-btn">Connect</button>
-                  </form>
+                  {% set connection_status = current_user.get_connection_status(student) %}
+                  {% if not connection_status %}
+                      <form action="{{ url_for('connect_with_user', user_id=student.id) }}" method="POST">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <button type="submit" class="connect-btn">Connect</button>
+                      </form>
+                  {% elif connection_status == 'pending' %}
+                      <button class="connect-btn" style="background-color: #ffa500;" disabled>Pending Connection</button>
+                  {% elif connection_status == 'accepted' %}
+                      <a href="{{ url_for('chat', user_id=student.id) }}" class="message-btn">Message</a>
+                  {% endif %}
                 </div>
               </div>
             {% endfor %}
@@ -700,21 +707,45 @@
         
         // Add tab input to all forms initially
         document.addEventListener('DOMContentLoaded', function() {
-          const activeTab = document.querySelector('.tab.active');
-          if (activeTab) {
-            const tabId = activeTab.getAttribute('data-tab-id') || 'find-partners';
-            
-            const forms = document.querySelectorAll('form');
-            forms.forEach(form => {
-              if (!form.querySelector('input[name="tab"]')) {
-                const tabInput = document.createElement('input');
-                tabInput.type = 'hidden';
-                tabInput.name = 'tab';
-                tabInput.value = tabId;
-                form.appendChild(tabInput);
-              }
+            // Handle connect button clicks
+            document.querySelectorAll('form[action^="/connect/"]').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const form = e.target;
+                    const url = form.action;
+                    const formData = new FormData(form);
+                    
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Show success message
+                            alert(data.message);
+                            // Optionally update the UI
+                            const connectBtn = form.querySelector('button[type="submit"]');
+                            if (connectBtn) {
+                                connectBtn.textContent = 'Request Sent';
+                                connectBtn.disabled = true;
+                            }
+                        } else {
+                            // Show error message
+                            alert(data.error);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('An error occurred while processing your request');
+                    }
+                });
             });
-          }
         });
 
         // Call the updateStudentCards function when the page loads

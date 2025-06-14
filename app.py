@@ -619,10 +619,14 @@ def connect_with_user(user_id):
     ).first()
     
     if existing_connection:
-        return jsonify({
-            'success': False,
-            'error': 'You already have a connection with this user'
-        })
+        if request.accept_mimetypes.accept_json:
+            return jsonify({
+                'success': False,
+                'error': 'You already have a connection with this user'
+            })
+        else:
+            flash('You already have a connection with this user', 'info')
+            return redirect(url_for('jomgather'))
     else:
         # Create a new connection
         new_connection = Connection(
@@ -633,16 +637,24 @@ def connect_with_user(user_id):
         db.session.add(new_connection)
         try:
             db.session.commit()
-            return jsonify({
-                'success': True,
-                'message': 'Connection request sent!'
-            })
+            if request.accept_mimetypes.accept_json:
+                return jsonify({
+                    'success': True,
+                    'message': 'Connection request sent!'
+                })
+            else:
+                flash('Connection request sent!', 'success')
+                return redirect(url_for('jomgather'))
         except Exception as e:
             db.session.rollback()
-            return jsonify({
-                'success': False,
-                'error': f'An error occurred: {str(e)}'
-            }), 500
+            if request.accept_mimetypes.accept_json:
+                return jsonify({
+                    'success': False,
+                    'error': f'An error occurred: {str(e)}'
+                }), 500
+            else:
+                flash(f'An error occurred: {str(e)}', 'error')
+                return redirect(url_for('jomgather'))
 
 @app.route('/connections', endpoint='view_connections')
 @login_required
