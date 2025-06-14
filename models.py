@@ -16,16 +16,15 @@ class User(UserMixin, db.Model):
     is_2fa_enabled = db.Column(db.Boolean, default=False, nullable=False)
     two_fa_secret = db.Column(db.String(32), nullable=True)
 
-    def get_connection_status(self, other_user):
-        """Check connection status between users"""
-        connection = Connection.query.filter(
-            ((Connection.user_id == self.id) & (Connection.connected_user_id == other_user.id)) |
-            ((Connection.user_id == other_user.id) & (Connection.connected_user_id == self.id))
-        ).first()
-        
-        if connection:
-            return connection.status  # returns 'pending', 'accepted', or 'rejected'
-        return None
+    def is_connected_to(self, other_user):
+        """Simpler version that checks if any connection exists"""
+        return Connection.query.filter(
+            ((Connection.user_id == self.id) & 
+            (Connection.connected_user_id == other_user.id)) |
+            ((Connection.user_id == other_user.id) & 
+            (Connection.connected_user_id == self.id))
+        ).first() is not None
+
     
     def __init__(self, student_id, username, email, password):
         self.student_id = student_id
