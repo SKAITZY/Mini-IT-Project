@@ -28,7 +28,7 @@
       </li>
       {% if current_user.is_authenticated %}
       <li class="navbar__item" role="none">
-        <a href="{{ url_for('view_connections') }}" class="navbar__links {% if request.endpoint == 'view_connections' %}active{% endif %}" role="menuitem">My Connections</a>
+        <a href="{{ url_for('view_guidelines') }}" class="navbar__links {% if request.endpoint == 'view_guidelines' %}active{% endif %}" role="menuitem">Guidelines</a>
       </li>
       <li class="navbar__btn" role="none">
         <a href="{{ url_for('logout') }}" class="button" role="menuitem">Logout</a>
@@ -55,7 +55,7 @@
   {% endwith %}
 
   <div class="chat-container">
-    <a href="{{ url_for('view_connections') }}" class="back-to-connections">← Back to Connections</a>
+    <a href="{{ url_for('view_guidelines') }}" class="back-to-connections">← Back to Guidelines</a>
     
     <div class="chat-header">
       <div class="chat-user-avatar">
@@ -109,10 +109,186 @@
   </div>
 
   <script>
-    // Scroll to bottom of chat history on page load
+    let lastMessageTimestamp = null;
+    let isPolling = false;
+    const connectionId = {{ connection.id }};
+    const currentUserId = {{ current_user.id }};
+    
+    // Real-time chat functionality
     document.addEventListener('DOMContentLoaded', function() {
       const chatHistory = document.getElementById('chat-history');
+      const chatForm = document.querySelector('.chat-form');
+      const messageInput = document.querySelector('.chat-input');
+      
+      // Scroll to bottom of chat history on page load
+      scrollToBottom();
+      
+      // Get the timestamp of the last message for polling
+      const lastMessage = chatHistory.querySelector('.message:last-child');
+      if (lastMessage) {
+        const timeElement = lastMessage.querySelector('.message-time');
+        if (timeElement) {
+          // Extract timestamp from the last message (this is a simple approach)
+          lastMessageTimestamp = new Date().toISOString();
+        }
+      }
+      
+      // Start polling for new messages
+      startMessagePolling();
+      
+      // Handle form submission with AJAX
+      chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        sendMessage();
+      });
+      
+      // Handle Enter key press
+      messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+    });
+    
+    function scrollToBottom() {
+      const chatHistory = document.getElementById('chat-history');
       chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+    
+    function startMessagePolling() {
+      if (isPolling) return;
+      isPolling = true;
+      
+      // Poll for new messages every 2 seconds
+      setInterval(function() {
+        fetchNewMessages();
+      }, 2000);
+    }
+    
+    function fetchNewMessages() {
+      let url = `/api/chat/${connectionId}/messages`;
+      if (lastMessageTimestamp) {
+        url += `?last_timestamp=${encodeURIComponent(lastMessageTimestamp)}`;
+      }
+      
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.messages && data.messages.length > 0) {
+            displayNewMessages(data.messages);
+            // Update the last message timestamp
+            const lastMsg = data.messages[data.messages.length - 1];
+            lastMessageTimestamp = lastMsg.created_at;
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching messages:', error);
+        });
+    }
+    
+    function displayNewMessages(messages) {
+      const chatHistory = document.getElementById('chat-history');
+      const noMessages = chatHistory.querySelector('.no-messages');
+      
+      // Remove the "no messages" placeholder if it exists
+      if (noMessages) {
+        noMessages.remove();
+      }
+      
+      messages.forEach(message => {
+        const messageRow = document.createElement('div');
+        messageRow.className = `message-row ${message.is_current_user ? 'sent' : 'received'}`;
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${message.is_current_user ? 'sent' : 'received'}`;
+        
+        // Format timestamp
+        const messageTime = new Date(message.created_at);
+        messageTime.setHours(messageTime.getHours() + 8); // Convert to GMT+8
+        const timeString = messageTime.toLocaleString('en-GB', {
+          hour: '2-digit',
+          minute: '2-digit',
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        }).replace(',', ' |') + ' (GMT+8)';
+        
+        messageDiv.innerHTML = `
+          ${message.content}
+          <div class="message-time">${timeString}</div>
+        `;
+        
+        messageRow.appendChild(messageDiv);
+        chatHistory.appendChild(messageRow);
+      });
+      
+      // Scroll to bottom to show new messages
+      scrollToBottom();
+    }
+    
+    function sendMessage() {
+      const messageInput = document.querySelector('.chat-input');
+      const message = messageInput.value.trim();
+      
+      if (!message) return;
+      
+      // Disable the input while sending
+      messageInput.disabled = true;
+      
+      // Prepare form data
+      const formData = new FormData();
+      formData.append('message', message);
+      
+      // Send the message via AJAX
+      fetch(`/chat/${connectionId}/send`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Clear the input
+          messageInput.value = '';
+          
+          // Add the sent message immediately to the chat
+          displayNewMessages([data.message]);
+          lastMessageTimestamp = data.message.created_at;
+        } else {
+          alert('Error sending message: ' + (data.error || 'Unknown error'));
+        }
+      })
+      .catch(error => {
+        console.error('Error sending message:', error);
+        alert('Error sending message. Please try again.');
+      })
+      .finally(() => {
+        // Re-enable the input
+        messageInput.disabled = false;
+        messageInput.focus();
+      });
+    }
+    
+    // Show typing indicator when user is typing (optional enhancement)
+    let typingTimer;
+    document.querySelector('.chat-input').addEventListener('input', function() {
+      clearTimeout(typingTimer);
+      // Could add typing indicator here
+      typingTimer = setTimeout(function() {
+        // User stopped typing
+      }, 1000);
+    });
+    
+    // Pause polling when page is not visible to save resources
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        isPolling = false;
+      } else if (!isPolling) {
+        startMessagePolling();
+      }
     });
 
   </script>

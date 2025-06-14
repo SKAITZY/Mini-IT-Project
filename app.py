@@ -668,7 +668,7 @@ def accept_connection(connection_id):
     # Ensure the current user is the one receiving the request
     if connection.connected_user_id != current_user.id:
         flash('You are not authorized to accept this connection', 'error')
-        return redirect(url_for('view_connections'))
+        return redirect(url_for('view_guidelines'))
     
     connection.status = 'accepted'
     db.session.commit()
@@ -685,13 +685,13 @@ def reject_connection(connection_id):
     # Ensure the current user is the one receiving the request
     if connection.connected_user_id != current_user.id:
         flash('You are not authorized to reject this connection', 'error')
-        return redirect(url_for('view_connections'))
+        return redirect(url_for('view_guidelines'))
     
     # Instead of marking as rejected, delete the connection
     db.session.delete(connection)
     db.session.commit()
     flash('Connection request rejected', 'success')
-    return redirect(url_for('view_connections'))
+    return redirect(url_for('view_guidelines'))
 
 @app.route('/chat/<int:user_id>')
 @login_required
@@ -707,7 +707,7 @@ def chat(user_id):
     
     if not connection or connection.status != 'accepted':
         flash('You must be connected with this user to chat', 'error')
-        return redirect(url_for('view_connections'))
+        return redirect(url_for('view_guidelines'))
     
     # Get all messages in this connection
     messages = Message.query.filter_by(connection_id=connection.id).order_by(Message.created_at).all()
@@ -726,6 +726,61 @@ def chat(user_id):
     
     return render_template('chat.html', other_user=other_user, connection=connection, messages=messages)
 
+@app.route('/api/chat/<int:connection_id>/messages')
+@login_required
+def get_chat_messages(connection_id):
+    """API endpoint to get new messages for real-time chat"""
+    connection = Connection.query.get_or_404(connection_id)
+    
+    # Ensure the current user is part of this connection
+    if connection.user_id != current_user.id and connection.connected_user_id != current_user.id:
+        return {'error': 'Unauthorized'}, 403
+    
+    # Get the last message timestamp from query parameter
+    last_timestamp = request.args.get('last_timestamp')
+    
+    if last_timestamp:
+        try:
+            from datetime import datetime
+            last_dt = datetime.fromisoformat(last_timestamp.replace('Z', '+00:00'))
+            # Get messages newer than the last timestamp
+            messages = Message.query.filter(
+                Message.connection_id == connection_id,
+                Message.created_at > last_dt
+            ).order_by(Message.created_at).all()
+        except ValueError:
+            # If timestamp is invalid, get all messages
+            messages = Message.query.filter_by(connection_id=connection_id).order_by(Message.created_at).all()
+    else:
+        # Get all messages if no timestamp provided
+        messages = Message.query.filter_by(connection_id=connection_id).order_by(Message.created_at).all()
+    
+    # Mark new messages from other user as read
+    other_user_id = connection.connected_user_id if connection.user_id == current_user.id else connection.user_id
+    unread_messages = Message.query.filter_by(
+        connection_id=connection_id,
+        sender_id=other_user_id,
+        is_read=False
+    ).all()
+    
+    for msg in unread_messages:
+        msg.is_read = True
+    
+    db.session.commit()
+    
+    # Convert messages to JSON format
+    messages_data = []
+    for msg in messages:
+        messages_data.append({
+            'id': msg.id,
+            'content': msg.content,
+            'sender_id': msg.sender_id,
+            'created_at': msg.created_at.isoformat(),
+            'is_current_user': msg.sender_id == current_user.id
+        })
+    
+    return {'messages': messages_data}
+
 @app.route('/chat/<int:connection_id>/send', methods=['POST'])
 @login_required
 def send_message(connection_id):
@@ -733,18 +788,24 @@ def send_message(connection_id):
     
     # Ensure the current user is part of this connection
     if connection.user_id != current_user.id and connection.connected_user_id != current_user.id:
+        if request.is_json or request.headers.get('Content-Type') == 'application/json':
+            return {'error': 'You are not authorized to send messages in this chat'}, 403
         flash('You are not authorized to send messages in this chat', 'error')
-        return redirect(url_for('view_connections'))
+        return redirect(url_for('view_guidelines'))
     
     # Ensure the connection is accepted
     if connection.status != 'accepted':
+        if request.is_json or request.headers.get('Content-Type') == 'application/json':
+            return {'error': 'This connection has not been accepted yet'}, 400
         flash('This connection has not been accepted yet', 'error')
-        return redirect(url_for('view_connections'))
+        return redirect(url_for('view_guidelines'))
     
     # Get the message content
     content = request.form.get('message', '').strip()
     
     if not content:
+        if request.is_json or request.headers.get('Content-Type') == 'application/json':
+            return {'error': 'Message cannot be empty'}, 400
         flash('Message cannot be empty', 'error')
         
         # Determine which user to redirect to for the chat
@@ -761,7 +822,20 @@ def send_message(connection_id):
     db.session.add(new_message)
     db.session.commit()
     
-    # Determine which user to redirect to for the chat
+    # If it's an AJAX request, return JSON response
+    if request.is_json or request.headers.get('Content-Type') == 'application/json':
+        return {
+            'success': True,
+            'message': {
+                'id': new_message.id,
+                'content': new_message.content,
+                'sender_id': new_message.sender_id,
+                'created_at': new_message.created_at.isoformat(),
+                'is_current_user': True
+            }
+        }
+    
+    # Determine which user to redirect to for the chat (for non-AJAX requests)
     other_user_id = connection.connected_user_id if connection.user_id == current_user.id else connection.user_id
     return redirect(url_for('chat', user_id=other_user_id))
 

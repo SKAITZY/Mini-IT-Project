@@ -31,7 +31,7 @@
       </li>
       {% if current_user.is_authenticated %}
       <li class="navbar__item" role="none">
-        <a href="{{ url_for('view_connections') }}" class="navbar__links {% if request.endpoint == 'view_connections' %}active{% endif %}" role="menuitem">My Connections</a>
+        <a href="{{ url_for('view_guidelines') }}" class="navbar__links {% if request.endpoint == 'view_guidelines' %}active{% endif %}" role="menuitem">Guidelines</a>
       </li>
       <li class="navbar__btn" role="none">
         <a href="{{ url_for('logout') }}" class="button" role="menuitem">Logout</a>

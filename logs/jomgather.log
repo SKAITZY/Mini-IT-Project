@@ -1,0 +1,5 @@
+2025-06-12 13:18:48,747 INFO: JomGather startup [in C:\Users\Keong\Documents\Projects\Mini-IT-Project\app.py:130]
+2025-06-12 13:18:48,766 INFO: Database tables created successfully [in C:\Users\Keong\Documents\Projects\Mini-IT-Project\app.py:139]
+2025-06-12 13:18:48,767 INFO: Creating test user for in-memory database [in C:\Users\Keong\Documents\Projects\Mini-IT-Project\app.py:143]
+2025-06-12 13:18:49,018 INFO: Created test user with ID 1 [in C:\Users\Keong\Documents\Projects\Mini-IT-Project\app.py:154]
+2025-06-12 13:18:49,021 INFO: Created customization for test user [in C:\Users\Keong\Documents\Projects\Mini-IT-Project\app.py:167]

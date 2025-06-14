@@ -484,7 +484,7 @@
         </li>
         {% if current_user.is_authenticated %}
         <li class="navbar__item">
-          <a href="{{ url_for('view_connections') }}" class="navbar__links">My Connections</a>
+                          <a href="{{ url_for('view_guidelines') }}" class="navbar__links">Guidelines</a>
         </li>
         <li class="navbar__btn">
           <a href="{{ url_for('logout') }}" class="button">Logout</a>
@@ -1041,6 +1041,6 @@
     </div>
   
   <script src="{{ url_for('static', filename='js/common.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/sound.js') }}"></script>
+  
 </body>
 </html>
