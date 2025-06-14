@@ -141,6 +141,9 @@
       event.currentTarget.classList.add('active');
     }
 
+  </script>
+
+  <script>
     // Mobile menu toggle
     const menu = document.querySelector('#mobile-menu');
     const menuLinks = document.querySelector('.navbar__menu');
@@ -151,6 +154,17 @@
         menuLinks.classList.toggle('active');
       });
     }
+
+            // Mobile menu toggle
+        const menu = document.querySelector('#mobile-menu');
+        const menuLinks = document.querySelector('.navbar__menu');
+
+        if (menu) {
+          menu.addEventListener('click', function() {
+            menu.classList.toggle('is-active');
+            menuLinks.classList.toggle('active');
+          });
+        }
   </script>
 
   <script src="{{ url_for('static', filename='js/common.js') }}"></script>
