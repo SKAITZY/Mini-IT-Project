@@ -236,9 +236,13 @@
       // Disable the input while sending
       messageInput.disabled = true;
       
+      // Get CSRF token from the form
+      const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+      
       // Prepare form data
       const formData = new FormData();
       formData.append('message', message);
+      formData.append('csrf_token', csrfToken);
       
       // Send the message via AJAX
       fetch(`/chat/${connectionId}/send`, {

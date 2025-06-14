@@ -786,16 +786,19 @@ def get_chat_messages(connection_id):
 def send_message(connection_id):
     connection = Connection.query.get_or_404(connection_id)
     
+    # Check if this is an AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
     # Ensure the current user is part of this connection
     if connection.user_id != current_user.id and connection.connected_user_id != current_user.id:
-        if request.is_json or request.headers.get('Content-Type') == 'application/json':
+        if is_ajax:
             return {'error': 'You are not authorized to send messages in this chat'}, 403
         flash('You are not authorized to send messages in this chat', 'error')
         return redirect(url_for('view_guidelines'))
     
     # Ensure the connection is accepted
     if connection.status != 'accepted':
-        if request.is_json or request.headers.get('Content-Type') == 'application/json':
+        if is_ajax:
             return {'error': 'This connection has not been accepted yet'}, 400
         flash('This connection has not been accepted yet', 'error')
         return redirect(url_for('view_guidelines'))
@@ -804,7 +807,7 @@ def send_message(connection_id):
     content = request.form.get('message', '').strip()
     
     if not content:
-        if request.is_json or request.headers.get('Content-Type') == 'application/json':
+        if is_ajax:
             return {'error': 'Message cannot be empty'}, 400
         flash('Message cannot be empty', 'error')
         
@@ -823,7 +826,7 @@ def send_message(connection_id):
     db.session.commit()
     
     # If it's an AJAX request, return JSON response
-    if request.is_json or request.headers.get('Content-Type') == 'application/json':
+    if is_ajax:
         return {
             'success': True,
             'message': {
